@@ -589,7 +589,7 @@ function makeCore(store) {
       ads: rows('Ads').filter(function (a) { return on(a.active === '' ? true : a.active); }).map(function (a) { return { name: a.name, channel: a.channel }; }),
       stockPick: rows('Stock').filter(function (x) { return x.branch === u.branch; }).map(function (x) { return { code: String(x.code), name: String(x.name), unit: String(x.unit || ''), category: String(x.category || '') }; }),
       bom: rows('BOM').reduce(function (m, x) { (m[x.item] = m[x.item] || []).push({ stock: x.stock, qty: num(x.qty) }); return m; }, {}),
-      branches: branchesPublic(),
+      branches: branchesPublic(), lateGrace: num(setting('lateGraceMin', 5)),
       open: (br && br.open) || setting('open', '10:00'), close: (br && br.close) || setting('close', '20:00'),
       gps: !!(br && num(br.lat) && num(br.lng)), radius: num(br && br.radius) || 150, tabletMe: on(setting('tabletMe', 'ไม่')), emailReceipts: on(setting('emailReceipts', 'ไม่')), paper: String(setting('receiptPaper', '80')).indexOf('58') >= 0 ? 58 : 80, autoPrint: on(setting('autoPrintReceipt', 'ใช่'))
     };
@@ -1648,6 +1648,51 @@ function makeCore(store) {
     var row = rows('Attendance').filter(function (a) { return a.staff === u.code && a.date === today(); }).slice(-1)[0];
     return { today: today(), now: hm(), attendance: clean(row), shift: (function () { var s = find('Staff', 'code', u.code); return s ? { in: s.shiftIn, out: s.shiftOut } : {}; })() };
   };
+
+  /* ---------- เข้า-ออกงานพนักงาน (ผู้จัดการเห็นสาขาตัวเอง · บัญชี/เจ้าของเห็นทุกสาขา · แก้ได้เฉพาะบัญชี) ---------- */
+  var TH_DAY = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
+  function isDayOff(st, d) { var w = TH_DAY[new Date(d + 'T00:00:00Z').getUTCDay()], off = String(st.dayOff || ''); return !!off && (off.indexOf(w) >= 0 || (w === 'พฤหัส' && off.indexOf('พฤหัสบดี') >= 0)); }
+  A.attReport = function (p, u) {
+    var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today(), inB = has(u, ['account', 'owner', 'admin']) ? scopeFn(p.scope || 'ALL', u) : function (b) { return b === u.branch; };
+    var staff = rows('Staff').filter(function (x) { return on(x.active) && inB(String(x.branch)); }), byCode = {};
+    staff.forEach(function (x) { byCode[String(x.code)] = x; });
+    var list = rows('Attendance').filter(function (a) { return a.date >= from && a.date <= to && (inB(String(a.branch)) || byCode[String(a.staff)]); }).map(function (a) {
+      var o = clean(a), st = byCode[String(a.staff)]; o.nick = st ? String(st.nick || st.name) : String(a.name || a.staff);
+      o.hours = a.out ? r2((toMin(a.out) - toMin(a.in)) / 60) : 0; o.early = st && st.shiftOut && a.out && toMin(a.out) < toMin(st.shiftOut) ? toMin(st.shiftOut) - toMin(a.out) : 0; return o; });
+    var sum1 = {};
+    list.forEach(function (a) { var k = String(a.staff), x = sum1[k] = sum1[k] || { code: k, nick: a.nick, branch: a.branch, days: 0, late: 0, lateMin: 0, hours: 0, noOut: 0, early: 0 };
+      x.days++; if (num(a.late) > 0) { x.late++; x.lateMin += num(a.late); } x.hours = r2(x.hours + a.hours); if (!a.out && a.date < today()) x.noOut++; if (a.early) x.early++; });
+    staff.forEach(function (st) { var k = String(st.code); if (!sum1[k]) sum1[k] = { code: k, nick: String(st.nick || st.name), branch: String(st.branch), days: 0, late: 0, lateMin: 0, hours: 0, noOut: 0, early: 0 }; sum1[k].role = rolesOf(st).join(' '); sum1[k].shift = st.shiftIn ? st.shiftIn + '–' + (st.shiftOut || '') : ''; sum1[k].partTime = on(st.partTime); });
+    var board = null, d = today();
+    if (from <= d && d <= to) {
+      var tr = {}; list.filter(function (a) { return a.date === d; }).forEach(function (a) { tr[String(a.staff)] = a; });
+      board = staff.filter(function (st) { return !on(st.partTime) || tr[String(st.code)]; }).map(function (st) {
+        var a = tr[String(st.code)], off = isDayOff(st, d), due = st.shiftIn && toMin(hm()) > toMin(st.shiftIn) + num(setting('lateGraceMin', 5));
+        return { code: String(st.code), nick: String(st.nick || st.name), branch: String(st.branch), shift: st.shiftIn ? st.shiftIn + '–' + (st.shiftOut || '') : '',
+          state: a ? (a.out ? 'OUT' : 'IN') : off ? 'OFF' : !st.shiftIn ? 'NOSHIFT' : st.shiftOut && toMin(hm()) > toMin(st.shiftOut) ? 'ABSENT' : due ? 'MISSING' : 'NOTYET', in: a ? a.in : '', out: a ? a.out : '', late: a ? num(a.late) : 0, dist: a ? a.inDist : '', gps: a ? a.inGps : '' };
+      }).sort(function (x, y) { var o = { ABSENT: 0, MISSING: 1, IN: 2, NOTYET: 3, OUT: 4, NOSHIFT: 5, OFF: 6 }; return o[x.state] - o[y.state]; });
+    }
+    return { from: from, to: to, canFix: has(u, ['account']), board: board, people: Object.keys(sum1).map(function (k) { return sum1[k]; }).sort(function (a, b) { return String(a.branch).localeCompare(String(b.branch)) || b.days - a.days; }),
+      rows: list.sort(function (a, b) { return a.date === b.date ? (a.in < b.in ? -1 : 1) : (a.date < b.date ? 1 : -1); }) };
+  };
+  A.attFix = function (p, u) {
+    var why = txt(p.reason, 200); if (!why) err('ใส่เหตุผลที่แก้');
+    var tIn = txt(p.in, 5), tOut = txt(p.out, 5), re = /^\d{1,2}:\d{2}$/;
+    if (tIn && !re.test(tIn) || tOut && !re.test(tOut)) err('เวลาให้ใส่แบบ 09:30'); if (tIn && tOut && toMin(tOut) <= toMin(tIn)) err('เวลาออกต้องหลังเวลาเข้า');
+    var row = p.id ? find('Attendance', 'id', txt(p.id)) : null, note = 'แก้โดย ' + u.name + ' ' + stamp() + ': ' + why;
+    if (row) {
+      var st = find('Staff', 'code', row.staff), pt = { note: (row.note ? row.note + ' · ' : '') + note + ' (เดิม ' + (row.in || '-') + '–' + (row.out || '-') + ')' };
+      if (tIn) { pt.in = tIn; pt.late = st && st.shiftIn ? Math.max(0, toMin(tIn) - toMin(st.shiftIn)) : 0; if (pt.late <= num(setting('lateGraceMin', 5))) pt.late = 0; }
+      if (p.out !== undefined) pt.out = tOut;
+      upd('Attendance', row, pt); log(u, 'attFix', row.id + ' ' + why); return { ok: true };
+    }
+    var s2 = find('Staff', 'code', txt(p.staff)); if (!s2) err('ไม่พบพนักงาน'); if (!isDate(p.date)) err('ใส่วันที่'); if (!tIn) err('ใส่เวลาเข้า');
+    if (rows('Attendance').some(function (a) { return a.staff === String(s2.code) && a.date === p.date; })) err('วันนั้นมีบันทึกอยู่แล้ว — แก้แถวเดิม');
+    var late = s2.shiftIn ? Math.max(0, toMin(tIn) - toMin(s2.shiftIn)) : 0; if (late <= num(setting('lateGraceMin', 5))) late = 0;
+    add('Attendance', { id: nextId('AT', 'seq_AT', 7), staff: String(s2.code), name: s2.name, branch: String(s2.branch), date: p.date, in: tIn, out: tOut, late: late, inPhoto: '', outPhoto: '', note: 'เพิ่มย้อนหลัง · ' + note, inGps: '', inDist: '', inAcc: '', outGps: '', outDist: '', outAcc: '' });
+    log(u, 'attFix', s2.code + ' ' + p.date + ' ' + why); return { ok: true };
+  };
+  PERM.attReport = ['manager', 'account']; PERM.attFix = ['account']; WRITES.attFix = 1;
 
   // ค่ามือ/DF/ค่าคอม ของทุกคนในช่วงวันที่ (ใช้ทั้งหน้าพนักงาน หน้า Owner และบัญชี)
   function earnings(from, to, branchFilter) {
@@ -2719,6 +2764,7 @@ var TILES = [
   { k: 'myleads', t: 'ลีดของฉัน', s: 'ใครมาแล้ว ซื้อเท่าไร', ic: 'list', r: ['adminpage', 'marketing'] },
   { k: 'owner', t: 'ภาพรวมธุรกิจ', s: 'ยอดขาย · กำไร · เทียบช่วงก่อน', ic: 'chart', r: ['account', 'manager'], hero: 1 },
   { k: 'income', t: 'รายรับ', s: 'วัน · เดือน · ปี · แยกช่องทาง · แก้รายการคีผิด', ic: 'cash', r: ['account', 'manager'] },
+  { k: 'att', t: 'เข้า-ออกงาน', s: 'ใครมาแล้ว · สาย · ลืมเช็คเอาท์', ic: 'user', r: ['account', 'manager'] },
   { k: 'fees', t: 'จ่ายพนักงาน', s: 'เงินเดือน · DF · ค่ามือ · ค่าคอม', ic: 'coin', r: ['account', 'manager'] },
   { k: 'promos', t: 'จัดการโปร', s: 'โปรรายเดือน S/M/L · ราคาแต่ละสาขา', ic: 'mega', r: ['marketing', 'manager'] },
   { k: 'mkt', t: 'ส่งออกข้อมูลยิงแอด', s: 'Audience · Offline conversion', ic: 'mega', r: ['marketing', 'account'] },
