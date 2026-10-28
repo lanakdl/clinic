@@ -326,7 +326,7 @@ var SCHEMA = {
                ['lineId','LINE (ผูกแล้ว — ลบเพื่อผูกใหม่)'],['lineName','ชื่อ LINE'],['lineAt','ผูก LINE เมื่อ','t']],
   Items:      [['code','รหัสรายการ'],['name','ชื่อรายการ'],['category','หมวด'],['type','ประเภท'],['performer','ผู้ทำ'],
                ['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
-               ['dfPct','DF แพทย์ %','n'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['sessions','จำนวนครั้ง (คอร์ส)','n'],['validDays','อายุคอร์ส (วัน)','n'],
+               ['dfPct','DF แพทย์ %','n'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['prepFee','ค่ามือตอนเตรียมให้หมอ (บาท/ครั้ง)','n'],['scrubFee','ค่ามือ Scrub (บาท/เคส)','n'],['circFee','ค่ามือ Circulating (บาท/เคส)','n'],['sessions','จำนวนครั้ง (คอร์ส)','n'],['validDays','อายุคอร์ส (วัน)','n'],
                ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว']],
   CourseItems:[['course','รหัสคอร์ส'],['courseName','ชื่อคอร์ส'],['item','รหัสรายการที่ใช้ได้'],['itemName','ชื่อรายการ'],['sessions','จำนวนครั้ง','n']],
   Promos:     [['code','รหัสโปร'],['name','ชื่อโปร'],['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
@@ -355,7 +355,7 @@ var SCHEMA = {
   OPD:        [['vn','VN'],['hn','HN'],['doctor','แพทย์'],['cc','CC'],['pi','PI'],['pe','PE'],['dx','Dx'],['plan','แผนการรักษา'],['followDays','นัดติดตาม (วัน)','n'],['signed','ลงนามโดย'],['signedAt','ลงนามเมื่อ','t'],['time','บันทึกเมื่อ','t']],
   Orders:     [['id','เลขรายการ'],['vn','VN'],['item','รหัส'],['name','รายการ'],['type','ประเภท'],['category','หมวด'],['qty','จำนวน','n'],['price','ราคา/หน่วย','n'],['disc','ส่วนลด','n'],['total','รวม','n'],
                ['paidNet','รับจริง (หลังลดท้ายบิล)','n'],['cashNet','รับเป็นเงินจริง (ไม่รวมวงเงิน)','n'],['upsell','อัพเซล','b'],['seller','ผู้ขาย'],['adminShare','ยอดของแอดมิน (ปิดจากเพจ)','n'],['voidOf','จากบิลที่ยกเลิก'],['adminBy','แอดมินที่ปิด'],['receipt','ใบเสร็จ'],['status','สถานะ'],['courseRef','ใช้คอร์ส'],['promo','โปร'],['choice','ตัวเลือก'],
-               ['perVal','มูลค่าต่อครั้ง','n'],['dfPct','DF %','n'],['staffFee','ค่ามือพนักงาน','n'],['dfFixed','DF บาท/ครั้ง','n'],['doctor','แพทย์ผู้ทำ'],['staffs','พนักงานผู้ทำ'],
+               ['perVal','มูลค่าต่อครั้ง','n'],['dfPct','DF %','n'],['staffFee','ค่ามือพนักงาน','n'],['prepFee','ค่ามือตอนเตรียม','n'],['scrub','Scrub'],['circ','Circulating'],['scrubFee','ค่ามือ Scrub','n'],['circFee','ค่ามือ Circulating','n'],['dfFixed','DF บาท/ครั้ง','n'],['doctor','แพทย์ผู้ทำ'],['staffs','พนักงานผู้ทำ'],
                ['opNote','Operative note'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
   Courses:    [['id','เลขคอร์ส'],['hn','HN'],['name','ชื่อ'],['src','รหัสที่ซื้อ'],['srcName','ซื้อจาก'],['item','รหัสบริการ'],['itemName','บริการ'],['total','ทั้งหมด','n'],['used','ใช้แล้ว','n'],
                ['perVal','ราคาจริงต่อครั้ง','n'],['dfPct','DF %','n'],['dfFixed','DF บาท/ครั้ง','n'],['expire','หมดอายุ'],['status','สถานะ'],['receipt','ใบเสร็จ'],['branch','สาขาที่ซื้อ'],
@@ -882,6 +882,7 @@ function makeCore(store) {
     var os = ordersOf(v.vn).map(function (o) {
       var c = clean(o), it = itemByCode(o.item);
       c.performer = it ? perfOf(it) : 'doctor';
+      c.orTeam = !!it && (num(it.scrubFee) > 0 || num(it.circFee) > 0 || String(setting('surgCategories', 'ผ่าตัด,ศัลยกรรม')).split(/\s*,\s*/).indexOf(String(it.category)) >= 0 && typeOf(it) === 'proc');
       c.bom = (bomM[o.item] || []).map(function (b) { return { stock: b.stock, name: (st[b.stock] || {}).name || b.stock, unit: (st[b.stock] || {}).unit || '', qty: b.qty * num(o.qty) }; });
       c.used = usedOf(o); c.fixable = o.status === 'DONE' && !on(o.stockPending) && String(o.doneAt).slice(0, 10) >= addDays(today(), -num(setting('supplyFixDays', 7)));
       c.fixes = rows('SupplyEdits').filter(function (e) { return e.order === o.id; }).map(clean);
@@ -1044,6 +1045,7 @@ function makeCore(store) {
     if ((perf === 'staff' || perf === 'both') && !staffs.length) err('เลือกพนักงานผู้ทำ');
     if (perf === 'either' && !doc && !staffs.length) err('เลือกผู้ทำ');
     if (doc) { var ds = find('Staff', 'code', doc); if (!ds || rolesOf(ds).indexOf('doctor') < 0) err('ผู้ทำที่เลือกไม่ใช่แพทย์'); }
+    var team = function (a) { return (a || []).map(String).filter(function (c) { return c && find('Staff', 'code', c); }); }, scrub = team(p.scrub), circ = team(p.circ);
     var need = {}, later = !!p.stockLater || u.partTime;
     if (!later) (p.supplies || []).forEach(function (s) { if (s.stock && num(s.qty) > 0) need[s.stock] = r2((need[s.stock] || 0) + num(s.qty)); });
     var hasBom = rows('BOM').some(function (b) { return String(b.item) === String(o.item); });
@@ -1051,7 +1053,7 @@ function makeCore(store) {
     var who = Object.keys(need).length ? byPin(p, u) : null;
     var lots = issue(u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
     upd('Orders', o, { stockPending: later && hasBom, status: 'DONE', doctor: doc, staffs: staffs.join(' '), opNote: txt(p.opNote, 2000), lot: txt(p.lot, 120) || lots.join(', '), doneAt: stamp(),
-      dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(it && it.staffFee) : num(o.staffFee) });
+      dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(it && it.staffFee) : num(o.staffFee), prepFee: it && !blank(it.prepFee) ? num(it.prepFee) : '', scrub: scrub.join(' '), circ: circ.join(' '), scrubFee: num(it && it.scrubFee), circFee: num(it && it.circFee) });
     log(u, 'completeOrder', o.id + ' ' + o.name + ' แพทย์ ' + (doc || '-') + ' พนักงาน ' + (staffs.join(',') || '-'));
     return true;
   };
@@ -1172,7 +1174,7 @@ function makeCore(store) {
     var x = find('Items', 'code', txt(p.code)); if (!x || !x.addedBy) err('ไม่พบรายการ');
     var pt = { reviewed: 'ใช่' };
     if (p.disable) pt.active = false;
-    ['dfPct', 'staffFee'].forEach(function (k) { if (p[k] !== undefined && p[k] !== '') pt[k] = num(p[k]); });
+    ['dfPct', 'staffFee', 'prepFee'].forEach(function (k) { if (p[k] !== undefined && p[k] !== '') pt[k] = num(p[k]); });
     if (p.name) pt.name = txt(p.name, 80); if (p.category) pt.category = txt(p.category, 40);
     upd('Items', x, pt); log(u, 'itemReview', x.code + (p.disable ? ' ปิด' : ' ok')); return { ok: true };
   };
@@ -1705,9 +1707,11 @@ function makeCore(store) {
         var d = String(o.doneAt).slice(0, 10); if (d < from || d > to) return;
         var per = num(o.perVal) || (o.receipt ? r2(num(o.paidNet) / Math.max(1, num(o.qty))) : r2(num(o.total) / Math.max(1, num(o.qty))));
         var df = num(o.dfFixed) ? r2(num(o.dfFixed) * num(o.qty)) : r2(per * num(o.qty) * num(o.dfPct) / 100);
-        var staffs = String(o.staffs || '').split(' ').filter(String), fee = r2(num(o.staffFee) * num(o.qty));
+        var staffs = String(o.staffs || '').split(' ').filter(String), prep = !!o.doctor && !blank(o.prepFee), fee = r2((prep ? num(o.prepFee) : num(o.staffFee)) * num(o.qty));
         if (o.doctor) { var pd = P(o.doctor); pd.df = r2(pd.df + df); pd.cases++; items.push({ who: o.doctor, kind: 'DF', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: per, pct: num(o.dfPct), amount: df, estimated: !o.receipt && !o.courseRef }); }
-        staffs.forEach(function (s) { var ps = P(s), share = r2(fee / staffs.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: 'ค่ามือ', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share }); });
+        [['scrub', 'scrubFee', 'Scrub'], ['circ', 'circFee', 'Circulating']].forEach(function (k) { var ls = String(o[k[0]] || '').split(' ').filter(String), tot = r2(num(o[k[1]]) * num(o.qty)); if (!ls.length || !(tot > 0)) return;
+          ls.forEach(function (s) { var ps = P(s), share = r2(tot / ls.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: 'ค่ามือ ' + k[2], date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share }); }); });
+        staffs.forEach(function (s) { var ps = P(s), share = r2(fee / staffs.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: prep ? 'ค่ามือ (เตรียมให้หมอ)' : 'ค่ามือ', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share }); });
       }
     });
     /* ---- ค่าคอมเซล / ผู้จัดการ / ค่าบริหาร (คิดรายเดือน) ---- */
