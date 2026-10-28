@@ -262,6 +262,12 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   body{background:#fff!important}
 }
 
+/* Beam QR */
+.bq-img{width:min(300px,72vw);aspect-ratio:1;max-width:100%;display:block;border-radius:12px;background:#fff;padding:6px}
+.bq-img svg{width:100%;height:100%;display:block}
+.bq-url{font-size:.75rem;word-break:break-all;max-width:100%}
+.bq-amt{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums}
+
 /* ===== แอพพนักงานใน LINE ===== */
 .lx{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px calc(96px + env(safe-area-inset-bottom,0px))}
 .lx-splash{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding-inline:16px}
@@ -315,7 +321,7 @@ var SCHEMA = {
   Rooms:      [['branch','สาขา'],['name','ชื่อห้อง/เตียง'],['type','ประเภท'],['machine','เครื่องประจำห้อง'],['active','ใช้งาน','b']],
   Staff:      [['code','รหัสพนักงาน'],['name','ชื่อ-สกุล'],['nick','ชื่อเล่น'],['role','บทบาท'],['role2','บทบาทที่ 2'],['branch','สาขาหลัก'],
                ['branches','สาขาที่เข้าได้ (ว่าง=ทุกสาขา)'],['phone','เบอร์โทร'],['email','อีเมล'],['license','เลขใบประกอบวิชาชีพ'],['pin','รหัสเข้าระบบ'],
-               ['shiftIn','เวลาเข้างาน'],['shiftOut','เวลาออกงาน'],['dayOff','วันหยุดประจำ'],['commPct','ค่าคอม %','n'],['partTime','แพทย์ Part-time (ไม่ยุ่งสต้อก)','b'],['active','ใช้งาน','b'],['sign','ลายเซ็น (Drive)'],
+               ['shiftIn','เวลาเข้างาน'],['shiftOut','เวลาออกงาน'],['dayOff','วันหยุดประจำ'],['commPct','ค่าคอม %','n'],['salary','เงินเดือน (บาท/เดือน)','n'],['partTime','แพทย์ Part-time (ไม่ยุ่งสต้อก)','b'],['active','ใช้งาน','b'],['sign','ลายเซ็น (Drive)'],
                ['lineId','LINE (ผูกแล้ว — ลบเพื่อผูกใหม่)'],['lineName','ชื่อ LINE'],['lineAt','ผูก LINE เมื่อ','t']],
   Items:      [['code','รหัสรายการ'],['name','ชื่อรายการ'],['category','หมวด'],['type','ประเภท'],['performer','ผู้ทำ'],
                ['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
@@ -357,6 +363,7 @@ var SCHEMA = {
                ['printed','พิมพ์แล้ว (ครั้ง)','n'],['void','ยกเลิกบิล'],['voidReason','เหตุผลขอยกเลิก'],['voidReqBy','ขอยกเลิกโดย'],['voidReqAt','ขอเมื่อ','t'],['voidBy','อนุมัติยกเลิกโดย (บัญชี)'],['voidAt','ยกเลิกเมื่อ','t'],['voidNote','หมายเหตุบัญชี']],
   PayLines:   [['receipt','เลขใบเสร็จ'],['method','ช่องทาง'],['amount','จำนวนเงิน','n'],['fee','ค่าธรรมเนียม','n'],['ref','เลขอ้างอิง'],['branch','สาขา'],['time','เวลา','t'],['by','ผู้รับเงิน']],
   SupplyEdits:[['time','แก้เมื่อ','t'],['branch','สาขา'],['order','รายการ'],['vn','VN'],['hn','HN'],['item','หัตถการ'],['doneAt','วันที่ทำเคส'],['change','เปลี่ยนอะไร'],['reason','เหตุผล'],['staff','ผู้ยืนยัน (ทำเคสนี้)'],['by','ผู้กดแก้']],
+  BeamCharges: [['id','รหัส Beam'],['kind','แบบ'],['vn','VN'],['hn','HN'],['branch','สาขา'],['method','ช่องทาง'],['amount','ยอด (รวมค่าธรรมเนียม)','n'],['ref','referenceId'],['url','ลิงก์'],['status','สถานะ'],['created','สร้างเมื่อ','t'],['by','ผู้สร้าง'],['paidAt','จ่ายเมื่อ','t'],['receipt','ใบเสร็จ'],['draft','ข้อมูลบิล (ระบบใช้)']],
   UsageFlags: [['time','เวลา','t'],['branch','สาขา'],['vn','VN'],['order','รายการ'],['item','ขายเป็น'],['stock','รหัสของ'],['name','ของ'],['std','ตามที่ขาย','n'],['used','เบิกจริง','n'],['over','เกิน','n'],['value','มูลค่าที่เกิน','n'],['reason','เหตุผล'],['by','ผู้เบิก'],['status','สถานะ'],['checkedBy','ตรวจโดย'],['note','หมายเหตุ']],
   PayEdits:   [['time','แก้เมื่อ','t'],['receipt','เลขใบเสร็จ'],['branch','สาขา'],['what','แก้อะไร'],['before','ก่อนแก้'],['after','หลังแก้'],['reason','เหตุผล'],['by','ผู้แก้']],
   PayMethods: [['name','ช่องทางชำระ'],['needRef','ต้องใส่เลขอ้างอิง','b'],['feePct','บวกค่าธรรมเนียม %','n'],['branches','ใช้ที่สาขา (ว่าง=ทุกสาขา)'],['active','ใช้งาน','b']],
@@ -577,6 +584,7 @@ function makeCore(store) {
       payMethods: rows('PayMethods').filter(function (m) { return on(m.active === '' ? true : m.active) && (!m.branches || String(m.branches).split(/[\s,]+/).indexOf(u.branch) >= 0); }).map(function (m) { return { name: m.name, needRef: on(m.needRef), feePct: num(m.feePct) }; }),
       ar: AR,
       wallet: WALLET,
+      beam: beamReady(),
       ads: rows('Ads').filter(function (a) { return on(a.active === '' ? true : a.active); }).map(function (a) { return { name: a.name, channel: a.channel }; }),
       bom: rows('BOM').reduce(function (m, x) { (m[x.item] = m[x.item] || []).push({ stock: x.stock, qty: num(x.qty) }); return m; }, {}),
       branches: branchesPublic(),
@@ -1266,6 +1274,16 @@ function makeCore(store) {
     var change = r2(paid - net), fee = 0;
     lines.forEach(function (l) { var m = methods[l.method]; l.fee = m && num(m.feePct) > 0 ? Math.round(l.amount * num(m.feePct) / 100) : 0; fee += l.fee; });
     if (change > cash) err('ยอดเกินมา ' + change + ' บาท — เงินทอนได้เฉพาะเงินสด');
+    var beamRows = [];
+    lines.forEach(function (l) {
+      if (!isBeam(l.method)) return;
+      if (!l.ref) err(l.method + ': กดสร้าง QR/ลิงก์ Beam ให้ลูกค้าจ่ายก่อน');
+      var br0 = find('BeamCharges', 'id', l.ref); if (!br0 || br0.vn !== v.vn) err(l.method + ': ไม่พบรายการ Beam ' + l.ref + ' ของบิลนี้');
+      if (br0.receipt) err('รายการ Beam ' + l.ref + ' ใช้กับใบเสร็จ ' + br0.receipt + ' ไปแล้ว');
+      if (r2(num(br0.amount)) !== r2(l.amount + l.fee)) err(l.method + ': ยอดที่ลูกค้าจ่ายใน Beam ' + num(br0.amount) + ' บาท ไม่ตรงกับยอดในบรรทัด ' + r2(l.amount + l.fee) + ' บาท');
+      if (beamCheck(br0).status !== 'PAID') err(l.method + ': Beam ยังไม่ได้รับเงิน');
+      if (beamRows.indexOf(br0) >= 0) err('ใช้รายการ Beam ซ้ำ'); beamRows.push(br0);
+    });
     if (change > 0) { var cl = lines.filter(function (l) { return l.method === 'เงินสด'; })[0]; cl.amount = r2(cl.amount - change); }
     // ยา/สินค้า ตัดสต้อกตอนจ่าย
     var need = {}; os.filter(function (o) { return o.type === 'product'; }).forEach(function (o) { rows('BOM').filter(function (b) { return String(b.item) === String(o.item); }).forEach(function (b) { need[b.stock] = r2((need[b.stock] || 0) + num(b.qty) * num(o.qty)); }); });
@@ -1286,6 +1304,7 @@ function makeCore(store) {
     var detail = lines.map(function (l) { return l.method + ' ' + l.amount + (l.fee ? ' +ค่าธรรมเนียม ' + l.fee : '') + (l.ref ? ' (' + l.ref + ')' : ''); }).join(' + ') || 'ส่วนลด 100%';
     add('Payments', { receipt: rc, vn: v.vn, hn: v.hn, name: v.name, subtotal: sub, discount: disc, net: net, method: detail, by: u.name, time: stamp(), branch: u.branch, change: change, wallet: wal, ar: ar, fee: fee });
     lines.forEach(function (l) { add('PayLines', { receipt: rc, method: l.method, amount: r2(l.amount + l.fee), fee: l.fee, ref: l.ref, branch: u.branch, time: stamp(), by: u.name }); });
+    beamRows.forEach(function (b) { upd('BeamCharges', b, { status: 'PAID', paidAt: b.paidAt || stamp(), receipt: rc }); });
     // ลีด: นับเฉพาะ visit แรก
     var pt = find('Patients', 'hn', v.hn), ld = v.leadId ? find('Leads', 'id', v.leadId) : null;
     if (ld && (!ld.vn || ld.vn === v.vn)) upd('Leads', ld, { status: 'BOUGHT', vn: v.vn, hn: v.hn, actual: r2(num(ld.actual) + net) });
@@ -1401,6 +1420,88 @@ function makeCore(store) {
     return res;
   };
   PERM.receiptGet = SELLERS.concat(['account', 'owner', 'admin']); PERM.receiptEmail = FRONTISH.concat(['sales', 'account', 'owner', 'admin']); WRITES.receiptEmail = 1;
+  /* ---------- Beam (แบบเดียวกับ Lana: เปิดหน้าจ่ายของ Beam → ลูกค้าเลือก บัตร / พร้อมเพย์ / โมบายแบงก์กิ้ง / วอลเล็ต / ผ่อน) ----------
+     ตั้งค่า: Apps Script → Project Settings → Script properties: BEAM_MERCHANT_ID, BEAM_API_KEY, BEAM_ENV (production = ค่าเริ่มต้น | playground = ทดลอง)
+     ช่องทางชำระที่ชื่อมีคำว่า "Beam" ใช้ระบบนี้ · จ่ายเสร็จระบบปิดบิลเอง (ถาม Beam ซ้ำทุกครั้งก่อนเชื่อ) แม้แท็บเล็ตจะปิดหน้าไปแล้ว */
+  function beamReady() { return !!(store.beamReady && store.beamReady()); }
+  function isBeam(m) { return /beam/i.test(String(m || '')) && beamReady(); }
+  function beamApi(method, path, body) {
+    var r = store.beam(method, path, body), j = r.json || {};
+    if (r.code >= 300) err('Beam ตอบกลับผิดพลาด: ' + ((j.error && (j.error.errorMessage || j.error.errorCode)) || j.message || j.errorMessage || ('HTTP ' + r.code)));
+    return j;
+  }
+  function beamCheck(row) {
+    if (row.kind === 'LINK') { var l = beamApi('GET', '/api/v1/payment-links/' + encodeURIComponent(row.id)), st = String(l.status || '');
+      return { status: st === 'PAID' ? 'PAID' : st === 'ACTIVE' ? 'PENDING' : 'FAILED', raw: st }; }
+    var c = beamApi('GET', '/api/v1/charges/' + encodeURIComponent(row.id)), cs = String(c.status || '');
+    return { status: cs === 'SUCCEEDED' ? 'PAID' : cs === 'FAILED' ? 'FAILED' : 'PENDING', raw: cs, failure: c.failureCode || '' };
+  }
+  A.beamCreate = function (p, u) {
+    if (!beamReady()) err('ยังไม่ได้ตั้งค่า Beam (BEAM_MERCHANT_ID / BEAM_API_KEY)');
+    var v = visitOf(p.vn, u), d = p.draft || {}, lines = (d.lines || []).map(function (l) { return { method: txt(l.method, 60), amount: r2(num(l.amount)), ref: txt(l.ref, 60) }; }).filter(function (l) { return l.amount > 0; });
+    var bl = lines.filter(function (l) { return isBeam(l.method); }); if (bl.length !== 1) err('ใส่ช่องทาง Beam ได้ 1 บรรทัดต่อบิล');
+    var meth = find('PayMethods', 'name', bl[0].method) || {}, fee = num(meth.feePct) > 0 ? Math.round(bl[0].amount * num(meth.feePct) / 100) : 0, amt = r2(bl[0].amount + fee);
+    var due = sum(ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; }), function (o) { return o.total; });
+    if (!(amt >= 1)) err('ยอดต้องมากกว่า 0'); if (!(due > 0)) err('ไม่มีรายการค้างชำระ');
+    if (lines.some(function (l) { return l.method === AR; })) err('ค้างชำระใช้คู่กับ Beam ไม่ได้');
+    // เช็กล่วงหน้าให้ปิดบิลได้แน่ ก่อนให้ลูกค้าจ่าย
+    var net0 = r2(due - Math.min(due, Math.max(0, num(d.discount)))), paid0 = sum(lines, function (l) { return l.amount; }), cash0 = sum(lines.filter(function (l) { return l.method === 'เงินสด'; }), function (l) { return l.amount; });
+    var wal0 = sum(lines.filter(function (l) { return l.method === WALLET; }), function (l) { return l.amount; }), pt0 = find('Patients', 'hn', v.hn);
+    if (paid0 < net0) err('ยอดชำระยังไม่ครบ ขาดอีก ' + r2(net0 - paid0) + ' บาท');
+    if (r2(paid0 - net0) > cash0) err('ยอดเกิน — ทอนได้เฉพาะเงินสด');
+    if (wal0 > num(pt0 && pt0.wallet)) err('วงเงินสมาชิกไม่พอ');
+    lines.forEach(function (l) { if (l.method !== WALLET && !find('PayMethods', 'name', l.method)) err('ไม่รู้จักช่องทาง ' + l.method); });
+    rows('BeamCharges').filter(function (x) { return x.vn === v.vn && x.status === 'PENDING'; }).forEach(function (x) {
+      if (x.kind === 'LINK') { try { beamApi('PATCH', '/api/v1/payment-links/' + encodeURIComponent(x.id) + '/disable', {}); } catch (e) {} } upd('BeamCharges', x, { status: 'CANCELLED' }); });
+    var br = find('Branches', 'code', u.branch) || {}, ref = v.vn + '-B' + store.next('beam_' + v.vn), satang = Math.round(amt * 100), name = String(br.name || u.branch);
+    var back = /^https:\/\//.test(String(p.returnUrl || '')) ? String(p.returnUrl) + (String(p.returnUrl).indexOf('?') >= 0 ? '&' : '?') + 'beam=' + encodeURIComponent(ref) : '';
+    var body = { collectDeliveryAddress: false, expiresAt: new Date(store.now().getTime() + num(setting('beamMinutes', 30)) * 60000).toISOString(),
+      order: { currency: 'THB', netAmount: satang, referenceId: ref, description: (name + ' · ' + v.hn).slice(0, 100),
+        orderItems: [{ itemName: (name + ' · ค่าบริการ').slice(0, 100), description: v.vn, price: satang, quantity: 1, sku: 'CLINIC', productId: v.vn }] },
+      linkSettings: { card: { isEnabled: true }, qrPromptPay: { isEnabled: true }, eWallets: { isEnabled: true }, mobileBanking: { isEnabled: true } } };
+    if (on(setting('beamInstallments', 'ใช่'))) { var y = { isEnabled: true }; body.linkSettings.cardInstallments = { isEnabled: true, installments3m: y, installments4m: y, installments6m: y, installments10m: y }; }
+    if (back) body.redirectUrl = back;
+    var l = beamApi('POST', '/api/v1/payment-links', body), id = l.id || l.paymentLinkId;
+    if (!id || !l.url) err('Beam ไม่ส่งลิงก์กลับมา');
+    bl[0].ref = id;
+    var draft = { vn: v.vn, discount: r2(num(d.discount)), lines: lines, who: { code: u.code, name: u.name, branch: u.branch, roles: u.roles, brand: u.brand } };
+    add('BeamCharges', { id: id, kind: 'LINK', vn: v.vn, hn: v.hn, branch: u.branch, method: bl[0].method, amount: amt, ref: ref, url: l.url, status: 'PENDING', created: stamp(), by: u.name, paidAt: '', receipt: '', draft: JSON.stringify(draft) });
+    log(u, 'beamCreate', v.vn + ' ' + amt + ' ' + id); return { id: id, ref: ref, url: l.url, amount: amt };
+  };
+  // จ่ายแล้ว → ปิดบิลตามที่หน้าร้านกรอกไว้ (เรียกจากแท็บเล็ตที่รออยู่ หรือจาก Beam แจ้งเข้ามาเอง)
+  function beamFinish(row) {
+    return store.lock(function () {
+      var r0 = find('BeamCharges', 'id', row.id); if (!r0) return null; if (r0.receipt) return r0.receipt;
+      if (beamCheck(r0).status !== 'PAID') return null;
+      var d = JSON.parse(r0.draft || '{}'); if (!d.who) return null;
+      var v = find('Visits', 'vn', r0.vn), unpaid = ordersOf(r0.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; });
+      if (!v || !unpaid.length) { upd('BeamCharges', r0, { status: 'PAID-ต้องตรวจ (บิลปิดไปแล้ว)', paidAt: stamp() }); return null; }
+      try { var out = A.pay({ vn: r0.vn, discount: d.discount, lines: d.lines }, d.who); return out.receipt; }
+      catch (e) { upd('BeamCharges', r0, { status: 'PAID-ต้องตรวจ: ' + String(e.message).slice(0, 80), paidAt: stamp() }); return null; }
+    });
+  }
+  A.beamStatus = function (p, u) {
+    var row = p.ref ? find('BeamCharges', 'ref', txt(p.ref, 80)) : find('BeamCharges', 'id', txt(p.id, 80)); if (!row || row.branch !== u.branch) err('ไม่พบรายการ Beam');
+    var base = { id: row.id, ref: row.ref, vn: row.vn, url: row.url, amount: num(row.amount) };
+    if (row.receipt) return Object.assign(base, { status: 'PAID', receipt: row.receipt });
+    if (row.status === 'CANCELLED') return Object.assign(base, { status: 'CANCELLED' });
+    var s = beamCheck(row); base.status = s.status;
+    if (s.status === 'PAID') { base.receipt = beamFinish(row); if (!base.receipt) { var r1 = find('BeamCharges', 'id', row.id); base.problem = r1 && r1.status; } }
+    return base;
+  };
+  A.beamCancel = function (p, u) {
+    var row = find('BeamCharges', 'id', txt(p.id, 80)); if (!row || row.branch !== u.branch) err('ไม่พบรายการ Beam'); if (row.receipt) err('รายการนี้รับเงินเข้าบิลแล้ว');
+    if (beamCheck(row).status === 'PAID') err('ลูกค้าจ่ายแล้ว — ยกเลิกไม่ได้');
+    try { beamApi('PATCH', '/api/v1/payment-links/' + encodeURIComponent(row.id) + '/disable', {}); } catch (e) {}
+    upd('BeamCharges', row, { status: 'CANCELLED' }); return { ok: true };
+  };
+  // Beam แจ้งเข้ามา (webhook) — ไม่เชื่อข้อมูลที่ส่งมา ถาม Beam ซ้ำก่อนปิดบิล
+  function beamHook(payload) {
+    var s = JSON.stringify(payload || {}), m = s.match(/"(?:paymentLinkId|sourceId|id)"\s*:\s*"([A-Za-z0-9_-]{6,})"/g) || [], ids = m.map(function (x) { return x.split('"')[3]; }), done = [];
+    rows('BeamCharges').filter(function (x) { return x.status === 'PENDING' && !x.receipt && ids.indexOf(String(x.id)) >= 0; }).forEach(function (x) { var rc = beamFinish(x); if (rc) done.push(rc); });
+    return { ok: true, receipts: done };
+  }
+  PERM.beamCreate = FRONTISH; PERM.beamStatus = FRONTISH; PERM.beamCancel = FRONTISH; WRITES.beamCreate = 1; WRITES.beamCancel = 1;
   PERM.courseToCredit = FRONTISH; PERM.walletHistory = ALL; PERM.walletAdjust = FRONTISH;
   WRITES.courseToCredit = 1; WRITES.walletAdjust = 1;
 
@@ -1512,7 +1613,7 @@ function makeCore(store) {
   function earnings(from, to, branchFilter) {
     var vs = {}; rows('Visits').forEach(function (v) { vs[v.vn] = v; });
     var people = {}, items = [];
-    function P(code) { return people[code] = people[code] || { code: code, name: staffName(code), df: 0, fee: 0, comm: 0, sales: 0, cases: 0, upsell: 0, mgmt: 0 }; }
+    function P(code) { return people[code] = people[code] || { code: code, name: staffName(code), df: 0, fee: 0, comm: 0, sales: 0, cases: 0, upsell: 0, mgmt: 0, salary: 0 }; }
     rows('Orders').forEach(function (o) {
       var v = vs[o.vn]; if (!v || (branchFilter && !branchFilter(v.branch))) return;
       if (o.status === 'DONE') {
@@ -1581,13 +1682,25 @@ function makeCore(store) {
         if (amt > 0) items.push({ who: String(mg.code), kind: 'ค่าบริหาร', date: bt.month + (bt.month === to.slice(0, 7) ? '-' + to.slice(8) : '-ทั้งเดือน'), branch: bt.branch, hn: '', name: '', item: 'ยอดสาขา ' + bt.total + ' − ส่วนตัว ' + own + ' − คลินิก ' + bt.clinic, base: base, pct: t.pct, amount: amt });
       });
     });
+    // เงินเดือน: คิดตามสัดส่วนวันในช่วงที่เลือก (ทั้งเดือน = เต็ม)
+    rows('Staff').forEach(function (s) {
+      var sal = num(s.salary); if (!(sal > 0) || !on(s.active) || (branchFilter && !branchFilter(s.branch))) return;
+      var ps = P(String(s.code)), m = from.slice(0, 8) + '01', tot = 0;
+      while (m <= to) {
+        var dim = new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7), 0)).getUTCDate(), me = m.slice(0, 8) + ('0' + dim).slice(-2);
+        var a = from > m ? from : m, b = to < me ? to : me, days = Math.round((Date.parse(b) - Date.parse(a)) / 864e5) + 1;
+        if (days > 0) { var amt = r2(sal * days / dim); tot = r2(tot + amt); items.push({ who: String(s.code), kind: 'เงินเดือน', date: a, branch: s.branch, hn: '', name: '', item: 'เงินเดือน ' + m.slice(0, 7) + (days < dim ? ' (' + days + '/' + dim + ' วัน)' : ''), base: sal, pct: 0, amount: amt }); }
+        m = addDays(me, 1);
+      }
+      ps.salary = tot; ps.salaryMonth = sal;
+    });
     return { people: people, items: items };
   }
   function shortName(n) { var p = String(n || '').trim().split(/\s+/); return p[0] + (p[1] ? ' ' + p[1].charAt(0) + '.' : ''); }
 
   A.myEarnings = function (p, u) {
     var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today();
-    var e = earnings(from, to, null), me = e.people[u.code] || { df: 0, fee: 0, comm: 0, sales: 0, cases: 0, upsell: 0 };
+    var e = earnings(from, to, null), me = e.people[u.code] || { df: 0, fee: 0, comm: 0, sales: 0, cases: 0, upsell: 0, salary: 0 };
     var att = rows('Attendance').filter(function (a) { return a.staff === u.code && a.date >= from && a.date <= to; }).map(clean);
     var hours = sum(att, function (a) { return a.out ? (toMin(a.out) - toMin(a.in)) / 60 : 0; });
     var leads = has(u, ['adminpage']) ? rows('Leads').filter(function (l) { return l.admin === u.name && l.date >= from && l.date <= to; }) : [];
@@ -1753,7 +1866,8 @@ function makeCore(store) {
     os.forEach(function (o) { upd('Orders', o, { receipt: '', paidNet: 0, cashNet: 0, adminShare: 0, adminBy: '', voidOf: rc }); });
     var v = find('Visits', 'vn', py.vn); if (v && v.stage === 'DONE') setStage(v, 'BACK');
     upd('Payments', py, { void: 'VOID', voidBy: u.name, voidAt: stamp(), voidNote: note });
-    log(u, 'voidApprove', rc + ' · ' + (py.voidReason || '')); return { voided: true, vn: py.vn };
+    var refund = rows('BeamCharges').filter(function (b) { return b.receipt === rc; }).map(function (b) { upd('BeamCharges', b, { status: 'ต้องคืนเงินใน Beam (ยกเลิกบิล)' }); return b.id + ' ' + num(b.amount) + ' บาท'; });
+    log(u, 'voidApprove', rc + ' · ' + (py.voidReason || '')); return { voided: true, vn: py.vn, beamRefund: refund };
   };
   // แก้ราคา/ส่วนลด ได้เฉพาะรายการที่กลับมาจากบิลที่ยกเลิก (กันแก้ราคาตามใจ)
   A.orderReprice = function (p, u) {
@@ -1772,7 +1886,9 @@ function makeCore(store) {
   A.feesReport = function (p, u) {
     var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today();
     var e = earnings(from, to, scopeFn(p.scope, u));
-    return { from: from, to: to, people: Object.keys(e.people).map(function (k) { return e.people[k]; }), items: e.items };
+    var pay = has(u, ['owner', 'admin', 'account']), ppl = Object.keys(e.people).map(function (k) { return e.people[k]; });
+    if (!pay) { ppl.forEach(function (x) { x.salary = 0; delete x.salaryMonth; }); ppl = ppl.filter(function (x) { return x.df || x.fee || x.comm || x.sales; }); }
+    return { from: from, to: to, salaryShown: pay, people: ppl, items: pay ? e.items : e.items.filter(function (i) { return i.kind !== 'เงินเดือน'; }) };
   };
 
   /* ---------- สต้อก ---------- */
@@ -1990,7 +2106,7 @@ function makeCore(store) {
   };
   PERM.countPreview = ['manager'];
 
-  return { api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); } };
+  return { api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook };
 }
 
 /* ---------- อ่านบัตรประชาชน (ข้อความจาก OCR) ---------- */
@@ -2071,6 +2187,21 @@ function makeMemoryStore(seed, persistKey) {
     getPhoto: function (id) { return db.photos[id] || ''; },
     // โหมดทดลอง: จำลอง LINE (idToken = 'demo:' + userId)
     verifyLine: function (t) { var m = String(t).match(/^demo:(U[\w-]+)(?:\|(.*))?$/); return m ? { sub: m[1], name: m[2] || 'ผู้ใช้ LINE (ทดลอง)', picture: '' } : null; },
+    // โหมดทดลอง: จำลอง Beam (กดจ่ายในหน้าจำลอง)
+    beamDemoPay: function (id) { var x = (db.beam || {})[id]; if (x) { x.paid = true; save(); } },
+    beamReady: function () { return true; },
+    beam: function (method, path, body) {
+      var bm = db.beam = db.beam || {}, m;
+      if (method === 'POST' && path === '/api/v1/charges') { var id = 'ch_demo' + Date.now().toString(36); bm[id] = { t: Date.now(), amount: body.amount };
+        return { code: 201, json: { chargeId: id, actionRequired: 'ENCODED_IMAGE', paymentMethodType: 'QR_PROMPT_PAY', encodedImage: { rawData: 'DEMO-PROMPTPAY|' + id + '|' + body.amount / 100, expiry: body.paymentMethod.qrPromptPay.expiryTime } } }; }
+      if (method === 'POST' && path === '/api/v1/payment-links') { var lid = 'pl_demo' + Date.now().toString(36); bm[lid] = { t: Date.now(), amount: body.order.netAmount };
+        return { code: 201, json: { id: lid, url: 'https://playground-pay.beamcheckout.com/demo/' + lid } }; }
+      if ((m = path.match(/^\/api\/v1\/(charges|payment-links)\/([^\/]+)(\/disable)?$/))) { var x = bm[decodeURIComponent(m[2])]; if (!x) return { code: 404, json: { message: 'not found' } };
+        if (m[3]) { x.off = true; return { code: 200, json: {} }; }
+        var paid = !x.off && !!x.paid;
+        return { code: 200, json: m[1] === 'charges' ? { chargeId: m[2], status: paid ? 'SUCCEEDED' : 'PENDING', amount: x.amount } : { paymentLinkId: m[2], status: x.off ? 'DISABLED' : paid ? 'PAID' : 'ACTIVE' } }; }
+      return { code: 404, json: { message: 'demo: ' + path } };
+    },
     // โหมดทดลอง: ไม่ส่งอีเมลจริง เก็บไว้ให้ดูตัวอย่าง
     sendMail: function (m) { (db.mail = db.mail || []).push({ to: m.to, subject: m.subject, time: new Date().toISOString() }); if (db.mail.length > 20) db.mail.shift(); save(); return true; },
     ocr: function () {
@@ -2522,7 +2653,9 @@ function loginScreen(step) {
 }
 function start() {
   applyBrand(S.user && S.user.brand); S.stack = []; S.cur = { name: 'home' };
-  call('boot', {}, { spin: true }).then(function (b) { S.boot = b; S.stock = null; show(); }).catch(function (e) { fail(e); logout(); });
+  call('boot', {}, { spin: true }).then(function (b) { S.boot = b; S.stock = null; show();
+    var bq = (location.search.match(/[?&]beam=([^&#]+)/) || [])[1]; if (bq && typeof beamWait === 'function') { try { history.replaceState(null, '', location.pathname); } catch (e) {} beamWait(decodeURIComponent(bq)); }
+  }).catch(function (e) { fail(e); logout(); });
 }
 function logout() { S.token = null; S.user = null; S.boot = null; LS.sset('hs_tok', null); LS.sset('hs_user', null); $('#dlg').hidden = true; loginScreen('pin'); }
 
@@ -2545,7 +2678,7 @@ var TILES = [
   { k: 'myleads', t: 'ลีดของฉัน', s: 'ใครมาแล้ว ซื้อเท่าไร', ic: 'list', r: ['adminpage', 'marketing'] },
   { k: 'owner', t: 'ภาพรวมธุรกิจ', s: 'ยอดขาย · กำไร · เทียบช่วงก่อน', ic: 'chart', r: ['account', 'manager'], hero: 1 },
   { k: 'income', t: 'รายรับ', s: 'วัน · เดือน · ปี · แยกช่องทาง · แก้รายการคีผิด', ic: 'cash', r: ['account', 'manager'] },
-  { k: 'fees', t: 'DF · ค่ามือ · ค่าคอม', s: 'สรุปจ่ายพนักงาน', ic: 'coin', r: ['account', 'manager'] },
+  { k: 'fees', t: 'จ่ายพนักงาน', s: 'เงินเดือน · DF · ค่ามือ · ค่าคอม', ic: 'coin', r: ['account', 'manager'] },
   { k: 'promos', t: 'จัดการโปร', s: 'โปรรายเดือน S/M/L · ราคาแต่ละสาขา', ic: 'mega', r: ['marketing', 'manager'] },
   { k: 'mkt', t: 'ส่งออกข้อมูลยิงแอด', s: 'Audience · Offline conversion', ic: 'mega', r: ['marketing', 'account'] },
   { k: 'gallery', t: 'รูปรีวิว', s: 'เฉพาะคนไข้ที่อนุญาต', ic: 'img', r: ['marketing'] },
@@ -2758,8 +2891,8 @@ function rngOf(k) {
 function payTab() {
   var r0 = rngOf(L.rng);
   return call('myEarnings', r0).then(function (e) {
-    var sm = e.sum, comm = (sm.comm || 0) - (sm.mgmt || 0), tot = (sm.df || 0) + (sm.fee || 0) + (sm.comm || 0);
-    var parts = [['DF แพทย์', sm.df], ['ค่ามือ', sm.fee], ['ค่าคอม', comm], ['ค่าบริหาร', sm.mgmt]].filter(function (x) { return x[1]; });
+    var sm = e.sum, comm = (sm.comm || 0) - (sm.mgmt || 0), tot = (sm.df || 0) + (sm.fee || 0) + (sm.comm || 0) + (sm.salary || 0);
+    var parts = [['เงินเดือน', sm.salary], ['DF แพทย์', sm.df], ['ค่ามือ', sm.fee], ['ค่าคอม', comm], ['ค่าบริหาร', sm.mgmt]].filter(function (x) { return x[1]; });
     return '<div class="chips" id="rng">' + RNG.map(function (x) { return '<button data-r="' + x[0] + '" class="' + (L.rng === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' +
       '<div class="card stack lx-total"><div class="small muted">' + esc(thDate(e.from)) + (e.to !== e.from ? ' – ' + esc(thDate(e.to)) : '') + '</div><div class="l">รวมที่ได้</div><div class="lx-amt">' + bt(tot) + '</div>' +
       (parts.length ? '<div class="lx-split">' + parts.map(function (x) { return '<div><span class="xs muted">' + x[0] + '</span><b>' + bt(x[1]) + '</b></div>'; }).join('') + '</div>' : '') +
