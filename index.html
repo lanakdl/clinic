@@ -267,6 +267,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .bq-img svg{width:100%;height:100%;display:block}
 .bq-url{font-size:.75rem;word-break:break-all;max-width:100%}
 .bq-amt{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums}
+.prod .addnew{border:1.5px dashed var(--line,#c9d6d4);background:transparent}
 
 </style>
 </head>
@@ -1566,7 +1567,7 @@ var SCHEMA = {
   Items:      [['code','รหัสรายการ'],['name','ชื่อรายการ'],['category','หมวด'],['type','ประเภท'],['performer','ผู้ทำ'],
                ['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['dfPct','DF แพทย์ %','n'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['sessions','จำนวนครั้ง (คอร์ส)','n'],['validDays','อายุคอร์ส (วัน)','n'],
-               ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b']],
+               ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว']],
   CourseItems:[['course','รหัสคอร์ส'],['courseName','ชื่อคอร์ส'],['item','รหัสรายการที่ใช้ได้'],['itemName','ชื่อรายการ'],['sessions','จำนวนครั้ง','n']],
   Promos:     [['code','รหัสโปร'],['name','ชื่อโปร'],['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['start','วันเริ่ม'],['end','วันหมด'],['part','รายการในชุด'],['item','รหัสรายการ'],['qty','จำนวน','n'],['fullPrice','ราคาเต็ม','n'],['free','ของแถม'],['choice','ตัวเลือก'],['buffetDF','บุฟเฟต์ DF บาท/ครั้ง','n']],
@@ -1826,6 +1827,7 @@ function makeCore(store) {
       wallet: WALLET,
       beam: beamReady(),
       ads: rows('Ads').filter(function (a) { return on(a.active === '' ? true : a.active); }).map(function (a) { return { name: a.name, channel: a.channel }; }),
+      stockPick: rows('Stock').filter(function (x) { return x.branch === u.branch; }).map(function (x) { return { code: String(x.code), name: String(x.name), unit: String(x.unit || ''), category: String(x.category || '') }; }),
       bom: rows('BOM').reduce(function (m, x) { (m[x.item] = m[x.item] || []).push({ stock: x.stock, qty: num(x.qty) }); return m; }, {}),
       branches: branchesPublic(),
       open: (br && br.open) || setting('open', '10:00'), close: (br && br.close) || setting('close', '20:00'),
@@ -2381,6 +2383,40 @@ function makeCore(store) {
       staffFee: num(it.staffFee), dfFixed: num(o2.dfFixed), doctor: '', staffs: '', opNote: '', lot: '', doneAt: '', time: stamp(), by: u.name });
   }
 
+  /* ---------- หน้าร้านเพิ่มรายการขายเองได้ (ใช้ทันทีที่สาขานี้ · บัญชีตรวจ DF/ค่ามือทีหลัง) ---------- */
+  var QTYPE = { proc: 'หัตถการ', course: 'คอร์ส', product: 'ยา/สินค้า', service: 'ค่าบริการ' }, QPERF = { doctor: 'แพทย์', staff: 'พนักงาน', none: '-' };
+  function catDefault(cat, f) { var c = {}, best = '', n = 0; rows('Items').forEach(function (x) { if (String(x.category) === cat && !blank(x[f]) && num(x[f]) > 0) { var k = String(num(x[f])); c[k] = (c[k] || 0) + 1; if (c[k] > n) { n = c[k]; best = k; } } }); return best === '' ? '' : num(best); }
+  function normName(n) { return String(n || '').toLowerCase().replace(/\s+/g, ''); }
+  A.itemQuickAdd = function (p, u) {
+    var mg = has(u, ['manager', 'owner', 'admin']) ? null : mgrOk(p.approvePin); if (!mg && !has(u, ['manager', 'owner', 'admin'])) err('เพิ่มรายการใหม่ต้องให้ผู้จัดการใส่รหัสอนุมัติ');
+    var name = txt(p.name, 80), price = r2(num(p.price)), cat = txt(p.category, 40) || 'อื่นๆ', type = QTYPE[p.type] ? p.type : 'proc', perf = QPERF[p.performer] ? p.performer : (type === 'product' || type === 'service' ? 'none' : 'doctor');
+    if (name.length < 2) err('ใส่ชื่อรายการ'); if (!(price >= 0) || blank(p.price)) err('ใส่ราคา');
+    var ses = type === 'course' ? Math.round(num(p.sessions)) : 0; if (type === 'course' && !(ses >= 2)) err('คอร์สต้องมีจำนวนครั้ง 2 ขึ้นไป');
+    var ex = rows('Items').filter(function (x) { return normName(x.name) === normName(name); })[0], col = 'p_' + u.branch;
+    if (ex) { if (!blank(ex[col])) err('มีรายการนี้แล้ว: ' + ex.name + ' (' + ex.code + ') ' + num(ex[col]) + ' บาท — ค้นหาแล้วกดได้เลย');
+      var pt = {}; pt[col] = price; upd('Items', ex, pt); log(u, 'itemQuickAdd', ex.code + ' ' + u.branch + ' ' + price); return { code: String(ex.code), existed: true, item: catalogFor(u.branch).items.filter(function (x) { return x.code === String(ex.code); })[0] }; }
+    var code = 'N' + pad(store.next('item_new'), 3), o = { code: code, name: name, category: cat, type: QTYPE[type], performer: QPERF[perf], dfPct: perf === 'doctor' ? catDefault(cat, 'dfPct') : '', staffFee: perf !== 'none' ? catDefault(cat, 'staffFee') : '',
+      sessions: ses || '', validDays: ses ? 365 : '', unit: txt(p.unit, 10), active: true, addedBy: mg ? u.name + ' · อนุมัติ ' + (mg.nick || mg.name) : u.name + ' (' + u.code + ')', addedAt: stamp(), reviewed: '' };
+    o[col] = price; add('Items', o);
+    if (p.stock) { var sr = stockRow(u.branch, p.stock); if (!sr) err('ไม่พบของในสต้อก'); var q = num(p.stockQty); if (!(q > 0)) err('ใส่จำนวนที่ใช้ต่อครั้ง'); add('BOM', { item: code, stock: String(sr.code), qty: q }); }
+    log(u, 'itemQuickAdd', code + ' ' + name + ' ' + price);
+    return { code: code, item: catalogFor(u.branch).items.filter(function (x) { return x.code === code; })[0] };
+  };
+  A.newItems = function (p, u) {
+    return rows('Items').filter(function (x) { return x.addedBy && !on(x.reviewed) && on(x.active === '' ? true : x.active); }).map(function (x) {
+      var o = clean(x), sold = rows('Orders').filter(function (r) { return String(r.item) === String(x.code); });
+      o.sold = sold.length; o.bom = rows('BOM').filter(function (b) { return String(b.item) === String(x.code); }).map(function (b) { var sr = rows('Stock').filter(function (s) { return String(s.code) === String(b.stock); })[0]; return (sr ? sr.name : b.stock) + ' ' + num(b.qty) + ' ' + (sr ? sr.unit : ''); });
+      o.prices = ['DTCM', 'TCPY', 'JBCM', 'JBMS'].filter(function (b) { return !blank(x['p_' + b]); }).map(function (b) { return b + ' ' + num(x['p_' + b]); }); return o; });
+  };
+  A.itemReview = function (p, u) {
+    var x = find('Items', 'code', txt(p.code)); if (!x || !x.addedBy) err('ไม่พบรายการ');
+    var pt = { reviewed: 'ใช่' };
+    if (p.disable) pt.active = false;
+    ['dfPct', 'staffFee'].forEach(function (k) { if (p[k] !== undefined && p[k] !== '') pt[k] = num(p[k]); });
+    if (p.name) pt.name = txt(p.name, 80); if (p.category) pt.category = txt(p.category, 40);
+    upd('Items', x, pt); log(u, 'itemReview', x.code + (p.disable ? ' ปิด' : ' ok')); return { ok: true };
+  };
+  PERM.itemQuickAdd = FRONTISH.concat(['sales']); PERM.newItems = ['account', 'owner']; PERM.itemReview = ['account', 'owner']; WRITES.itemQuickAdd = 1; WRITES.itemReview = 1;
   A.saleCommit = function (p, u) {
     var lines = (p.items || []).filter(function (i) { return i && (i.topup || ((i.item || i.promo) && num(i.qty) > 0)); });
     if (!lines.length) err('ยังไม่ได้เลือกรายการ');
@@ -2471,6 +2507,7 @@ function makeCore(store) {
         weight: num(priceAt(cit || {}, u.branch)) * num(c.sessions), dfPct: cit ? num(cit.dfPct) : 0, buffet: false, dfFixed: 0, choice: '' }); });
       else parts.push({ item: String(o.item), name: String(o.name), qty: (num(it && it.sessions) || 1) * num(o.qty), weight: 1, dfPct: num(it && it.dfPct), buffet: typeOf(it || {}) === 'buffet', dfFixed: 0, choice: o.choice || '' });
     }
+    if (parts.some(function (x) { return !(x.weight > 0); })) parts.forEach(function (x) { x.weight = Math.max(1, num(x.qty)); }); // ไม่มีราคาเต็ม → แบ่งมูลค่าตามจำนวนครั้ง
     var wsum = sum(parts, function (x) { return x.weight; }) || parts.length, acc = 0;
     var days = num(it && it.validDays) || (parts.some(function (x) { return x.buffet; }) ? 365 : 0);
     var exp = days ? addDays(today(), days) : '';
@@ -3337,6 +3374,7 @@ function makeCore(store) {
       stockPending: (function () { var vs = {}; rows('Visits').forEach(function (v) { if (v.branch === u.branch) vs[v.vn] = 1; }); return rows('Orders').filter(function (o) { return on(o.stockPending) && vs[o.vn]; }).length; })(),
       voidsPending: has(u, ['account']) ? rows('Payments').filter(function (x) { return x.void === 'REQUESTED'; }).length : 0,
       usageNew: has(u, ['account']) ? rows('UsageFlags').filter(function (f) { return f.status === 'NEW'; }).length : 0,
+      newItems: has(u, ['account', 'owner']) ? rows('Items').filter(function (x) { return x.addedBy && !on(x.reviewed) && on(x.active === '' ? true : x.active); }).length : 0,
       countsPending: has(u, ['account']) ? rows('Counts').filter(function (c) { return c.status === 'PENDING'; }).length : 0,
       vialsExpired: rows('OpenVials').filter(function (v) { return v.branch === u.branch && v.status === 'OPEN' && v.expireAt && String(v.expireAt) < stamp(); }).length,
       countDue: !lastCount || minsSince(lastCount.time) > 7 * 1440 };
@@ -3946,6 +3984,7 @@ SCR.home.after = function () {
     var al = [];
     if (stk && has(['manager']) && s.countDue) al.push('<div class="note w row"><span class="sp">ถึงรอบนับสต้อกประจำสัปดาห์แล้ว</span><button class="btn sm w" data-go="stock" data-arg="count">นับสต้อก</button></div>');
     var stk = S.user.stock;
+    if (s.newItems) al.push('<div class="note row"><span class="sp">หน้าร้านเพิ่มรายการขายใหม่ ' + s.newItems + ' รายการ — ตรวจ DF/ค่ามือ</span><button class="btn sm" data-go="newItems">ตรวจ</button></div>');
     if (s.voidsPending) al.push('<div class="note w row"><span class="sp">หน้าร้านขอยกเลิกบิล ' + s.voidsPending + ' ใบ</span><button class="btn sm w" data-go="voids">ตรวจ/อนุมัติ</button></div>');
     if (s.usageNew) al.push('<div class="note d row"><span class="sp">มีการเบิกยา/ฟิลเลอร์เกินที่ขาย ' + s.usageNew + ' รายการ</span><button class="btn sm d" data-go="usage">ตรวจ</button></div>');
     if (s.countsPending) al.push('<div class="note w row"><span class="sp">ผลนับสต้อกที่ไม่ตรง รอบัญชีอนุมัติ ' + s.countsPending + ' รอบ</span><button class="btn sm w" data-go="countApprove">ตรวจ/อนุมัติ</button></div>');
@@ -4321,6 +4360,7 @@ function prodButtons() {
   var P = S.v.pos, q = P.q.toLowerCase(), out = [];
   if (!q && P.cat === 'โปร' || q) S.boot.promos.forEach(function (p) { if (!q || p.name.toLowerCase().indexOf(q) >= 0) out.push('<button class="promo" data-pr="' + esc(p.code) + '"><span class="xs muted">โปร' + (p.end ? ' · ถึง ' + esc(thDate(p.end)) : '') + '</span><b>' + esc(p.name) + '</b><span class="xs muted">' + esc(p.parts.map(function (x) { return x.part + (x.qty > 1 ? ' ×' + x.qty : ''); }).join(' + ')) + '</span><span class="pr">' + bt(p.price) + '</span></button>'); });
   S.boot.items.forEach(function (i) { if (q ? (i.name.toLowerCase().indexOf(q) >= 0 || i.code.toLowerCase() === q) : i.category === P.cat) out.push('<button data-it="' + esc(i.code) + '"><span class="xs muted">' + esc({ proc: 'หัตถการ', product: 'สินค้า', service: 'ค่าบริการ', course: 'คอร์ส', buffet: 'บุฟเฟต์' }[i.type] || '') + (i.parts ? ' · ' + i.parts.map(function (x) { return x.sessions > 999 ? 'ไม่จำกัด' : x.sessions + ' ครั้ง'; }).join('+') : i.sessions ? ' · ' + i.sessions + ' ครั้ง' : '') + '</span><b>' + esc(i.name) + '</b><span class="pr">' + bt(i.price) + (i.unit ? ' / ' + esc(i.unit) : '') + '</span></button>'); });
+  if (has(['front', 'manager', 'sales'])) out.push('<button class="addnew" data-new="1"><b>+ เพิ่มรายการใหม่</b><span class="xs muted">' + (q ? 'ไม่เจอ "' + esc(P.q) + '" — เพิ่มเลย' : 'ไม่มีในปุ่ม พิมพ์ชื่อ+ราคาเอง') + (has(['manager']) ? '' : ' · ผู้จัดการใส่รหัส') + '</span></button>');
   return out.join('') || '<div class="empty">ไม่พบรายการ</div>';
 }
 function lineTotal(l) { var g = Math.round(l.price * l.qty * 100) / 100, d = l.dpct ? g * l.disc / 100 : l.disc; return Math.max(0, Math.round((g - Math.min(g, d)) * 100) / 100); }
@@ -4345,6 +4385,7 @@ SCR.pos.after = function () {
   $('#cats').onclick = function (e) { var b = e.target.closest('[data-c]'); if (!b) return; P.cat = b.dataset.c; P.q = ''; $('#pq').value = ''; posRedraw(1); };
   $('#prods').onclick = function (e) {
     var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.new) return quickAdd(P);
     if (b.dataset.pr) { var pr = S.boot.promos.filter(function (x) { return x.code === b.dataset.pr; })[0], ch = pr.parts.filter(function (x) { return x.choice; })[0];
       P.cart.push({ promo: pr.code, name: pr.name, price: pr.price, qty: 1, disc: 0, dpct: false, choices: ch ? ch.choice.split(/\s*\/\s*/) : null, choice: '' }); }
     else { var it = S.boot.items.filter(function (x) { return x.code === b.dataset.it; })[0], ex = P.cart.filter(function (l) { return l.item === it.code; })[0];
@@ -4361,6 +4402,34 @@ SCR.pos.after = function () {
   c.onchange = function (e) { var t = e.target; if (t.dataset.d != null) { var l = P.cart[+t.dataset.d]; l.disc = Math.max(0, nz(t.value)); if (l.dpct) l.disc = Math.min(100, l.disc); posRedraw(); } if (t.dataset.ch != null) P.cart[+t.dataset.ch].choice = t.value; if (t.dataset.qv != null) { var q = Math.round(nz(t.value) * 100) / 100; P.cart[+t.dataset.qv].qty = q > 0 ? q : 1; posRedraw(); } };
   bindSellers($('.cart'), P.sellers);
 };
+function quickAdd(P) {
+  var cats = posCats().filter(function (c) { return c !== 'โปร'; }), T = [['proc', 'หัตถการ'], ['course', 'คอร์ส'], ['product', 'ยา/สินค้า'], ['service', 'ค่าบริการ']];
+  var sp = (S.boot.stockPick || []).filter(function (x) { return x.category !== 'ของสิ้นเปลือง'; });
+  dialog({ title: 'เพิ่มรายการใหม่', ok: 'เพิ่มแล้วใส่ตะกร้า',
+    body: '<label>ชื่อรายการ *<input id="qn" value="' + esc(P.q || '') + '" placeholder="เช่น Oligio 300 shot"></label>' +
+      '<div class="g2"><label>ราคา (บาท) *<input id="qp" type="number" inputmode="decimal"></label><label>หมวด<select id="qc">' + opts(cats, P.cat !== 'โปร' ? P.cat : '') + '</select></label></div>' +
+      '<div><div class="small muted">ประเภท</div><div class="chips" id="qt">' + T.map(function (t, i) { return '<button type="button" data-t="' + t[0] + '" class="' + (i ? '' : 'on') + '">' + t[1] + '</button>'; }).join('') + '</div></div>' +
+      '<label id="qsw" hidden>จำนวนครั้งในคอร์ส (รวมแถม)<input id="qs" type="number" inputmode="numeric"></label>' +
+      '<div><div class="small muted">ใครทำ</div><div class="chips" id="qf"><button type="button" data-f="doctor" class="on">แพทย์</button><button type="button" data-f="staff">พนักงาน</button><button type="button" data-f="none">ไม่มี (ขายของ)</button></div></div>' +
+      (sp.length ? '<details><summary class="small">ใช้ยา/ฟิลเลอร์จากสต้อก (ถ้ามี)</summary><div class="g2" style="margin-top:.5rem"><label>ของที่ใช้<select id="qk">' + opts(sp.map(function (x) { return [x.code, x.name + (x.unit ? ' (' + x.unit + ')' : '')]; }), '', '— ไม่ใช้ —') + '</select></label><label>ใช้ต่อครั้ง<input id="qq" type="number" inputmode="decimal" step="any"></label></div></details>' : '') +
+      (has(['manager']) ? '' : '<label>รหัสผู้จัดการ (อนุมัติ) *<input id="qm" type="password" inputmode="numeric" autocomplete="off"></label>') +
+      '<p class="xs muted">ใช้ได้ทันทีที่สาขานี้ · ระบบใส่ DF/ค่ามือตามหมวดให้ก่อน บัญชีจะตรวจอีกที</p>',
+    mount: function (b) {
+      var t = b.querySelector('#qt'), f = b.querySelector('#qf');
+      t.onclick = function (e) { var x = e.target.closest('[data-t]'); if (!x) return; $$('#qt button').forEach(function (y) { y.classList.toggle('on', y === x); }); b.querySelector('#qsw').hidden = x.dataset.t !== 'course';
+        if (x.dataset.t === 'product' || x.dataset.t === 'service') $$('#qf button').forEach(function (y) { y.classList.toggle('on', y.dataset.f === 'none'); }); };
+      f.onclick = function (e) { var x = e.target.closest('[data-f]'); if (!x) return; $$('#qf button').forEach(function (y) { y.classList.toggle('on', y === x); }); };
+    },
+    onOk: function (b) {
+      var g = function (id) { var el = b.querySelector(id); return el ? el.value.trim() : ''; }, on1 = function (sel) { var el = b.querySelector(sel + ' button.on'); return el ? (el.dataset.t || el.dataset.f) : ''; };
+      var d = { name: need(g('#qn'), 'ใส่ชื่อรายการ'), price: need(g('#qp'), 'ใส่ราคา'), category: need(g('#qc'), 'เลือกหมวด'), type: on1('#qt'), performer: on1('#qf'), sessions: g('#qs'), stock: g('#qk'), stockQty: g('#qq'), approvePin: has(['manager']) ? '' : need(g('#qm'), 'ให้ผู้จัดการใส่รหัส') };
+      return call('itemQuickAdd', d, { write: true }).then(function (r) {
+        var it = r.item; if (!it) return; S.boot.items = S.boot.items.filter(function (x) { return x.code !== it.code; }).concat([it]);
+        P.cart.push({ item: it.code, name: it.name, price: it.price, qty: 1, disc: 0, dpct: false, unit: it.unit, presets: it.presets });
+        P.q = ''; var pq = $('#pq'); if (pq) pq.value = ''; P.cat = it.category; posRedraw(1); toast(r.existed ? 'มีชื่อนี้อยู่แล้ว — ใส่ราคาสาขานี้ให้แล้ว' : 'เพิ่ม ' + it.name + ' แล้ว');
+      });
+    } });
+}
 ACT.posCommit = function () {
   var P = S.v.pos;
   var miss = P.cart.filter(function (l) { return l.choices && !l.choice; })[0]; if (miss) return toast('เลือกตำแหน่งของ ' + miss.name + ' ก่อน', 1);
@@ -5497,6 +5566,24 @@ ACT.promoEdit = function (el) {
         .then(function (code) { toast('บันทึกโปร ' + code); call('boot').then(function (bb) { S.boot = bb; }); refresh(); });
     } });
 };
+
+/* ---------- รายการที่หน้าร้านเพิ่มเอง (บัญชีตรวจ) ---------- */
+TITLES.newItems = 'รายการขายที่หน้าร้านเพิ่มเอง';
+SCR.newItems = function () {
+  return call('newItems').then(function (ls) {
+    S.v.ni = ls;
+    return '<div class="stack"><div class="note small">หน้าร้านเพิ่มแล้วขายได้ทันที · ระบบใส่ DF/ค่ามือตามรายการอื่นในหมวดเดียวกันไว้ให้ก่อน — แก้ให้ถูกแล้วกด "ตรวจแล้ว" · ไม่ควรขาย ให้กด "ปิดรายการ" (บิลเดิมไม่หาย)</div>' + (ls.length ? ls.map(function (x, i) {
+      return '<div class="card stack" data-ni="' + i + '"><div class="row"><b class="sp">' + esc(x.name) + '</b><span class="pill">' + esc(x.code) + '</span></div>' +
+        '<div class="small muted">' + esc([x.category, x.type, x.performer !== '-' ? 'ทำโดย' + x.performer : 'ขายของ', x.sessions ? x.sessions + ' ครั้ง' : ''].filter(Boolean).join(' · ')) + ' · ราคา ' + esc(x.prices.join(' / ')) + '</div>' +
+        '<div class="small muted">เพิ่มโดย ' + esc(x.addedBy) + ' ' + esc(x.addedAt) + ' · ขายไปแล้ว ' + x.sold + ' ครั้ง' + (x.bom.length ? ' · ใช้ ' + esc(x.bom.join(', ')) : '') + '</div>' +
+        '<div class="g3"><label>ชื่อ<input data-k="name" value="' + esc(x.name) + '"></label><label>DF แพทย์ %<input data-k="dfPct" type="number" inputmode="decimal" value="' + esc(x.dfPct) + '"></label><label>ค่ามือ (บาท/ครั้ง)<input data-k="staffFee" type="number" inputmode="decimal" value="' + esc(x.staffFee) + '"></label></div>' +
+        '<div class="row"><button class="btn d" data-a="niOff" data-i="' + i + '">ปิดรายการ</button><button class="btn p" data-a="niOk" data-i="' + i + '">ตรวจแล้ว</button></div></div>';
+    }).join('') : '<div class="card empty">ไม่มีรายการรอตรวจ</div>') + '<p class="xs muted">ถ้าจะให้ขายสาขาอื่นด้วย ใส่ราคาในชีต Items ช่องของสาขานั้น</p></div>';
+  });
+};
+function niVals(i) { var c = $('[data-ni="' + i + '"]'), o = {}; $$('[data-k]', c).forEach(function (el) { o[el.dataset.k] = el.value.trim(); }); return o; }
+ACT.niOk = function (el) { var x = S.v.ni[+el.dataset.i], v = niVals(el.dataset.i); call('itemReview', { code: x.code, name: v.name, dfPct: v.dfPct, staffFee: v.staffFee }, { write: true }).then(function () { toast('บันทึกแล้ว'); refresh(); }).catch(fail); };
+ACT.niOff = function (el) { var x = S.v.ni[+el.dataset.i]; ask('ปิดรายการ ' + x.name, 'ปุ่มนี้จะหายจากหน้าขาย บิลที่ขายไปแล้วไม่เปลี่ยน', 'ปิดรายการ', true).then(function (ok) { if (ok) call('itemReview', { code: x.code, disable: true }, { write: true }).then(function () { toast('ปิดแล้ว'); refresh(); }).catch(fail); }); };
 
 /* เริ่มระบบ */
 (function () {
