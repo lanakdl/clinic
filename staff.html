@@ -329,7 +329,7 @@ var SCHEMA = {
   Items:      [['code','รหัสรายการ'],['name','ชื่อรายการ'],['category','หมวด'],['type','ประเภท'],['performer','ผู้ทำ'],
                ['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['dfPct','DF แพทย์ %','n'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['prepFee','ค่ามือตอนเตรียมให้หมอ (บาท/ครั้ง)','n'],['scrubFee','ค่ามือ Scrub (บาท/เคส)','n'],['circFee','ค่ามือ Circulating (บาท/เคส)','n'],['sessions','จำนวนครั้ง (คอร์ส)','n'],['validDays','อายุคอร์ส (วัน)','n'],
-               ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว']],
+               ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว'],['feeNext','ค่ามือหน่วยถัดไป (เช่น Filler cc ที่ 2 ขึ้นไป)','n'],['feeGroup','กลุ่มเคสผ่าตัด (หลัก+ออฟชั่น)'],['tierAt','ขั้นราคาเคส (รวมออฟชั่น)','n'],['scrubHi','Scrub เมื่อเกินขั้น','n'],['circHi','Circ เมื่อเกินขั้น','n'],['dfHiAt','DF ขั้นสูงเมื่อจำนวนถึง','n'],['dfHi','DF ขั้นสูง %','n'],['feeTiers','ค่ามือตามจำนวน (เช่น 1:30,3:60)']],
   CourseItems:[['course','รหัสคอร์ส'],['courseName','ชื่อคอร์ส'],['item','รหัสรายการที่ใช้ได้'],['itemName','ชื่อรายการ'],['sessions','จำนวนครั้ง','n']],
   Promos:     [['code','รหัสโปร'],['name','ชื่อโปร'],['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['start','วันเริ่ม'],['end','วันหมด'],['part','รายการในชุด'],['item','รหัสรายการ'],['qty','จำนวน','n'],['fullPrice','ราคาเต็ม','n'],['free','ของแถม'],['choice','ตัวเลือก'],['buffetDF','บุฟเฟต์ DF บาท/ครั้ง','n']],
@@ -1196,7 +1196,7 @@ function makeCore(store) {
     var proc = o2.forceStatus || ((type === 'proc' || type === 'lab') ? 'PENDING' : '-');
     return add('Orders', { id: nextId('OR', 'seq_OR', 7), vn: v.vn, item: String(it.code), name: o2.name || String(it.name), type: o2.type || type, category: String(it.category || ''),
       qty: qty, price: price, disc: disc, total: r2(gross - disc), paidNet: 0, upsell: !!o2.upsell, seller: txt(o2.seller || u.name, 60), receipt: '', status: proc,
-      courseRef: o2.courseRef || '', promo: o2.promo || '', choice: txt(o2.choice, 120), perVal: num(o2.perVal), dfPct: o2.dfPct != null ? num(o2.dfPct) : num(it.dfPct),
+      courseRef: o2.courseRef || '', promo: o2.promo || '', choice: txt(o2.choice, 120), perVal: num(o2.perVal), dfPct: o2.dfPct != null ? num(o2.dfPct) : (num(it.dfHiAt) > 0 && num(qty) >= num(it.dfHiAt) ? num(it.dfHi) : num(it.dfPct)),
       staffFee: num(it.staffFee), dfFixed: num(o2.dfFixed), doctor: '', staffs: '', opNote: '', lot: '', doneAt: '', time: stamp(), by: u.name });
   }
 
@@ -1810,15 +1810,25 @@ function makeCore(store) {
     var vs = {}; rows('Visits').forEach(function (v) { vs[v.vn] = v; });
     var people = {}, items = [];
     function P(code) { return people[code] = people[code] || { code: code, name: staffName(code), df: 0, fee: 0, comm: 0, sales: 0, cases: 0, upsell: 0, mgmt: 0, salary: 0 }; }
+    // เคสผ่าตัดที่มีออฟชั่น: ค่ามือ Scrub/Circ คิดจากรายการหลัก ตามขั้นราคา "รวมออฟชั่น" ในบิลเดียวกัน (ออฟชั่นได้ค่ามือของตัวเองเพิ่ม ปกติ 0)
+    var grp = {}, mainOf = {}, inGrp = {};
+    rows('Orders').forEach(function (o) { if (o.status !== 'DONE' || o.voidOf === 'x') return; var it = itemByCode(o.item); if (!it || !String(it.feeGroup || '').trim()) return;
+      var k = o.vn + '|' + String(it.feeGroup).trim(), g = grp[k] = grp[k] || { total: 0, main: null, tierAt: 0, it: null };
+      g.total = r2(g.total + num(o.total)); inGrp[o.id] = k; if (num(it.tierAt) > 0 && (!g.main || num(o.total) > num(g.main.total))) { g.main = o; g.it = it; } });
+    Object.keys(grp).forEach(function (k) { var g = grp[k]; if (g.main) mainOf[g.main.id] = g; });
     rows('Orders').forEach(function (o) {
       var v = vs[o.vn]; if (!v || (branchFilter && !branchFilter(v.branch))) return;
       if (o.status === 'DONE') {
         var d = String(o.doneAt).slice(0, 10); if (d < from || d > to) return;
         var per = num(o.perVal) || (o.receipt ? r2(num(o.paidNet) / Math.max(1, num(o.qty))) : r2(num(o.total) / Math.max(1, num(o.qty))));
         var df = num(o.dfFixed) ? r2(num(o.dfFixed) * num(o.qty)) : r2(per * num(o.qty) * num(o.dfPct) / 100);
-        var staffs = String(o.staffs || '').split(' ').filter(String), prep = !!o.doctor && !blank(o.prepFee), fee = r2((prep ? num(o.prepFee) : num(o.staffFee)) * num(o.qty));
+        var staffs = String(o.staffs || '').split(' ').filter(String), prep = !!o.doctor && !blank(o.prepFee), fee = r2((prep ? num(o.prepFee) : num(o.staffFee)) * num(o.qty)), fit = itemByCode(o.item), fnx = fit && !blank(fit.feeNext) ? num(fit.feeNext) : -1;
+        var ftr = fit ? String(fit.feeTiers || '').trim() : '';
+        if (ftr) { var tf = 0; ftr.split(',').forEach(function (x) { var q = x.split(':'); if (num(o.qty) >= num(q[0])) tf = num(q[1]); }); fee = tf; }   // เช่น Thermage ขายทีละ 100 ช็อต: 1:30,3:60,8:90,12:110
+        else if (fnx >= 0 && num(o.qty) > 1 && fee > 0) fee = r2((prep ? num(o.prepFee) : num(o.staffFee)) + fnx * (num(o.qty) - 1));   // เช่น Filler cc แรก 30 · cc ถัดไปละ 5 · ใส่ 0 = เหมาต่อครั้ง ไม่คูณจำนวน
         if (o.doctor) { var pd = P(o.doctor); pd.df = r2(pd.df + df); pd.cases++; items.push({ who: o.doctor, kind: 'DF', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: per, pct: num(o.dfPct), amount: df, estimated: !o.receipt && !o.courseRef }); }
-        [['scrub', 'scrubFee', 'Scrub'], ['circ', 'circFee', 'Circulating']].forEach(function (k) { var ls = String(o[k[0]] || '').split(' ').filter(String), tot = r2(num(o[k[1]]) * num(o.qty)); if (!ls.length || !(tot > 0)) return;
+        var gm = mainOf[o.id], gIn = inGrp[o.id] && grp[inGrp[o.id]].main && !gm;   // อยู่ในเคสเดียวกับรายการหลัก = รวมในค่ามือรายการหลักแล้ว
+        [['scrub', 'scrubFee', 'Scrub'], ['circ', 'circFee', 'Circulating']].forEach(function (k) { var ls = String(o[k[0]] || '').split(' ').filter(String), tot = gIn ? 0 : gm ? (gm.total > num(gm.it.tierAt) && num(gm.it[k[0] + 'Hi']) > 0 ? num(gm.it[k[0] + 'Hi']) : num(o[k[1]])) : r2(num(o[k[1]]) * num(o.qty)); if (!ls.length || !(tot > 0)) return;
           ls.forEach(function (s) { var ps = P(s), share = r2(tot / ls.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: 'ค่ามือ ' + k[2], date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share }); }); });
         staffs.forEach(function (s) { var ps = P(s), share = r2(fee / staffs.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: prep ? 'ค่ามือ (เตรียมให้หมอ)' : 'ค่ามือ', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share }); });
       }
@@ -1863,7 +1873,7 @@ function makeCore(store) {
       else if (m.kind === 'manager') { m.skinPct = MSKIN; m.surgPct = MSURG; }
       else { var st0 = sl.filter(function (x) { return x.code === m.code; })[0].st, op = st0 && num(st0.commPct) ? num(st0.commPct) : num(setting('defaultCommPct', 5)); m.skinPct = op; m.surgPct = op; }
     });
-    var perBill = num(setting('adminPerBill', 0));
+    var perBill = adminTiers().length ? 1 : num(setting('adminPerBill', 0));   // >0 = แอดมินคิดต่อบิล (ขั้นเรท หรือเรทเดียว)
     sl.forEach(function (x) {
       if (x.kind === 'admin' && perBill > 0) { if (x.inR) { var pa = P(x.code); pa.sales = r2(pa.sales + x.base); } return; }   // แอดมินคิดต่อบิล: ยอดไว้ดูเฉยๆ
       var m = mon[x.code + '|' + x.mo], ps = P(x.code), pct = x.kind === 'admin' ? (x.st && num(x.st.commPct) ? num(x.st.commPct) : num(setting('adminCommPct', 5))) : x.surg ? m.surgPct : m.skinPct;
@@ -1895,10 +1905,10 @@ function makeCore(store) {
       }
       ps.salary = tot; ps.salaryMonth = sal;
     });
-    if (perBill > 0) adminBillRows(from, to).forEach(function (r) {
-      if (!r.bill || r.kind !== 'admin' || !r.code || (branchFilter && !branchFilter(r.branch))) return;
-      var pa = P(r.code); pa.comm = r2(pa.comm + perBill); pa.cases++;
-      items.push({ who: r.code, kind: 'ค่าคอมแอดมิน (ต่อบิล · ' + r.type + ')' + (r.carried ? ' · ลีดจากเดือนก่อน' : ''), date: r.date, branch: r.branch, hn: r.hn, name: r.name, item: 'ลีด ' + r.leadDate + (r.type === 'มัดจำ' ? ' · มัดจำ ' + r.dep : ' · ใช้จริง ' + r.actual), base: r.type === 'มัดจำ' ? r.dep : r.actual, pct: 0, amount: perBill });
+    if (perBill > 0) adminBillPay(adminBillRows(from.slice(0, 8) + '01', to.slice(0, 8) + '31')).forEach(function (r) {   // นับบิลทั้งเดือนเพื่อหาขั้นเรท แล้วจ่ายเฉพาะบิลในช่วงที่เลือก
+      if (!r.bill || r.kind !== 'admin' || !r.code || r.date < from || r.date > to || (branchFilter && !branchFilter(r.branch))) return;
+      var pa = P(r.code); pa.comm = r2(pa.comm + r.amt); pa.cases++;
+      items.push({ who: r.code, kind: 'ค่าคอมแอดมิน (ต่อบิล · ' + r.type + ')' + (r.carried ? ' · ลีดจากเดือนก่อน' : ''), date: r.date, branch: r.branch, hn: r.hn, name: r.name, item: 'บิลที่ ' + r.no + '/' + r.n + ' ของเดือน · เรท ' + r.rate + ' · ลีด ' + r.leadDate + (r.type === 'มัดจำ' ? ' · มัดจำ ' + r.dep : ' · ใช้จริง ' + r.actual), base: r.type === 'มัดจำ' ? r.dep : r.actual, pct: 0, amount: r.amt });
     });
     return { people: people, items: items };
   }
@@ -1921,9 +1931,21 @@ function makeCore(store) {
     });
     return out.sort(function (a, b) { return a.date < b.date ? 1 : -1; });
   }
+  // เรทต่อบิลตามจำนวนบิลของแอดมินคนนั้นในเดือน (ทุกสาขารวม) · Settings: adminBillTiers "1:50,31:100,51:120,81:150"
+  // adminTierMode = ทั้งหมด (ถึงขั้นไหน ทุกบิลได้เรทนั้น) | ขั้นบันได (บิล 1–30 ได้ 50, บิล 31–50 ได้ 100 ...) · ไม่ใส่ขั้น = ใช้ adminPerBill ตายตัว
+  function adminTiers() { var t = String(setting('adminBillTiers', '')).split(/[,\n]/).map(function (x) { var m = x.split(':'); return { min: num(m[0]), rate: num(m[1]) }; }).filter(function (x) { return x.min > 0 && x.rate >= 0; }); return t.sort(function (a, b) { return a.min - b.min; }); }
+  function adminRate(n) { var t = adminTiers(), r = num(setting('adminPerBill', 0)); if (!t.length) return r; r = 0; t.forEach(function (x) { if (n >= x.min) r = x.rate; }); return r; }
+  function adminWhole() { return !/ขั้นบันได|marginal|step/i.test(String(setting('adminTierMode', 'ทั้งหมด'))); }
+  function adminPay(n) { if (adminWhole()) return r2(n * adminRate(n)); var s = 0; for (var i = 1; i <= n; i++) s += adminRate(i); return r2(s); }
+  function adminBillPay(rs) {   // ใส่ r.no (ลำดับบิลในเดือน) r.n (บิลทั้งเดือน) r.rate r.amt
+    var g = {}; rs.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }).forEach(function (r) { if (!r.bill) return; var k = r.code + '|' + r.date.slice(0, 7); (g[k] = g[k] || []).push(r); });
+    var whole = adminWhole();
+    Object.keys(g).forEach(function (k) { var l = g[k], n = l.length; l.forEach(function (r, i) { r.no = i + 1; r.n = n; r.rate = adminRate(whole ? n : i + 1); r.amt = r.rate; }); });
+    return rs;
+  }
   A.adminBills = function (p, u) {
     var mo = /^\d{4}-\d{2}$/.test(String(p.month)) ? String(p.month) : today().slice(0, 7), from = mo + '-01', to = mo + '-31';
-    var per = num(setting('adminPerBill', 0)), rs = adminBillRows(from, to), by = {};
+    var tiers = adminTiers(), per = tiers.length ? -1 : num(setting('adminPerBill', 0)), rs = adminBillPay(adminBillRows(from, to)), by = {};
     var ads = rows('Staff').filter(function (s) { return on(s.active) && rolesOf(s).indexOf('adminpage') >= 0; });
     ads.forEach(function (s) { by[String(s.nick || s.name)] = { admin: String(s.nick || s.name), code: String(s.code), bills: 0, dep: 0, came: 0, fromPrev: 0, cameNoBuy: 0, byBranch: {}, depAmt: 0, actual: 0, pay: 0, leads: 0, closedAmt: 0, waiting: 0 }; });
     rs.forEach(function (r) { var a = by[r.admin]; if (!a) return;
@@ -1933,9 +1955,9 @@ function makeCore(store) {
     var vs = {}; rows('Visits').forEach(function (v) { if (v.leadId && v.stage !== 'CANCEL' && v.stage !== 'SALE') vs[v.leadId] = 1; });
     rows('Leads').forEach(function (l) { var a = by[String(l.admin)]; if (!a || String(l.date).slice(0, 7) !== mo) return;
       a.leads++; a.closedAmt = r2(a.closedAmt + num(l.closed)); if (!l.depAt && !vs[l.id] && l.status !== 'BOUGHT' && ['NEW', 'BOOKED'].indexOf(String(l.status)) >= 0) a.waiting++; });
-    var list = Object.keys(by).map(function (k) { var a = by[k]; a.pay = r2(a.bills * per); return a; }).filter(function (a) { return a.bills || a.leads || a.cameNoBuy; }).sort(function (a, b) { return b.bills - a.bills; });
+    var list = Object.keys(by).map(function (k) { var a = by[k]; a.rate = adminRate(a.bills); a.pay = adminPay(a.bills); var nx = tiers.filter(function (x) { return x.min > a.bills; })[0]; a.nextAt = nx ? nx.min : null; a.nextRate = nx ? nx.rate : null; return a; }).filter(function (a) { return a.bills || a.leads || a.cameNoBuy; }).sort(function (a, b) { return b.bills - a.bills; });
     function T(k) { return sum(list, function (a) { return a[k]; }); }
-    return { month: mo, perBill: per, admins: list, rows: rs, total: { bills: T('bills'), dep: T('dep'), came: T('came'), fromPrev: T('fromPrev'), waiting: T('waiting'), pay: T('pay') } };
+    return { month: mo, perBill: per, tiers: tiers, whole: adminWhole(), admins: list, rows: rs, total: { bills: T('bills'), dep: T('dep'), came: T('came'), fromPrev: T('fromPrev'), waiting: T('waiting'), pay: T('pay') } };
   };
   PERM.adminBills = ['owner', 'account', 'manager'];
 
