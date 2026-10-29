@@ -3398,7 +3398,12 @@ function makeCore(store) {
   /* ---------- สต้อก ---------- */
   A.stockList = function (p, u) {
     var b = p.branch === 'CENTRAL' && has(u, ['central', 'owner', 'admin']) ? 'CENTRAL' : u.branch;
-    return rows('Stock').filter(function (s) { return s.branch === b; }).map(function (s) { var o = clean(s); o.sealed = num(o.qty); o.open = splittable(s) ? openLeft(b, s.code) : 0; o.qty = r2(o.sealed + o.open); o.split = splittable(s); o.low = num(o.min) > 0 && o.qty <= num(o.min); return o; });
+    var mine = rows('Stock').filter(function (s) { return s.branch === b; });
+    if (p.req && b !== 'CENTRAL') {   // หน้าขอเบิก: รวมของที่มีในคลังกลางแต่สาขายังไม่เคยมี (คงเหลือสาขา = 0)
+      var have = {}; mine.forEach(function (s) { have[s.code] = 1; });
+      rows('Stock').forEach(function (s) { if (s.branch === 'CENTRAL' && !have[s.code]) { var c = clean(s); c.branch = b; c.qty = 0; c.min = 0; c.lot = ''; c.expire = ''; c.fromCentral = true; mine.push(c); } });
+    }
+    return mine.map(function (s) { var o = s.fromCentral ? s : clean(s); o.sealed = num(o.qty); o.open = splittable(s) ? openLeft(b, s.code) : 0; o.qty = r2(o.sealed + o.open); o.split = splittable(s); o.low = num(o.min) > 0 && o.qty <= num(o.min); return o; });
   };
   function nextRound() {
     var d = today(), day = +d.slice(8), rounds = String(setting('rounds', '15,30')).split(',').map(num).sort(function (a, b) { return a - b; });
@@ -3446,7 +3451,7 @@ function makeCore(store) {
       var q = p.lines && p.lines[l.stock] != null ? num(p.lines[l.stock]) : num(l.approved); upd('ReqLines', l, { received: q });
       if (q <= 0) return;
       var s = stockRow(u.branch, l.stock), c = stockRow('CENTRAL', l.stock);
-      if (!s) s = add('Stock', { branch: u.branch, code: l.stock, name: l.name, category: c ? c.category : '', unit: c ? c.unit : '', qty: 0, cost: c ? num(c.cost) : 0, min: 0, lot: '', expire: '' });
+      if (!s) s = add('Stock', { branch: u.branch, code: l.stock, name: l.name, category: c ? c.category : '', unit: c ? c.unit : '', qty: 0, cost: c ? num(c.cost) : 0, pack: c ? c.pack : '', packName: c ? c.packName : '', openDays: c ? c.openDays : '', min: 0, lot: '', expire: '' });
       var bal = r2(num(s.qty) + q); upd('Stock', s, { qty: bal }); add('StockMoves', { time: stamp(), branch: u.branch, stock: s.code, name: s.name, qty: q, type: 'รับจากคลังกลาง', ref: r.id, by: who.name + ' (' + who.code + ')', balance: bal });
     });
     upd('Reqs', r, { status: 'RECEIVED', receivedAt: stamp(), note: [r.note, 'รับโดย ' + who.name].filter(String).join(' · ') }); log(u, 'reqReceive', r.id); return true;
@@ -5584,9 +5589,16 @@ ACT.vialOpen = function () {
 };
 ACT.stab = function (el) { S.cur.arg = el.dataset.t; refresh(); };
 ACT.reqAdd = function () {
-  stockCache().then(function (st) {
-    dialog({ title: 'เพิ่มรายการเบิก', ok: 'เพิ่ม', body: '<label>รายการ<select id="rs">' + opts(st.map(function (s) { return [s.code, s.name]; }), '', '— เลือก —') + '</select></label><label>จำนวน<input id="rq" type="number" inputmode="decimal"></label>',
-      onOk: function (b) { var c = need(b.querySelector('#rs').value, 'เลือกรายการ'), q = nz(b.querySelector('#rq').value); need(q > 0 || '', 'ใส่จำนวน'); S.v.sug.push({ stock: c, qty: q }); $('[data-a=reqSend]').disabled = false; toast('เพิ่มแล้ว (' + S.v.sug.length + ' รายการ)'); } });
+  call('stockList', { req: 1 }).then(function (st) {
+    var byC = {}; st.forEach(function (s) { byC[s.code] = s; });
+    dialog({ title: 'เพิ่มรายการเบิก', ok: 'เพิ่ม', body: '<label>รายการ<select id="rs">' + opts(st.map(function (s) { return [s.code, s.name]; }), '', '— เลือก —') + '</select></label><div class="g2"><label>จำนวน<input id="rq" type="number" inputmode="decimal" step="any"></label><label>หน่วย<select id="ru"><option value="1">—</option></select></label></div><p class="xs muted" id="rh"></p>',
+      onOk: function (b) { var c = need(b.querySelector('#rs').value, 'เลือกรายการ'), q = nz(b.querySelector('#rq').value) * (nz(b.querySelector('#ru').value) || 1); need(q > 0 || '', 'ใส่จำนวน'); S.v.sug.push({ stock: c, qty: q }); $('[data-a=reqSend]').disabled = false; toast('เพิ่มแล้ว ' + fm(q) + ' ' + ((byC[c] || {}).unit || '') + ' (' + S.v.sug.length + ' รายการ)'); } });
+    var rs = $('#rs'), ru = $('#ru'), rh = $('#rh');
+    if (rs && ru) rs.onchange = function () {   // ของที่มีขนาดบรรจุ: เลือกเบิกเป็นกล่อง/ขวดได้ ระบบแปลงเป็นหน่วยเล็กสุดให้
+      var s = byC[rs.value]; if (!s) return; var pk = Number(s.pack) || 1;
+      ru.innerHTML = (pk > 1 ? '<option value="' + pk + '">' + esc(s.packName || 'แพ็ค') + ' (' + pk + ' ' + esc(s.unit) + ')</option>' : '') + '<option value="1">' + esc(s.unit || 'หน่วย') + '</option>';
+      rh.textContent = 'คงเหลือที่สาขา ' + fm(s.qty) + ' ' + (s.unit || '');
+    };
   });
 };
 ACT.reqSend = function () {

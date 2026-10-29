@@ -2158,7 +2158,12 @@ function makeCore(store) {
   /* ---------- สต้อก ---------- */
   A.stockList = function (p, u) {
     var b = p.branch === 'CENTRAL' && has(u, ['central', 'owner', 'admin']) ? 'CENTRAL' : u.branch;
-    return rows('Stock').filter(function (s) { return s.branch === b; }).map(function (s) { var o = clean(s); o.sealed = num(o.qty); o.open = splittable(s) ? openLeft(b, s.code) : 0; o.qty = r2(o.sealed + o.open); o.split = splittable(s); o.low = num(o.min) > 0 && o.qty <= num(o.min); return o; });
+    var mine = rows('Stock').filter(function (s) { return s.branch === b; });
+    if (p.req && b !== 'CENTRAL') {   // หน้าขอเบิก: รวมของที่มีในคลังกลางแต่สาขายังไม่เคยมี (คงเหลือสาขา = 0)
+      var have = {}; mine.forEach(function (s) { have[s.code] = 1; });
+      rows('Stock').forEach(function (s) { if (s.branch === 'CENTRAL' && !have[s.code]) { var c = clean(s); c.branch = b; c.qty = 0; c.min = 0; c.lot = ''; c.expire = ''; c.fromCentral = true; mine.push(c); } });
+    }
+    return mine.map(function (s) { var o = s.fromCentral ? s : clean(s); o.sealed = num(o.qty); o.open = splittable(s) ? openLeft(b, s.code) : 0; o.qty = r2(o.sealed + o.open); o.split = splittable(s); o.low = num(o.min) > 0 && o.qty <= num(o.min); return o; });
   };
   function nextRound() {
     var d = today(), day = +d.slice(8), rounds = String(setting('rounds', '15,30')).split(',').map(num).sort(function (a, b) { return a - b; });
@@ -2206,7 +2211,7 @@ function makeCore(store) {
       var q = p.lines && p.lines[l.stock] != null ? num(p.lines[l.stock]) : num(l.approved); upd('ReqLines', l, { received: q });
       if (q <= 0) return;
       var s = stockRow(u.branch, l.stock), c = stockRow('CENTRAL', l.stock);
-      if (!s) s = add('Stock', { branch: u.branch, code: l.stock, name: l.name, category: c ? c.category : '', unit: c ? c.unit : '', qty: 0, cost: c ? num(c.cost) : 0, min: 0, lot: '', expire: '' });
+      if (!s) s = add('Stock', { branch: u.branch, code: l.stock, name: l.name, category: c ? c.category : '', unit: c ? c.unit : '', qty: 0, cost: c ? num(c.cost) : 0, pack: c ? c.pack : '', packName: c ? c.packName : '', openDays: c ? c.openDays : '', min: 0, lot: '', expire: '' });
       var bal = r2(num(s.qty) + q); upd('Stock', s, { qty: bal }); add('StockMoves', { time: stamp(), branch: u.branch, stock: s.code, name: s.name, qty: q, type: 'รับจากคลังกลาง', ref: r.id, by: who.name + ' (' + who.code + ')', balance: bal });
     });
     upd('Reqs', r, { status: 'RECEIVED', receivedAt: stamp(), note: [r.note, 'รับโดย ' + who.name].filter(String).join(' · ') }); log(u, 'reqReceive', r.id); return true;
