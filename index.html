@@ -134,7 +134,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dots{display:flex;gap:.7rem;justify-content:center;margin:1rem 0}
 .dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink3)}
 .dots i.on{background:var(--accent);border-color:var(--accent)}
-.sig{border:1.5px dashed var(--ink3);border-radius:12px;background:var(--surface);touch-action:none;width:100%;height:170px;display:block}
+.sig{border:1.5px dashed var(--ink3);border-radius:12px;background:#fff;touch-action:none;width:100%;height:170px;display:block}
 .chips{display:flex;flex-wrap:wrap;gap:.45rem}
 .chips button{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:.5rem .85rem;cursor:pointer;min-height:44px;text-align:left}
 .chips button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
@@ -268,6 +268,8 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .bq-url{font-size:.75rem;word-break:break-all;max-width:100%}
 .bq-amt{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums}
 .prod .addnew{border:1.5px dashed var(--line,#c9d6d4);background:transparent}
+input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none}
+.split>*,.cart,.cart .li .main{min-width:0}select{max-width:100%;min-width:0}.cart .li .t{overflow-wrap:anywhere}
 
 </style>
 </head>
@@ -1584,7 +1586,7 @@ var SCHEMA = {
                ['bc','BC'],['wallet','วงเงินคงเหลือ','n'],['consent','ยินยอมใช้ข้อมูลรักษา'],['mktConsent','ยินยอมรับโฆษณา'],['sign','ลายเซ็น (Drive)'],['channel','รู้จักจาก'],['ad','จากแอด'],['reviewOk','อนุญาตใช้รูปรีวิว']],
   Leads:      [['id','เลขลีด'],['date','วันที่'],['branch','สาขา'],['fbName','ชื่อ facebook'],['gender','เพศ'],['phone','เบอร์โทร'],['channel','channel'],['ad','ทักมาจากแอด'],['interest','บริการที่สนใจ'],
                ['value','Value คาดการณ์','n'],['prefer','สะดวกวันไหน'],['admin','แอดมิน'],['status','สถานะ'],['hn','HN'],['vn','VN แรก'],['actual','Value จริง','n'],['created','สร้างเมื่อ','t'],['apptId','นัด'],
-               ['closed','ยอดที่แอดมินปิดได้','n'],['closedNote','ปิดโปร/รายการ'],['credited','นับให้แอดมินแล้ว','n']],
+               ['closed','ยอดที่แอดมินปิดได้','n'],['closedNote','ปิดโปร/รายการ'],['credited','นับให้แอดมินแล้ว','n'],['page','เพจที่ทักมา (CNX/PTY/JB)'],['depAt','มัดจำเมื่อ','t'],['depAmt','ยอดมัดจำ','n'],['depRc','ใบเสร็จมัดจำ']],
   Ads:        [['name','ชื่อแอด/โปร'],['channel','channel'],['active','ใช้งาน','b']],
   Appointments:[['id','เลขนัด'],['branch','สาขา'],['date','วันที่'],['start','เริ่ม'],['end','จบ'],['room','ห้อง'],['cRoom','ห้องตรวจ (ปรึกษา)'],['cStart','ปรึกษาเริ่ม'],['cEnd','ปรึกษาจบ'],
                ['hn','HN'],['name','ชื่อ'],['phone','โทร'],['item','รายการ'],['itemName','ชื่อรายการ'],['courseId','ใช้คอร์ส'],['note','หมายเหตุ'],['status','สถานะ'],['vn','VN'],['leadId','ลีด'],['by','ผู้ลงนัด'],['created','เวลาลงนัด','t'],['ipdRoom','ห้องพักฟื้น'],['ipdEnd','พักฟื้นถึง']],
@@ -1592,7 +1594,7 @@ var SCHEMA = {
                ['doctor','แพทย์'],['room','ห้อง'],['claimedBy','ผู้รับงาน'],['numbAt','ทายาชาเมื่อ','t'],['numbMin','ยาชา (นาที)','n'],['created','เวลาเข้า','t'],['updated','อัปเดต','t'],['apptId','นัด'],['leadId','ลีด'],['buyMore','ซื้อเพิ่ม','b'],
                ['route','ส่งต่อไป (หลังคุย)'],['concern','ความกังวล/สิ่งที่อยากแก้'],['consultBy','ผู้คุยเบื้องต้น'],
                ['concernNote','รายละเอียดที่คุย'],['bp','ความดัน (BP)'],['pr','ชีพจร (PR)','n']],
-  OPD:        [['vn','VN'],['hn','HN'],['doctor','แพทย์'],['cc','CC'],['pi','PI'],['pe','PE'],['dx','Dx'],['plan','แผนการรักษา'],['followDays','นัดติดตาม (วัน)','n'],['signed','ลงนามโดย'],['signedAt','ลงนามเมื่อ','t'],['time','บันทึกเมื่อ','t']],
+  OPD:        [['vn','VN'],['hn','HN'],['doctor','แพทย์'],['cc','CC'],['pi','PI'],['pe','PE'],['dx','Dx'],['plan','แผนการรักษา'],['followDays','นัดติดตาม (วัน)','n'],['signed','ลงนามโดย'],['signedAt','ลงนามเมื่อ','t'],['time','บันทึกเมื่อ','t'],['proc','บันทึกหัตถการ (แพทย์)'],['sigImg','ไฟล์ลายเซ็นแพทย์']],
   Orders:     [['id','เลขรายการ'],['vn','VN'],['item','รหัส'],['name','รายการ'],['type','ประเภท'],['category','หมวด'],['qty','จำนวน','n'],['price','ราคา/หน่วย','n'],['disc','ส่วนลด','n'],['total','รวม','n'],
                ['paidNet','รับจริง (หลังลดท้ายบิล)','n'],['cashNet','รับเป็นเงินจริง (ไม่รวมวงเงิน)','n'],['upsell','อัพเซล','b'],['seller','ผู้ขาย'],['adminShare','ยอดของแอดมิน (ปิดจากเพจ)','n'],['voidOf','จากบิลที่ยกเลิก'],['adminBy','แอดมินที่ปิด'],['receipt','ใบเสร็จ'],['status','สถานะ'],['courseRef','ใช้คอร์ส'],['promo','โปร'],['choice','ตัวเลือก'],
                ['perVal','มูลค่าต่อครั้ง','n'],['dfPct','DF %','n'],['staffFee','ค่ามือพนักงาน','n'],['prepFee','ค่ามือตอนเตรียม','n'],['scrub','Scrub'],['circ','Circulating'],['scrubFee','ค่ามือ Scrub','n'],['circFee','ค่ามือ Circulating','n'],['dfFixed','DF บาท/ครั้ง','n'],['doctor','แพทย์ผู้ทำ'],['staffs','พนักงานผู้ทำ'],
@@ -1719,9 +1721,9 @@ function makeCore(store) {
   var PERM = {
     boot: ALL, searchPatients: ALL, patientPage: ALL, getPhoto: SELLERS.concat(['adminpage']),
     registerPatient: FRONTISH, patientConsent: FRONTISH, setPhoto: FRONTISH.concat(CLIN), ocrIdCard: FRONTISH, addLegacyCourse: FRONTISH,
-    dayBook: ALL, slots: FRONTISH, apptCreate: FRONTISH, apptCancel: FRONTISH, apptMove: FRONTISH, apptArrive: FRONTISH, apptNoShow: FRONTISH,
+    dayBook: ALL, slots: FRONTISH.concat(['adminpage']), apptCreate: FRONTISH, apptCancel: FRONTISH, apptMove: FRONTISH, apptArrive: FRONTISH, apptNoShow: FRONTISH,
     createVisit: FRONTISH, queue: ALL, cancelVisit: FRONTISH,
-    callDoctor: ['doctor'], saveOPD: ['doctor'], startNumb: CLIN, claim: CLIN, moveRoom: CLIN, completeOrder: CLIN, sendBack: CLIN, visitDetail: ALL,
+    callDoctor: ['doctor'], saveOPD: CLIN, opdSig: ALL, startNumb: CLIN, claim: CLIN, moveRoom: CLIN, completeOrder: CLIN, sendBack: CLIN, visitDetail: ALL,
     saleCommit: SELLERS, useCourse: SELLERS, removeOrder: FRONTISH.concat(['doctor']), dueList: FRONTISH.concat(['account']), bill: FRONTISH.concat(['account']), pay: FRONTISH,
     reviewConsent: CLIN.concat(FRONTISH),
     leadCreate: ['adminpage', 'front', 'manager'], leadList: ['adminpage', 'front', 'manager', 'marketing'], ads: ALL,
@@ -1887,7 +1889,7 @@ function makeCore(store) {
       channel: txt(p.channel, 30), ad: txt(p.ad, 120), reviewOk: ''
     });
     // walk-in ที่ทักเพจมาก่อน: สร้างลีดให้ ทีมการตลาดจะได้เห็นยอดจริง
-    if (p.channel && p.channel !== 'Walk-in' && !leadOf(phone)) {
+    if (p.channel && ['Walk-in', 'เซลหามาเอง', 'เพื่อนแนะนำ'].indexOf(String(p.channel)) < 0 && !leadOf(phone)) {
       add('Leads', { id: nextId('L', 'seq_L', 5), date: today(), branch: u.branch, fbName: name, gender: o.gender, phone: phone, channel: txt(p.channel), ad: txt(p.ad), interest: '', value: 0,
         prefer: '', admin: 'หน้าร้าน', status: 'NEW', hn: hn, vn: '', actual: 0, created: now, apptId: '' });
     }
@@ -1900,6 +1902,24 @@ function makeCore(store) {
     if (!p.consent) err('คนไข้ต้องยินยอมการใช้ข้อมูลเพื่อการรักษา (PDPA) ก่อน'); if (!p.sign) err('กรุณาให้คนไข้เซ็นชื่อ');
     upd('Patients', pt, { consent: stamp(), mktConsent: p.mktConsent ? stamp() : '', sign: store.savePhoto(pt.hn + '_sign', p.sign) }); log(u, 'patientConsent', pt.hn); return cleanPt(pt);
   };
+  // คนไข้ที่ลงชื่อไว้จากลีด มาถึงแล้วกรอกประวัติเพิ่ม + เซ็นยินยอม (ใช้แฟ้มเดิม ไม่สร้าง HN ใหม่)
+  A.patientComplete = function (p, u) {
+    var pt = find('Patients', 'hn', txt(p.hn)); if (!pt) err('ไม่พบคนไข้');
+    var name = txt(p.name, 120); if (!name) err('กรุณาใส่ชื่อ-สกุล');
+    var phone = String(p.phone || '').replace(/[^\d+]/g, ''); if (!/^\+?\d{9,15}$/.test(phone)) err('กรุณาใส่เบอร์โทรให้ถูกต้อง');
+    var email = txt(p.email).toLowerCase(); if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) err('อีเมลไม่ถูกต้อง');
+    if (!pt.consent && !p.consent) err('คนไข้ต้องยินยอมการใช้ข้อมูลเพื่อการรักษา (PDPA) ก่อน'); if (!pt.consent && !p.sign) err('กรุณาให้คนไข้เซ็นชื่อ');
+    var idc = String(p.idcard || '').replace(/[\s-]/g, '').toUpperCase();
+    if (idc) { if (/^\d+$/.test(idc) && !idValid(idc)) err('เลขบัตรประชาชนไม่ถูกต้อง ตรวจอีกครั้ง'); var dup = rows('Patients').filter(function (r) { return String(r.idcard) === idc && r !== pt; })[0]; if (dup) err('เลขบัตรนี้ลงทะเบียนแล้ว: ' + dup.hn + ' ' + dup.name); }
+    var now = stamp(), o = { name: name, phone: phone, email: email, idcard: idc, dob: isDate(p.dob) ? p.dob : pt.dob, gender: ['ชาย', 'หญิง', 'อื่นๆ'].indexOf(p.gender) >= 0 ? p.gender : pt.gender };
+    ['title', 'nickname', 'nameEn', 'occupation', 'address', 'allergy', 'chronic', 'supplements', 'silicone', 'smoking', 'emName'].forEach(function (k) { if (p[k] !== undefined) o[k] = txt(p[k], k === 'address' ? 300 : 200); });
+    if (p.emPhone !== undefined) o.emPhone = String(p.emPhone || '').replace(/[^\d+]/g, '');
+    if (p.img) o.photo = store.savePhoto(pt.hn + '_id', p.img);
+    if (p.consent && p.sign) { o.consent = now; o.sign = store.savePhoto(pt.hn + '_sign', p.sign); }
+    if (p.mktConsent) o.mktConsent = now;
+    upd('Patients', pt, o); log(u, 'patientComplete', pt.hn); return cleanPt(pt);
+  };
+  PERM.patientComplete = FRONTISH; WRITES.patientComplete = 1;
   A.setPhoto = function (p, u) {
     var pt = find('Patients', 'hn', p.hn); if (!pt) err('ไม่พบคนไข้');
     upd('Patients', pt, { photo: store.savePhoto(pt.hn + '_id', p.img) }); log(u, 'setPhoto', pt.hn); return true;
@@ -1933,7 +1953,7 @@ function makeCore(store) {
       due: open ? sum(ords.filter(function (o) { return o.vn === open.vn && !o.receipt; }), function (o) { return o.total; }) : 0,
       history: visits.slice(-20).reverse().map(function (v) {
         var op = opd.filter(function (o) { return o.vn === v.vn; })[0] || {};
-        return { vn: v.vn, date: v.date, branch: v.branch, doctor: v.doctor, stage: v.stage, dx: op.dx || '', plan: op.plan || '',
+        return { vn: v.vn, date: v.date, branch: v.branch, doctor: v.doctor, stage: v.stage, dx: op.dx || '', plan: op.plan || '', proc: op.proc || '', signed: op.signed ? String(op.signed).replace(/^\S+\s/, '') + ' · ' + op.signedAt + (op.sigImg ? ' ✍' : '') : '',
           orders: ords.filter(function (o) { return o.vn === v.vn; }).map(function (o) { return o.name + ' ×' + o.qty; }) };
       })
     };
@@ -2005,7 +2025,8 @@ function makeCore(store) {
   A.slots = function (p, u) {
     var it = itemByCode(p.item); if (!it) err('เลือกรายการก่อน');
     if (!isDate(p.date)) err('เลือกวันที่');
-    return findSlots(u.branch, p.date, it, p.hn, p.exceptId);
+    var b = p.branch && find('Branches', 'code', p.branch) ? String(p.branch) : u.branch;
+    return findSlots(b, p.date, it, p.hn, p.exceptId);
   };
 
   A.dayBook = function (p, u) {
@@ -2143,17 +2164,51 @@ function makeCore(store) {
     if (room && roomTaken(u.branch, room, v.vn)) err(room + ' มีคนไข้อยู่');
     setStage(v, 'IN_DR', { doctor: u.name, room: room }); log(u, 'callDoctor', v.vn); return true;
   };
+  // แพทย์บันทึก OPD ได้ทั้งหน้าตรวจและหน้าห้องหัตถการ · แท็บเล็ตห้องที่ล็อกอินเป็นผู้ช่วย ให้แพทย์ใส่ PIN ตัวเอง
+  function docByPin(p, u) {
+    if ((u.roles || []).indexOf('doctor') >= 0) return u;
+    var pin = String(p.pin || '').trim(), fk = 'f_' + u.branch, fails = num(store.cacheGet(fk));
+    if (!/^\d{4,8}$/.test(pin)) err('ให้แพทย์ใส่รหัสพนักงาน (PIN) ของตัวเอง');
+    if (fails >= 10) err('ใส่รหัสผิดหลายครั้ง กรุณารอ 5 นาที');
+    var h = store.hash('pin:' + pin), st = rows('Staff').filter(function (x) { return on(x.active) && (String(x.pin) === h || String(x.pin) === pin); })[0];
+    if (!st) { store.cachePut(fk, String(fails + 1), 300); err('รหัสแพทย์ไม่ถูกต้อง'); }
+    if (rolesOf(st).indexOf('doctor') < 0) err((st.nick || st.name) + ' ไม่ใช่แพทย์ — บันทึก/ลงนาม OPD ได้เฉพาะแพทย์');
+    if (!canBranch(st, u.branch)) err('แพทย์ไม่มีสิทธิ์ที่สาขานี้');
+    return { code: String(st.code), name: String(st.nick || st.name), fullName: String(st.name) };
+  }
   A.saveOPD = function (p, u) {
-    var v = visitOf(p.vn, u);
+    var v = visitOf(p.vn, u), d = docByPin(p, u);
     if (['DONE', 'CANCEL'].indexOf(v.stage) >= 0) err('ปิดเคสแล้ว');
     var ex = find('OPD', 'vn', v.vn);
-    if (ex && ex.signed && !p.addendum) err('บันทึกนี้ลงนามแล้ว แก้ไขไม่ได้ — ใช้ \"บันทึกเพิ่มเติม\"');
-    var data = { vn: v.vn, hn: v.hn, doctor: u.name, cc: txt(p.cc, 500), pi: txt(p.pi, 2000), pe: txt(p.pe, 2000), dx: txt(p.dx, 500), plan: txt(p.plan, 2000), followDays: Math.round(num(p.followDays)), time: stamp() };
-    if (p.sign) { data.signed = u.code + ' ' + u.fullName; data.signedAt = stamp(); }
-    if (ex && p.addendum) { data.plan = ex.plan + '\n[เพิ่มเติม ' + stamp() + ' ' + u.name + '] ' + txt(p.addendum, 1000); data.pi = ex.pi; data.pe = ex.pe; data.dx = ex.dx; data.cc = ex.cc; data.signed = ex.signed; data.signedAt = ex.signedAt; }
-    if (ex) upd('OPD', ex, data); else add('OPD', data);
-    if (p.finish) setStage(v, 'DR_DONE', { room: '', doctor: v.doctor || u.name });
-    log(u, p.finish ? 'finishOPD' : 'saveOPD', v.vn); return true;
+    if (p.reopen) {   // แพทย์ขอแก้บันทึกที่เซ็นแล้ว (เคสยังไม่ปิด): เก็บฉบับเดิมไว้ในบันทึกการใช้งาน แล้วกลับเป็นร่าง ต้องเซ็นใหม่
+      if (!ex || !ex.signed) return true;
+      log(u, 'opdReopen', v.vn + ' โดย ' + d.code + ' · ฉบับเดิม: ' + JSON.stringify({ cc: ex.cc, pi: ex.pi, pe: ex.pe, dx: ex.dx, plan: ex.plan, proc: ex.proc, signed: ex.signed, signedAt: ex.signedAt, sigImg: ex.sigImg }).slice(0, 4000));
+      upd('OPD', ex, { signed: '', signedAt: '', sigImg: '', time: stamp() }); return true;
+    }
+    if (ex && ex.signed && !p.addendum && !p.procAdd) err('บันทึกนี้ลงนามแล้ว แก้ไขไม่ได้ — ใช้ \"บันทึกเพิ่มเติม\"');
+    if (ex && ex.signed) {
+      var line = '[' + stamp() + ' ' + d.name + '] ';
+      if (p.procAdd) upd('OPD', ex, { proc: (ex.proc ? ex.proc + '\n' : '') + line + txt(p.procAdd, 2000) });
+      if (p.addendum) upd('OPD', ex, { plan: ex.plan + '\n[เพิ่มเติม ' + stamp() + ' ' + d.name + '] ' + txt(p.addendum, 1000) });
+      log(u, 'opdAddendum', v.vn + (d !== u ? ' โดย ' + d.code : '')); return true;
+    }
+    ex = ex || {};
+    function k(f, n) { return p[f] === undefined ? (ex[f] || '') : txt(p[f], n); }
+    var data = { vn: v.vn, hn: v.hn, doctor: d.name, cc: k('cc', 500), pi: k('pi', 2000), pe: k('pe', 2000), dx: k('dx', 500), plan: k('plan', 2000), proc: k('proc', 3000),
+      followDays: p.followDays === undefined ? num(ex.followDays) : Math.round(num(p.followDays)), time: stamp() };
+    if (p.sign) {
+      if (!data.dx && !data.plan && !data.proc) err('ใส่ Dx / แผน / รายละเอียดหัตถการ ก่อนลงนาม');
+      var sr = find('Staff', 'code', d.code) || {}; data.signed = d.code + ' ' + (d.fullName || d.name) + (sr.license ? ' (' + sr.license + ')' : ''); data.signedAt = stamp();
+      if (p.sigImg) data.sigImg = store.savePhoto(v.hn + '_' + v.vn + '_drsign', p.sigImg);
+    }
+    if (ex.vn) upd('OPD', ex, data); else add('OPD', data);
+    if (!v.doctor) upd('Visits', v, { doctor: d.name });
+    if (p.finish) setStage(v, 'DR_DONE', { room: '', doctor: v.doctor || d.name });
+    log(u, p.finish ? 'finishOPD' : 'saveOPD', v.vn + (d !== u ? ' โดย ' + d.code : '')); return true;
+  };
+  A.opdSig = function (p, u) {
+    var op = find('OPD', 'vn', p.vn); if (!op || !op.sigImg) err('ไม่มีลายเซ็น');
+    visitOf(p.vn, u); log(u, 'viewDrSign', p.vn); return store.getPhoto(op.sigImg);
   };
   A.startNumb = function (p, u) {
     var v = visitOf(p.vn, u);
@@ -2370,7 +2425,7 @@ function makeCore(store) {
     if (!ss.length) return txt(p.seller || u.name, 60);
     var tot = sum(ss, function (x) { return x.pct; });
     if (ss.length > 1 && Math.abs(tot - 100) > 0.5) err('สัดส่วนผู้ขายต้องรวมกัน 100% (ตอนนี้ ' + tot + '%)');
-    return ss.length === 1 ? txt(ss[0].name, 40) : ss.map(function (x) { return txt(x.name, 40).replace(/[:,]/g, '') + ':' + r2(num(x.pct)); }).join(',');
+    return ss.length === 1 ? txt(ss[0].name, 40) : ss.map(function (x) { return txt(x.name, 40).replace(/[:,]/g, '') + ':' + Math.round(num(x.pct) * 1e4) / 1e4; }).join(',');
   }
   function addOrder(v, it, qty, u, o2) {
     o2 = o2 || {};
@@ -2587,9 +2642,15 @@ function makeCore(store) {
     add('Payments', { receipt: rc, vn: v.vn, hn: v.hn, name: v.name, subtotal: sub, discount: disc, net: net, method: detail, by: u.name, time: stamp(), branch: u.branch, change: change, wallet: wal, ar: ar, fee: fee });
     lines.forEach(function (l) { add('PayLines', { receipt: rc, method: l.method, amount: r2(l.amount + l.fee), fee: l.fee, ref: l.ref, branch: u.branch, time: stamp(), by: u.name }); });
     beamRows.forEach(function (b) { upd('BeamCharges', b, { status: 'PAID', paidAt: b.paidAt || stamp(), receipt: rc }); });
+    // มัดจำที่เก็บทีหลัง (หน้าคนไข้) ของลูกค้าจากลีดที่ยังไม่มา → นับเป็นบิลมัดจำของแอดมิน
+    if (os.some(function (o) { return o.type === 'wallet' && /^มัดจำ/.test(o.name); })) {
+      var dfrom = addDays(today(), -num(setting('adminDealDays', 60)));
+      var dl0 = rows('Leads').filter(function (l) { return !l.depAt && l.admin && l.admin !== 'หน้าร้าน' && l.status !== 'BOUGHT' && String(l.date) >= dfrom && (l.hn === v.hn || (pt0 && pt0.phone && String(l.phone) === String(pt0.phone))); }).slice(-1)[0];
+      if (dl0) upd('Leads', dl0, { depAt: stamp(), depAmt: sum(os.filter(function (o) { return o.type === 'wallet' && /^มัดจำ/.test(o.name); }), function (o) { return o.paidNet || o.total; }), depRc: rc, hn: v.hn });
+    }
     // ลีด: นับเฉพาะ visit แรก
     var pt = find('Patients', 'hn', v.hn), ld = v.leadId ? find('Leads', 'id', v.leadId) : null;
-    if (ld && (!ld.vn || ld.vn === v.vn)) upd('Leads', ld, { status: 'BOUGHT', vn: v.vn, hn: v.hn, actual: r2(num(ld.actual) + net) });
+    if (ld && (!ld.vn || ld.vn === v.vn)) upd('Leads', ld, { status: 'BOUGHT', vn: v.vn, hn: v.hn, actual: r2(num(ld.actual) + net), value: r2(num(ld.actual) + net) });
     var all = ordersOf(v.vn), pend = all.some(function (o) { return o.status === 'PENDING'; });
     if (v.stage === 'SALE' || (v.stage === 'BACK' && !pend)) setStage(v, 'DONE');
     log(u, 'pay', rc + ' ' + v.vn + ' ' + net + ' · ' + detail);
@@ -2804,14 +2865,33 @@ function makeCore(store) {
     if (!txt(p.fbName)) err('ใส่ชื่อ facebook / LINE');
     if (!find('Branches', 'code', p.branch)) err('เลือกสาขา');
     var pt = rows('Patients').filter(function (x) { return String(x.phone) === phone; })[0];
+    // นัดเลยตอนลงลีด (ถ้าลูกค้าเลือกเวลาแล้ว) — เช็กเวลาว่างก่อนบันทึกอะไร
+    var ap = p.appt && p.appt.item && p.appt.date && p.appt.time ? p.appt : null, ub = Object.assign({}, u, { branch: String(p.branch) }), apIt = null;
+    if (ap) { apIt = itemByCode(ap.item); if (!apIt) err('เลือกรายการที่จะนัด'); if (!isDate(ap.date) || ap.date < today()) err('วันที่นัดต้องไม่ย้อนหลัง');
+      if (!findSlots(ub.branch, ap.date, apIt, pt ? pt.hn : '').slots.some(function (x) { return x.time === ap.time; })) err('เวลา ' + ap.time + ' ไม่ว่างแล้ว เลือกเวลาใหม่'); }
+    var dp = p.deposit && num(p.deposit.amount) > 0 ? p.deposit : null;
+    if (dp) { if (!txt(p.admin)) err('มัดจำต้องระบุคนที่ปิดการขาย'); var dm = find('PayMethods', 'name', txt(dp.method)); if (!dm) err('เลือกช่องทางที่ลูกค้าโอนมัดจำ'); if (isBeam(dm.name)) err('มัดจำผ่าน Beam ให้รับที่หน้าเก็บเงิน'); if (on(dm.needRef) && !txt(dp.ref)) err('ใส่เลขอ้างอิงการโอนมัดจำ'); }
     var l = add('Leads', { id: nextId('L', 'seq_L', 5), date: today(), branch: p.branch, fbName: txt(p.fbName, 80), gender: txt(p.gender, 10), phone: phone, channel: txt(p.channel, 30),
-      ad: txt(p.ad, 120), interest: txt(p.interest, 120), value: num(p.value), prefer: txt(p.prefer, 120), admin: u.name, status: 'NEW', hn: pt ? pt.hn : '', vn: '', actual: 0, created: stamp(), apptId: '',
-      closed: Math.max(0, r2(num(p.closed))), closedNote: txt(p.closedNote, 120), credited: 0 });
+      ad: txt(p.ad, 120), interest: txt(p.interest, 120), value: num(p.value), prefer: txt(p.prefer, 120), admin: txt(p.admin, 60) || u.name, status: 'NEW', hn: pt ? pt.hn : '', vn: '', actual: 0, created: stamp(), apptId: '',
+      closed: Math.max(0, r2(num(p.closed))), closedNote: txt(p.closedNote, 120), credited: 0, page: ['CNX', 'PTY', 'JB'].indexOf(p.page) >= 0 ? p.page : pageOf(p.branch) });
     log(u, 'leadCreate', l.id + ' ' + l.fbName);
+    var appt = null, depo = null;
+    if ((ap || dp) && !pt) { var np0 = A.registerPatient({ name: txt(p.fbName, 80), phone: phone, gender: p.gender, noEmail: true, pre: true, note: 'ลงทะเบียนจากลีด #' + l.id }, ub); pt = find('Patients', 'hn', np0.hn); upd('Patients', pt, { channel: txt(p.channel, 30), ad: txt(p.ad, 120) }); upd('Leads', l, { hn: pt.hn }); }
+    if (dp) {
+      // มัดจำที่ลูกค้าโอนในแชท: เข้ายอดร้านวันนี้ + นับค่าคอมคนปิดวันนี้ (เข้าวงเงินคนไข้ ใช้หักตอนมาทำ)
+      var sc = A.saleCommit({ hn: pt.hn, items: [{ topup: num(dp.amount), deposit: true, note: txt(p.closedNote || p.interest, 80) || 'จากแชท', surg: /ผ่าตัด|เสริม|จมูก|ตา|หน้าอก/.test(String(p.closedNote || p.interest || '')) }], sellers: [{ name: txt(p.admin, 60), pct: 100 }] }, ub);
+      var dv = find('Visits', 'vn', sc.vn); upd('Visits', dv, { leadId: '' });
+      var pr = A.pay({ vn: sc.vn, lines: [{ method: txt(dp.method), amount: num(dp.amount), ref: txt(dp.ref, 60) }] }, ub);
+      depo = { receipt: pr.receipt, amount: num(dp.amount) }; upd('Leads', l, { depAt: stamp(), depAmt: num(dp.amount), depRc: pr.receipt });
+    }
+    if (ap) {
+      if (!pt) { var np = A.registerPatient({ name: txt(p.fbName, 80), phone: phone, gender: p.gender, noEmail: true, pre: true, note: 'ลงทะเบียนจากลีด #' + l.id }, ub); pt = find('Patients', 'hn', np.hn); upd('Patients', pt, { channel: txt(p.channel, 30), ad: txt(p.ad, 120) }); upd('Leads', l, { hn: pt.hn }); }
+      appt = A.apptCreate({ hn: pt.hn, item: apIt.code, date: ap.date, time: ap.time, note: txt(ap.note), leadId: l.id }, ub);
+    }
     var br = find('Branches', 'code', p.branch);
     var msg = '🟢 ลีดใหม่ · ' + (br ? br.name : p.branch) + '\nคุณ ' + l.fbName + (l.gender ? ' (' + l.gender + ')' : '') + ' ' + phone + '\nสนใจ: ' + (l.interest || '-') + (l.value ? ' ' + l.value.toLocaleString() : '') +
-      '\nจากแอด: ' + (l.ad || '-') + ' · ' + (l.channel || '-') + (l.closed ? '\n✅ ปิดแล้ว: ' + (l.closedNote || l.interest || '') + ' ' + l.closed.toLocaleString() + ' บาท' : '') + '\nสะดวก: ' + (l.prefer || '-') + '\nแอดมิน: ' + u.name + ' · ลีด #' + l.id + (pt ? '\n(คนไข้เก่า ' + pt.hn + ')' : '');
-    return { lead: clean(l), line: msg };
+      '\nจากแอด: ' + (l.ad || '-') + ' · ' + (l.channel || '-') + (l.closed ? '\n✅ ปิดแล้ว: ' + (l.closedNote || l.interest || '') + ' ' + l.closed.toLocaleString() + ' บาท' : '') + '\nสะดวก: ' + (l.prefer || '-') + '\nแอดมิน: ' + l.admin + ' · ลงโดย ' + u.name + ' · ลีด #' + l.id + (appt ? '\n📅 นัดแล้ว ' + appt.date + ' ' + (appt.cStart || appt.start) + ' · ' + appt.itemName + ' (' + appt.room + ')' : '') + (pt && !appt ? '\n(คนไข้เก่า ' + pt.hn + ')' : '');
+    return { lead: clean(l), line: msg + (depo ? '\n💰 มัดจำ ' + depo.amount.toLocaleString() + ' บาท · ใบเสร็จ ' + depo.receipt : ''), appt: appt, deposit: depo };
   };
   A.leadClose = function (p, u) {
     var l = find('Leads', 'id', txt(p.id)); if (!l) err('ไม่พบลีด');
@@ -2843,6 +2923,35 @@ function makeCore(store) {
     });
     return { count: ls.length, sheet: sheet.map(function (r) { return r.map(csv).join(','); }).join('\n'), meta: meta.map(function (r) { return r.map(csv).join(','); }).join('\n') };
   };
+
+  /* ---------- ชีตให้ทีมยิงแอด (หน้าตาเหมือนชีตเดิมของทีม) — gas.js เขียนลงไฟล์แยกต่อกลุ่มสาขา ---------- */
+  function pageOf(b) { return b === 'TCPY' ? 'PTY' : /^JB/.test(String(b)) ? 'JB' : 'CNX'; }
+  function adsExport(code, from) {
+    from = from || addDays(today(), -400);
+    var inB = function () { return true; }, pts = {}, brs = {}, dep = {}, ords = {}, vs = {};
+    rows('Patients').forEach(function (x) { pts[x.hn] = x; }); rows('Branches').forEach(function (b) { brs[b.code] = b; });
+    rows('Wallet').forEach(function (w) { if (/^มัดจำ/.test(String(w.type)) && num(w.amount) > 0) dep[w.hn] = (dep[w.hn] || 0) + num(w.amount); });
+    rows('Orders').forEach(function (o) { if (o.receipt) (ords[o.vn] = ords[o.vn] || []).push(o); });
+    rows('Visits').forEach(function (v) { vs[v.vn] = v; });
+    var dmy = function (d) { d = String(d || '').slice(0, 10).split('-'); return d.length === 3 ? d[2] + '/' + d[1] + '/' + d[0] : ''; };
+    var ST = { NEW: 'ยังไม่นัด', BOOKED: 'นัดแล้ว', ARRIVED: 'มาแล้ว', BOUGHT: 'ซื้อแล้ว', NOSHOW: 'ไม่มา' };
+    var ls = rows('Leads').filter(function (l) { return (l.page || pageOf(l.branch)) === code && String(l.date) >= from; }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; });
+    var leads = [['DD/MM/YYYY', 'ชื่อ facebook', 'เพศ', 'ทักมาจากแอดตัวไหน', 'บริการที่สนใจ', 'Value', 'เบอร์โทรศัพท์', 'channel', 'มัดจำ', 'อัพ', 'สาขา', 'แอดมิน', 'สถานะ', 'ยอดที่ปิดในแชท', 'ยอดจ่ายจริง']];
+    var conv = [['Date.', 'Phone', 'Event Name', 'Branch', 'Product', 'Value', 'All Channel', 'Email', 'First Name', 'Last Name', 'Zip', 'City', 'Country', 'Date of Birth', 'Gender', 'Age', 'จองมัดจำ', 'เข้ามาใช้บริการแล้ว', 'Upsell']];
+    ls.forEach(function (l) {
+      var pt = pts[l.hn], old = pt && String(pt.created).slice(0, 10) < String(l.date), bought = l.status === 'BOUGHT', came = bought || l.status === 'ARRIVED';
+      var depo = !!(l.hn && dep[l.hn]), closed = num(l.closed), act = num(l.actual);
+      var up = !came ? (l.status === 'NOSHOW' ? 'ไม่มา' : 'ยังไม่เข้า') : (closed > 0 ? (act > closed ? 'อัพได้' : 'อัพไม่ได้') : (act > num(l.value) && num(l.value) > 0 ? 'อัพได้' : 'อัพไม่ได้'));
+      var br = brs[l.branch] || {};
+      leads.push([dmy(l.date), l.fbName, l.gender, l.ad, l.interest || l.closedNote, bought ? act : num(l.value), l.phone, l.channel, old ? 'ลูกค้าเก่าซื้อโปรเพิ่ม' : depo ? 'มัดจำจองสิทธิ์' : 'ไม่มัดจำจองสิทธิ์', up, br.name || l.branch, l.admin, ST[l.status] || l.status, closed || '', bought ? act : '']);
+      if (!bought) return;
+      var v = vs[l.vn] || {}, its = (ords[l.vn] || []).map(function (o) { return o.name + (num(o.qty) > 1 ? ' ×' + num(o.qty) : ''); }).join(' + ');
+      var nm = String(pt ? pt.name : l.fbName).trim().split(/\s+/), dob = pt && pt.dob ? String(pt.dob) : '', age = dob ? Math.floor((Date.parse(today()) - Date.parse(dob)) / 3.15576e10) : '';
+      var g = String((pt && pt.gender) || l.gender || ''), gen = /หญิง/.test(g) ? 'f' : /ชาย/.test(g) ? 'm' : '';
+      conv.push([dmy(v.date || l.date), l.phone, 'Purchase', br.name || l.branch, its || l.interest, act, l.channel, pt ? pt.email || '' : '', nm[0] || '', nm.slice(1).join(' '), '', '', 'TH', dob ? dmy(dob) : '', gen, age, depo, true, up === 'อัพได้']);
+    });
+    return { leads: leads, conv: conv };
+  }
 
   /* ---------- พนักงาน: เช็คอิน / ยอดของฉัน ---------- */
   function dist(a, b, c, d) { var R = 6371e3, r = Math.PI / 180, x = (c - a) * r, y = (d - b) * r, h = Math.sin(x / 2) * Math.sin(x / 2) + Math.cos(a * r) * Math.cos(c * r) * Math.sin(y / 2) * Math.sin(y / 2); return 2 * R * Math.asin(Math.sqrt(h)); }
@@ -2972,7 +3081,8 @@ function makeCore(store) {
       bt.total = r2(bt.total + full);
       var aS = Math.min(full, num(o.adminShare));
       if (aS > 0) { var ast = staffBy[String(o.adminBy)], acode = ast ? String(ast.code) : String(o.adminBy); bt.by[acode] = r2((bt.by[acode] || 0) + aS);
-        sl.push({ code: acode, st: ast, kind: 'admin', mo: mo, d: d, surg: surg, base: aS, inR: d >= from, o: o, pay: pay, split: 0 }); }
+        var akr = ast ? rolesOf(ast) : [], akind = akr.indexOf('manager') >= 0 ? 'manager' : akr.indexOf('sales') >= 0 ? 'sales' : 'admin'; // เซลเข้าไปตอบแชทเองแล้วปิดได้ = นับเป็นยอดขายของเซล (ขั้นบันได)
+        sl.push({ code: acode, st: ast, kind: akind, chat: true, mo: mo, d: d, surg: surg, base: aS, inR: d >= from, o: o, pay: pay, split: 0 }); }
       full = r2(full - aS); if (full <= 0) return;
       var raw = String(o.seller || '').trim();
       if (!raw || raw === '-' || raw === 'คลินิก') { bt.clinic = r2(bt.clinic + full); return; }
@@ -2993,12 +3103,14 @@ function makeCore(store) {
       else if (m.kind === 'manager') { m.skinPct = MSKIN; m.surgPct = MSURG; }
       else { var st0 = sl.filter(function (x) { return x.code === m.code; })[0].st, op = st0 && num(st0.commPct) ? num(st0.commPct) : num(setting('defaultCommPct', 5)); m.skinPct = op; m.surgPct = op; }
     });
+    var perBill = num(setting('adminPerBill', 0));
     sl.forEach(function (x) {
+      if (x.kind === 'admin' && perBill > 0) { if (x.inR) { var pa = P(x.code); pa.sales = r2(pa.sales + x.base); } return; }   // แอดมินคิดต่อบิล: ยอดไว้ดูเฉยๆ
       var m = mon[x.code + '|' + x.mo], ps = P(x.code), pct = x.kind === 'admin' ? (x.st && num(x.st.commPct) ? num(x.st.commPct) : num(setting('adminCommPct', 5))) : x.surg ? m.surgPct : m.skinPct;
       if (!x.inR) return;
       var c = r2(x.base * pct / 100);
       ps.sales = r2(ps.sales + x.base); ps.comm = r2(ps.comm + c); if (on(x.o.upsell)) ps.upsell = r2(ps.upsell + x.base);
-      items.push({ who: x.code, kind: x.kind === 'admin' ? 'ค่าคอมแอดมิน (ปิดจากเพจ)' : 'ค่าคอม' + (x.surg ? ' (ศัลยกรรม)' : '') + (num(x.o.adminShare) > 0 ? ' · ส่วนเกินดีลแอดมิน' : ''), date: x.d, branch: x.pay.branch, hn: x.pay.hn, name: shortName(x.pay.name), item: x.o.name + (x.split ? ' (' + x.split + '%)' : ''), base: x.base, pct: pct, amount: c, receipt: x.o.receipt });
+      items.push({ who: x.code, kind: x.kind === 'admin' ? 'ค่าคอมแอดมิน (ปิดจากเพจ)' : x.chat ? 'ค่าคอม (ปิดในแชท)' + (x.surg ? ' (ศัลยกรรม)' : '') : 'ค่าคอม' + (x.surg ? ' (ศัลยกรรม)' : '') + (num(x.o.adminShare) > 0 ? ' · ส่วนเกินดีลแอดมิน' : ''), date: x.d, branch: x.pay.branch, hn: x.pay.hn, name: shortName(x.pay.name), item: x.o.name + (x.split ? ' (' + x.split + '%)' : ''), base: x.base, pct: pct, amount: c, receipt: x.o.receipt });
     });
     Object.keys(mon).forEach(function (k) { var m = mon[k]; if (m.month >= from.slice(0, 7)) { var ps = P(m.code); (ps.months = ps.months || []).push(m); } });
     // ค่าบริหารผู้จัดการ: (ยอดรวมสาขา − ยอดส่วนตัวผู้จัดการ − ยอดคลินิก) ต่อเดือน
@@ -3023,9 +3135,49 @@ function makeCore(store) {
       }
       ps.salary = tot; ps.salaryMonth = sal;
     });
+    if (perBill > 0) adminBillRows(from, to).forEach(function (r) {
+      if (!r.bill || r.kind !== 'admin' || !r.code || (branchFilter && !branchFilter(r.branch))) return;
+      var pa = P(r.code); pa.comm = r2(pa.comm + perBill); pa.cases++;
+      items.push({ who: r.code, kind: 'ค่าคอมแอดมิน (ต่อบิล · ' + r.type + ')' + (r.carried ? ' · ลีดจากเดือนก่อน' : ''), date: r.date, branch: r.branch, hn: r.hn, name: r.name, item: 'ลีด ' + r.leadDate + (r.type === 'มัดจำ' ? ' · มัดจำ ' + r.dep : ' · ใช้จริง ' + r.actual), base: r.type === 'มัดจำ' ? r.dep : r.actual, pct: 0, amount: perBill });
+    });
     return { people: people, items: items };
   }
   function shortName(n) { var p = String(n || '').trim().split(/\s+/); return p[0] + (p[1] ? ' ' + p[1].charAt(0) + '.' : ''); }
+
+  /* ---------- บิลแอดมิน: นับรายบิล ทุกสาขารวมกัน · นับเดือนที่ลูกค้ามาใช้บริการจริง (visit แรกที่ซื้อ) ---------- */
+  // นับเฉพาะลีดที่คนปิดเป็นแอดมินเพจ: (1) เก็บมัดจำได้ = 1 บิล ณ วันที่มัดจำ  (2) ไม่มีมัดจำ แต่มาใช้บริการ (ครั้งแรก จ่ายเงิน) = 1 บิล ณ วันที่มา
+  function adminBillRows(from, to) {
+    var vs = {}, arr = {}; rows('Visits').forEach(function (v) { vs[v.vn] = v; if (v.leadId && v.stage !== 'CANCEL' && v.stage !== 'SALE') { var a = arr[v.leadId]; if (!a || String(v.date) < String(a.date)) arr[v.leadId] = v; } });
+    var stByName = {}; rows('Staff').forEach(function (s) { stByName[String(s.nick || s.name)] = s; stByName[String(s.name)] = stByName[String(s.name)] || s; });
+    var out = [];
+    rows('Leads').forEach(function (l) {
+      var st = stByName[String(l.admin)]; if (!st || rolesOf(st).indexOf('adminpage') < 0) return;
+      var dep = l.depAt ? String(l.depAt).slice(0, 10) : '', bv = l.status === 'BOUGHT' && l.vn ? vs[l.vn] : null, av = arr[l.id] || bv;
+      var type = dep ? 'มัดจำ' : bv ? 'มาใช้บริการ' : av ? 'มาแต่ไม่ซื้อ' : '', d = dep || (av ? String(av.date) : '');
+      if (!type || d < from || d > to) return;
+      out.push({ lead: l.id, admin: String(l.admin), code: String(st.code), kind: 'admin', type: type, bill: type !== 'มาแต่ไม่ซื้อ', date: d, leadDate: String(l.date), carried: String(l.date).slice(0, 7) < d.slice(0, 7),
+        branch: String(av ? av.branch : l.branch), hn: String((av && av.hn) || l.hn || ''), name: shortName((av && av.name) || l.fbName), page: String(l.page || pageOf(l.branch)),
+        closed: num(l.closed), dep: num(l.depAmt), actual: num(l.actual), came: !!av });
+    });
+    return out.sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+  }
+  A.adminBills = function (p, u) {
+    var mo = /^\d{4}-\d{2}$/.test(String(p.month)) ? String(p.month) : today().slice(0, 7), from = mo + '-01', to = mo + '-31';
+    var per = num(setting('adminPerBill', 0)), rs = adminBillRows(from, to), by = {};
+    var ads = rows('Staff').filter(function (s) { return on(s.active) && rolesOf(s).indexOf('adminpage') >= 0; });
+    ads.forEach(function (s) { by[String(s.nick || s.name)] = { admin: String(s.nick || s.name), code: String(s.code), bills: 0, dep: 0, came: 0, fromPrev: 0, cameNoBuy: 0, byBranch: {}, depAmt: 0, actual: 0, pay: 0, leads: 0, closedAmt: 0, waiting: 0 }; });
+    rs.forEach(function (r) { var a = by[r.admin]; if (!a) return;
+      if (!r.bill) { a.cameNoBuy++; return; }
+      a.bills++; a.byBranch[r.branch] = (a.byBranch[r.branch] || 0) + 1;
+      if (r.type === 'มัดจำ') { a.dep++; a.depAmt = r2(a.depAmt + r.dep); } else { a.came++; a.actual = r2(a.actual + r.actual); if (r.carried) a.fromPrev++; } });
+    var vs = {}; rows('Visits').forEach(function (v) { if (v.leadId && v.stage !== 'CANCEL' && v.stage !== 'SALE') vs[v.leadId] = 1; });
+    rows('Leads').forEach(function (l) { var a = by[String(l.admin)]; if (!a || String(l.date).slice(0, 7) !== mo) return;
+      a.leads++; a.closedAmt = r2(a.closedAmt + num(l.closed)); if (!l.depAt && !vs[l.id] && l.status !== 'BOUGHT' && ['NEW', 'BOOKED'].indexOf(String(l.status)) >= 0) a.waiting++; });
+    var list = Object.keys(by).map(function (k) { var a = by[k]; a.pay = r2(a.bills * per); return a; }).filter(function (a) { return a.bills || a.leads || a.cameNoBuy; }).sort(function (a, b) { return b.bills - a.bills; });
+    function T(k) { return sum(list, function (a) { return a[k]; }); }
+    return { month: mo, perBill: per, admins: list, rows: rs, total: { bills: T('bills'), dep: T('dep'), came: T('came'), fromPrev: T('fromPrev'), waiting: T('waiting'), pay: T('pay') } };
+  };
+  PERM.adminBills = ['owner', 'account', 'manager'];
 
   A.myEarnings = function (p, u) {
     var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today();
@@ -3190,7 +3342,8 @@ function makeCore(store) {
       add('StockMoves', { time: stamp(), branch: py.branch, stock: srow.code, name: srow.name, qty: q, type: 'คืน (ยกเลิกบิล)', ref: rc, by: u.name, balance: num(srow.qty) }); }); });
     // ยอดดีลแอดมิน / ลีด
     var aS = sum(os, function (o) { return o.adminShare; }); if (aS > 0) { var ld = rows('Leads').filter(function (l) { return l.admin === (os[0] && os[0].adminBy) && l.hn === py.hn && num(l.credited) > 0; }).slice(-1)[0]; if (ld) upd('Leads', ld, { credited: r2(Math.max(0, num(ld.credited) - aS)) }); }
-    var vlead = rows('Leads').filter(function (l) { return l.vn === py.vn; })[0]; if (vlead) upd('Leads', vlead, { actual: r2(Math.max(0, num(vlead.actual) - num(py.net))) });
+    var vlead = rows('Leads').filter(function (l) { return l.vn === py.vn; })[0]; if (vlead) { var na = r2(Math.max(0, num(vlead.actual) - num(py.net))); upd('Leads', vlead, na > 0 ? { actual: na, value: na } : { actual: 0, value: 0, status: 'ARRIVED' }); }
+    rows('Leads').filter(function (l) { return l.depRc === rc; }).forEach(function (l) { upd('Leads', l, { depAt: '', depAmt: 0, depRc: '' }); });
     // รายการกลับเป็นยังไม่จ่าย (คงสถานะทำแล้ว/ของที่ใช้ไว้ตามจริง) → เก็บเงินใหม่
     os.forEach(function (o) { upd('Orders', o, { receipt: '', paidNet: 0, cashNet: 0, adminShare: 0, adminBy: '', voidOf: rc }); });
     var v = find('Visits', 'vn', py.vn); if (v && v.stage === 'DONE') setStage(v, 'BACK');
@@ -3436,7 +3589,7 @@ function makeCore(store) {
   };
   PERM.countPreview = ['manager'];
 
-  return { api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook };
+  return { api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook, adsExport: adsExport };
 }
 
 /* ---------- อ่านบัตรประชาชน (ข้อความจาก OCR) ---------- */
@@ -3992,26 +4145,26 @@ function logout() { S.token = null; S.user = null; S.boot = null; LS.sset('hs_to
 /* ---------- หน้าแรก ---------- */
 var FRONT = ['front', 'manager'], CLINS = ['doctor', 'nurse', 'assistant', 'therapist'];
 var TILES = [
+  { k: 'lead', t: 'ลงลีด + นัด', s: 'จากแชทที่แอดมินส่งมา · ลงนัดในตัว', ic: 'chat', r: FRONT.concat(['adminpage']), hero: 1 },
   { k: 'walkin', t: 'Walk-in', s: 'คนไข้เดินเข้ามา · ค้นหา/ลงทะเบียน', ic: 'walk', r: FRONT, hero: 1 },
   { k: 'arrivals', t: 'คนไข้นัดไว้แล้ว', s: 'กดรับเข้าคิวเมื่อมาถึง', ic: 'cal', r: FRONT, b: 'booked' },
   { k: 'bookNew', t: 'ลงนัด', s: 'จองห้อง/เตียงอัตโนมัติ', ic: 'plus', r: FRONT },
   { k: 'due', t: 'เก็บเงิน / ค้างจ่าย', s: 'บิลที่ยังไม่ได้ชำระ', ic: 'cash', r: FRONT, b: 'due' },
   { k: 'queue', t: 'คิววันนี้', s: 'สถานะคนไข้ทุกคน', ic: 'list', r: FRONT.concat(['sales']) },
-  { k: 'leads', t: 'ลีดรอลงนัด', s: 'จากแอดมินเพจ', ic: 'chat', r: FRONT, b: 'leads' },
+  { k: 'leads', t: 'ลีดรอลงนัด', s: 'ลีดที่ยังไม่ได้นัด', ic: 'chat', r: FRONT, b: 'leads' },
   { k: 'sched', t: 'ตารางนัด', s: 'ห้อง · เตียง · ทั้งวัน', ic: 'grid', r: FRONT.concat(CLINS) },
   { k: 'doctor', t: 'ห้องแพทย์', s: 'คนไข้รอตรวจ · บันทึก OPD', ic: 'steth', r: ['doctor'], hero: 1 },
   { k: 'or', t: 'ห้องทรีตเมนต์ / หัตถการ', s: 'รับงาน · ทายาชา · เบิกของ', ic: 'bed', r: CLINS, hero: 1 },
   { k: 'search', t: 'ค้นหาคนไข้', s: 'ประวัติ · คอร์สคงเหลือ · ขาย', ic: 'search', r: FRONT.concat(CLINS, ['sales']) },
   { k: 'stock', t: 'สต้อกสาขา / เบิกของ', s: 'คงเหลือ · ขอเบิกจากคลังกลาง', ic: 'box', r: ['nurse', 'assistant', 'therapist', 'doctor', 'manager'], b: 'low', stock: 1 },
   { k: 'central', t: 'คลังกลาง', s: 'อนุมัติใบเบิก · รับของเข้า', ic: 'wh', r: ['central'], hero: 1, b: 'reqs' },
-  { k: 'lead', t: 'ลงลีดใหม่', s: 'ส่งเข้ากลุ่ม LINE ให้หน้าร้าน', ic: 'mega', r: ['adminpage', 'manager'], hero: 1 },
   { k: 'myleads', t: 'ลีดของฉัน', s: 'ใครมาแล้ว ซื้อเท่าไร', ic: 'list', r: ['adminpage', 'marketing'] },
   { k: 'owner', t: 'ภาพรวมธุรกิจ', s: 'ยอดขาย · กำไร · เทียบช่วงก่อน', ic: 'chart', r: ['account', 'manager'], hero: 1 },
   { k: 'income', t: 'รายรับ', s: 'วัน · เดือน · ปี · แยกช่องทาง · แก้รายการคีผิด', ic: 'cash', r: ['account', 'manager'] },
   { k: 'att', t: 'เข้า-ออกงาน', s: 'ใครมาแล้ว · สาย · ลืมเช็คเอาท์', ic: 'user', r: ['account', 'manager'] },
+  { k: 'adm', t: 'บิลแอดมิน', s: 'ปิดได้กี่บิล · มาจริง · แยกสาขา · ยกมาจากเดือนก่อน', ic: 'chat', r: ['account', 'manager'] },
   { k: 'fees', t: 'จ่ายพนักงาน', s: 'เงินเดือน · DF · ค่ามือ · ค่าคอม', ic: 'coin', r: ['account', 'manager'] },
   { k: 'promos', t: 'จัดการโปร', s: 'โปรรายเดือน S/M/L · ราคาแต่ละสาขา', ic: 'mega', r: ['marketing', 'manager'] },
-  { k: 'mkt', t: 'ส่งออกข้อมูลยิงแอด', s: 'Audience · Offline conversion', ic: 'mega', r: ['marketing', 'account'] },
   { k: 'gallery', t: 'รูปรีวิว', s: 'เฉพาะคนไข้ที่อนุญาต', ic: 'img', r: ['marketing'] },
   { k: 'me', t: 'ของฉัน · ลงเวลา', s: 'เช็คอิน · DF/ค่ามือ/ค่าคอมของฉัน', ic: 'user', r: null }
 ];
@@ -4115,15 +4268,20 @@ function ptRow(p) {
 
 /* ---------- ลงทะเบียน ---------- */
 TITLES.register = 'ลงทะเบียนคนไข้';
-var CHANNELS = ['Walk-in', 'Facebook', 'TikTok', 'LINE OA', 'Instagram', 'Google', 'เพื่อนแนะนำ', 'อื่นๆ'];
+var CHANNELS = ['Walk-in', 'เซลหามาเอง', 'Facebook', 'TikTok', 'LINE OA', 'Instagram', 'Google', 'เพื่อนแนะนำ', 'อื่นๆ'];
 function opts(list, v, blank) { return (blank != null ? '<option value="">' + esc(blank) + '</option>' : '') + list.map(function (x) { var k = Array.isArray(x) ? x[0] : x, l = Array.isArray(x) ? x[1] : x; return '<option value="' + esc(k) + '"' + (String(k) === String(v) ? ' selected' : '') + '>' + esc(l) + '</option>'; }).join(''); }
 SCR.register = function (arg) {
-  var paper = arg === 'paper', pre = arg && typeof arg === 'object' ? arg : null;
-  S.v.reg = { img: '', paper: paper, pre: pre };
-  var f = pre || {};
+  if (typeof arg === 'string' && arg.indexOf('complete:') === 0) return call('patientPage', { hn: arg.slice(9) }).then(function (d) { return regHtml(null, d.patient); });
+  return regHtml(arg);
+};
+function regHtml(arg, cp) {
+  var paper = arg === 'paper', pre = !cp && arg && typeof arg === 'object' ? arg : null;
+  S.v.reg = { img: '', paper: paper, pre: pre, complete: cp ? cp.hn : '' };
+  var f = cp || pre || {}, V = function (k) { return f[k] ? ' value="' + esc(f[k]) + '"' : ''; };
   return '<form class="stack" id="rf" autocomplete="off">' +
     (paper ? '<div class="note">คนไข้เก่าที่มีแฟ้มกระดาษ: ใส่ HN เดิมจากแฟ้ม ไม่ต้องเซ็นใหม่ (ใบยินยอมอยู่ในแฟ้มแล้ว)</div>' : '') +
     (pre ? '<div class="note">ลงทะเบียนล่วงหน้าจากลีด — ให้คนไข้เซ็นยินยอมวันที่มาถึง</div>' : '') +
+    (cp ? '<div class="note">' + esc(cp.hn) + ' · ลงชื่อไว้จากลีดแล้ว — กรอกข้อมูลที่เหลือ แล้วให้คนไข้เซ็นยินยอม (ใช้ HN เดิม)</div>' : '') +
     '<div class="split"><div class="stack">' +
     (pre ? '' : '<div class="card stack"><div class="row"><h3 class="sp">บัตรประชาชน / พาสปอร์ต</h3><span class="pill">ไม่บังคับ</span></div>' +
       '<div class="row"><label class="btn" style="flex-direction:row">' + ic('cam', 18) + ' ถ่ายรูปบัตร<input type="file" accept="image/*" capture="environment" id="idf" hidden></label>' +
@@ -4131,20 +4289,20 @@ SCR.register = function (arg) {
     '<div class="card stack"><h3>ข้อมูลคนไข้</h3>' +
     (paper ? '<label>HN เดิม (จากแฟ้มกระดาษ) *<input name="oldHn" required placeholder="เช่น 10234"></label>' : '') +
     '<div class="g3"><label>คำนำหน้า<select name="title">' + opts(['', 'นาย', 'นาง', 'นางสาว', 'Mr.', 'Mrs.', 'Ms.'], '') + '</select></label><label style="grid-column:span 2">ชื่อ-สกุล *<input name="name" required value="' + esc(f.name || '') + '"></label></div>' +
-    '<div class="g3"><label>ชื่อเล่น<input name="nickname"></label><label style="grid-column:span 2">ชื่อภาษาอังกฤษ<input name="nameEn"></label></div>' +
-    '<div class="g3"><label>เลขบัตร/พาสปอร์ต<input name="idcard" inputmode="numeric"></label><label>วันเกิด<input type="date" name="dob"></label><label>เพศ<select name="gender">' + opts(['', 'หญิง', 'ชาย', 'อื่นๆ'], f.gender || '') + '</select></label></div>' +
-    '<div class="g2"><label>เบอร์โทร * <span class="xs">(ใช้ยิงแอด)</span><input name="phone" type="tel" inputmode="tel" required value="' + esc(f.phone || '') + '"></label><label>อีเมล * <span class="xs">(ใช้ยิงแอด)</span><input name="email" type="email" inputmode="email"></label></div>' +
-    '<label class="ck"><input type="checkbox" name="noEmail"' + (pre ? ' checked' : '') + '> คนไข้ไม่มีอีเมล</label>' +
+    '<div class="g3"><label>ชื่อเล่น<input name="nickname"' + V('nickname') + '></label><label style="grid-column:span 2">ชื่อภาษาอังกฤษ<input name="nameEn"' + V('nameEn') + '></label></div>' +
+    '<div class="g3"><label>เลขบัตร/พาสปอร์ต<input name="idcard" inputmode="numeric"' + V('idcard') + '></label><label>วันเกิด<input type="date" name="dob"' + V('dob') + '></label><label>เพศ<select name="gender">' + opts(['', 'หญิง', 'ชาย', 'อื่นๆ'], f.gender || '') + '</select></label></div>' +
+    '<div class="g2"><label>เบอร์โทร * <span class="xs">(ใช้ยิงแอด)</span><input name="phone" type="tel" inputmode="tel" required value="' + esc(f.phone || '') + '"></label><label>อีเมล * <span class="xs">(ใช้ยิงแอด)</span><input name="email" type="email" inputmode="email"' + V('email') + '></label></div>' +
+    '<label class="ck"><input type="checkbox" name="noEmail"' + (pre || (cp && !cp.email) ? ' checked' : '') + '> คนไข้ไม่มีอีเมล</label>' +
     '<div class="g2"><label>อาชีพ<input name="occupation"></label><label>รู้จักคลินิกจาก<select name="channel">' + opts(CHANNELS, f.channel || 'Walk-in') + '</select></label></div>' +
     '<label>มาจากแอด/โปร<select name="ad">' + opts((S.boot.ads || []).map(function (a) { return a.name; }), f.ad || '', '— ไม่ทราบ / ไม่ได้มาจากแอด —') + '</select></label>' +
-    '<label>ที่อยู่<textarea name="address" style="min-height:60px"></textarea></label></div></div>' +
-    '<div class="stack"><div class="card stack"><h3>ประวัติสุขภาพ</h3><label>แพ้ยา/แพ้อาหาร<input name="allergy" placeholder="ไม่มี"></label><label>โรคประจำตัว<input name="chronic"></label>' +
+    '<label>ที่อยู่<textarea name="address" style="min-height:60px">' + esc(f.address || '') + '</textarea></label></div></div>' +
+    '<div class="stack"><div class="card stack"><h3>ประวัติสุขภาพ</h3><label>แพ้ยา/แพ้อาหาร<input name="allergy" placeholder="ไม่มี"' + V('allergy') + '></label><label>โรคประจำตัว<input name="chronic"' + V('chronic') + '></label>' +
     '<label>ยา/อาหารเสริมที่ทานอยู่<input name="supplements"></label><div class="g2"><label>เคยฉีดซิลิโคน/ฟิลเลอร์<select name="silicone">' + opts(['', 'ไม่เคย', 'เคย']) + '</select></label>' +
     '<label>สูบบุหรี่<select name="smoking">' + opts(['', 'ไม่สูบ', 'สูบ']) + '</select></label></div><div class="g2"><label>ผู้ติดต่อฉุกเฉิน<input name="emName"></label><label>เบอร์ฉุกเฉิน<input name="emPhone" type="tel"></label></div></div>' +
-    (paper || pre ? '' : '<div class="card stack"><h3>ความยินยอม</h3><label class="ck"><input type="checkbox" name="consent"> ข้าพเจ้ายินยอมให้คลินิกเก็บและใช้ข้อมูลสุขภาพเพื่อการรักษา (PDPA) *</label>' +
+    (paper || pre || (cp && !cp.needConsent) ? '' : '<div class="card stack"><h3>ความยินยอม</h3><label class="ck"><input type="checkbox" name="consent"> ข้าพเจ้ายินยอมให้คลินิกเก็บและใช้ข้อมูลสุขภาพเพื่อการรักษา (PDPA) *</label>' +
       '<label class="ck"><input type="checkbox" name="mktConsent"> ยินยอมรับข่าวสาร/โปรโมชั่น และให้ใช้เบอร์/อีเมลเพื่อโฆษณาที่ตรงความสนใจ</label>' + sigBlock('sg', 'ลายเซ็นคนไข้ *') + '</div>') +
-    '<button class="btn p lg blk" data-a="saveReg" type="button">บันทึกและเปิดหน้าคนไข้</button></div></div></form>';
-};
+    '<button class="btn p lg blk" data-a="saveReg" type="button">' + (cp ? 'บันทึกข้อมูลคนไข้' : 'บันทึกและเปิดหน้าคนไข้') + '</button></div></div></form>';
+}
 SCR.register.after = function () {
   S.v.reg.pads = mountSigs($('#rf'));
   var f = $('#idf'); if (!f) return;
@@ -4161,6 +4319,7 @@ ACT.saveReg = function () {
   $$('input,select,textarea', F).forEach(function (el) { if (!el.name) return; d[el.name] = el.type === 'checkbox' ? el.checked : el.value.trim(); });
   d.img = R.img; if (R.pads && R.pads.sg) d.sign = R.pads.sg.get();
   if (R.pre) { d.pre = true; }
+  if (R.complete) { d.hn = R.complete; return call('patientComplete', d, { write: true }).then(function (p) { toast('บันทึกข้อมูล ' + p.hn + ' แล้ว'); go('patient', p.hn, true); }).catch(fail); }
   call('registerPatient', d, { write: true }).then(function (p) {
     toast('ลงทะเบียนแล้ว ' + p.hn);
     if (R.pre && R.pre.after) { S.cur = S.stack.pop(); R.pre.after(p); return; }
@@ -4209,7 +4368,7 @@ SCR.patient = function (hn) {
       (d.receipts && d.receipts.length ? '<div class="card stack"><div class="sec"><h2>ใบเสร็จ</h2><span class="pill">' + d.receipts.length + ' ล่าสุด</span></div><div class="list">' + d.receipts.map(function (x) { return '<div class="li"><div class="main"><div class="t">' + esc(x.receipt) + '</div><div class="s">' + esc(thDate(x.time, 1)) + ' · ' + esc(x.branch) + (x.emailed ? ' · <span class="pill g">✉ ส่งแล้ว</span>' : '') + (x.void === 'VOID' ? ' · <span class="pill d">ยกเลิก</span>' : x.void === 'REQUESTED' ? ' · <span class="pill w">รอยกเลิก</span>' : '') + '</div></div><div class="num">' + bt(x.net) + '</div><button class="btn sm" data-go="receipt" data-arg="' + esc(x.receipt) + '">ดู/ส่ง</button></div>'; }).join('') + '</div></div>' : '') +
       '<div class="card stack"><h2>ประวัติการรักษา</h2>' + (d.history.length ? '<div class="list">' + d.history.map(function (h) {
         return '<div class="li"><div class="main"><div class="t">' + esc(thDate(h.date, 1)) + ' · ' + esc(h.branch) + ' ' + stagePill(h.stage) + '</div><div class="s">' + esc(h.orders.join(', ') || '—') + '</div>' +
-          (h.dx || h.plan ? '<div class="small">' + (h.dx ? '<b>Dx</b> ' + esc(h.dx) + ' ' : '') + (h.plan ? '<b>Plan</b> ' + esc(h.plan) : '') + '</div>' : '') + '</div></div>';
+          (h.dx || h.plan ? '<div class="small">' + (h.dx ? '<b>Dx</b> ' + esc(h.dx) + ' ' : '') + (h.plan ? '<b>Plan</b> ' + esc(h.plan) : '') + '</div>' : '') + (h.proc ? '<div class="small" style="white-space:pre-wrap"><b>หัตถการ</b> ' + esc(h.proc) + '</div>' : '') + (h.signed ? '<div class="xs muted">ลงนาม ' + esc(h.signed) + '</div>' : '') + '</div></div>';
       }).join('') + '</div>' : '<div class="empty">ยังไม่มีประวัติ</div>') + '</div></div>';
   });
 };
@@ -4312,14 +4471,22 @@ function walletAdjDlg() {
 function sellerPicker(init) {
   var list = S.boot.staff.filter(function (s) { return s.roles.some(function (r) { return ['front', 'sales', 'manager', 'doctor', 'nurse', 'assistant', 'therapist', 'adminpage'].indexOf(r) >= 0; }); });
   list = list.concat([{ name: 'คลินิก' }]);
-  return '<div class="stack" style="gap:.35rem"><div class="small b">ผู้ขาย (แตะได้หลายคน · แบ่ง % ได้ · ไม่มีเซล = คลินิก)</div><div class="chips" data-sp>' + list.map(function (s) { return '<button type="button" data-sn="' + esc(s.name) + '" class="' + (init.some(function (x) { return x.name === s.name; }) ? 'on' : '') + '">' + esc(s.name) + '</button>'; }).join('') + '</div><div data-spl class="row"></div></div>';
+  return '<div class="stack" style="gap:.35rem"><div class="small b">ผู้ขาย (แตะได้หลายคน · แบ่งยอดเป็นบาทได้ · ไม่มีเซล = คลินิก)</div><div class="chips" data-sp>' + list.map(function (s) { return '<button type="button" data-sn="' + esc(s.name) + '" class="' + (init.some(function (x) { return x.name === s.name; }) ? 'on' : '') + '">' + esc(s.name) + '</button>'; }).join('') + '</div><div data-spl class="stack" style="gap:.35rem"></div></div>';
 }
-function bindSellers(root, arr) {
-  var w = root.querySelector('[data-spl]');
-  function eq() { arr.forEach(function (x) { x.pct = Math.round(10000 / arr.length) / 100; }); if (arr.length) arr[arr.length - 1].pct = Math.round((100 - arr.slice(0, -1).reduce(function (s, x) { return s + x.pct; }, 0)) * 100) / 100; }
-  function draw() { w.innerHTML = arr.length > 1 ? arr.map(function (x, i) { return '<label style="flex-direction:row;align-items:center;gap:.3rem">' + esc(x.name) + '<input data-sp-i="' + i + '" type="number" inputmode="decimal" value="' + x.pct + '" style="width:76px;min-height:34px;padding:.2rem .4rem">%</label>'; }).join('') : ''; }
+// แบ่งยอดผู้ขายเป็น "บาท" (ระบบแปลงเป็น % ให้เองตอนบันทึก) · total() = ยอดรวมที่จะแบ่ง
+function bindSellers(root, arr, total) {
+  var w = root.querySelector('[data-spl]'); total = total || function () { return 100; };
+  function T() { return Math.max(0, Math.round(nz(total()) * 100) / 100); }
+  function eq() { var t = T(), n = arr.length; arr.forEach(function (x, i) { x.amt = i < n - 1 ? Math.round(t / n) : Math.round((t - Math.round(t / n) * (n - 1)) * 100) / 100; }); }
+  function left() { return Math.round((T() - arr.reduce(function (s, x) { return s + nz(x.amt); }, 0)) * 100) / 100; }
+  function hint() { var h = w.querySelector('[data-left]'); if (!h) return; var l = left(); h.textContent = l === 0 ? 'ครบ ' + fm(T()) + ' บาท' : l > 0 ? 'ยังเหลือ ' + fm(l) + ' บาท' : 'เกิน ' + fm(-l) + ' บาท'; h.className = 'xs ' + (l === 0 ? 'muted' : 'dn'); }
+  function draw() { w.innerHTML = arr.length > 1 ? '<div class="row" style="gap:.4rem .8rem">' + arr.map(function (x, i) { return '<label style="flex-direction:row;align-items:center;gap:.3rem">' + esc(x.name) + '<input data-sp-i="' + i + '" type="number" inputmode="decimal" value="' + x.amt + '" style="width:96px;min-height:34px;padding:.2rem .4rem">฿</label>'; }).join('') + '</div><span data-left></span>' : ''; hint(); }
   root.querySelector('[data-sp]').onclick = function (e) { var b = e.target.closest('[data-sn]'); if (!b) return; var i = arr.map(function (x) { return x.name; }).indexOf(b.dataset.sn); if (i >= 0) arr.splice(i, 1); else arr.push({ name: b.dataset.sn, pct: 100 }); b.classList.toggle('on', i < 0); eq(); draw(); };
-  w.oninput = function (e) { var i = e.target.dataset.spI; if (i != null) arr[+i].pct = nz(e.target.value); };
+  w.oninput = function (e) { var i = e.target.dataset.spI; if (i != null) { arr[+i].amt = nz(e.target.value); hint(); } };
+  arr.sync = function () { var t = T(), cur = arr.reduce(function (s, x) { return s + nz(x.amt); }, 0); if (arr.length > 1 && Math.abs(cur - t) > 0.01) { if (cur > 0) { var acc = 0; arr.forEach(function (x, i) { x.amt = i < arr.length - 1 ? Math.round(nz(x.amt) * t / cur) : Math.round((t - acc) * 100) / 100; acc += x.amt; }); } else eq(); draw(); } };
+  arr.toPct = function () { if (arr.length < 2) { arr.forEach(function (x) { x.pct = 100; }); return true; } var t = T(); if (!(t > 0)) { eq(); } if (Math.abs(left()) > 0.5) { toast('ยอดแบ่งผู้ขายยังไม่ครบ — ' + w.querySelector('[data-left]').textContent, 1); return false; }
+    var acc = 0; arr.forEach(function (x, i) { x.pct = i < arr.length - 1 ? Math.round(nz(x.amt) / t * 1e6) / 1e4 : Math.round((100 - acc) * 1e4) / 1e4; acc += x.pct; }); return true; };
+  if (arr.length > 1 && arr[0].amt == null) eq();
   draw();
 }
 ACT.depositDlg = function () {
@@ -4328,8 +4495,8 @@ ACT.depositDlg = function () {
     body: (p.wallet < 0 ? '<div class="note w small">ยอดค้างชำระเดิม ' + bt(-p.wallet) + ' — เงินที่รับจะหักยอดค้างก่อน</div>' : '') +
       '<label>มัดจำ/ชำระค่าอะไร<input id="nt" placeholder="เช่น มัดจำตาสองชั้น / ชำระงวด 2"></label><label>จำนวนเงิน (บาท)<input id="am" type="number" inputmode="decimal"></label><label class="ck"><input type="checkbox" id="sg"> มัดจำงานศัลยกรรม (คิดค่าคอมเรทศัลยกรรม)</label>' + sellerPicker(sel) +
       '<p class="xs muted">ยอดนี้นับเป็นยอดขายของเซลวันนี้ · เงินเข้าวงเงินของลูกค้า วันมาทำหักจากวงเงิน (ไม่คิดค่าคอมซ้ำ)</p>',
-    mount: function (b) { bindSellers(b, sel); },
-    onOk: function (b) { var am = nz(b.querySelector('#am').value); need(am > 0 || '', 'ใส่จำนวนเงิน'); need(sel.length || '', 'เลือกผู้ขาย');
+    mount: function (b) { bindSellers(b, sel, function () { return b.querySelector('#am').value; }); b.querySelector('#am').oninput = function () { sel.sync(); }; },
+    onOk: function (b) { var am = nz(b.querySelector('#am').value); need(am > 0 || '', 'ใส่จำนวนเงิน'); need(sel.length || '', 'เลือกผู้ขาย'); if (!sel.toPct()) return false;
       return call('saleCommit', { hn: p.hn, items: [{ topup: am, deposit: true, surg: b.querySelector('#sg').checked, note: b.querySelector('#nt').value }], sellers: sel }, { write: true }).then(function (r) { setTimeout(function () { go('pay', r.vn); }, 30); }); } });
 };
 ACT.topupDlg = function () {
@@ -4428,7 +4595,7 @@ function cartHtml() {
       '<div class="stack r" style="gap:.2rem"><span class="num">' + bt(lineTotal(l)) + '</span><button class="btn q sm" data-rm="' + i + '" aria-label="ลบ">✕</button></div></div>';
   }).join('') : '<div class="empty">แตะรายการด้านซ้ายเพื่อเพิ่ม</div>';
 }
-function posRedraw(full) { if (full) { $('#prods').innerHTML = prodButtons(); $$('#cats button').forEach(function (b) { b.classList.toggle('on', b.dataset.c === S.v.pos.cat && !S.v.pos.q); }); } $('#cart').innerHTML = cartHtml(); $('#ctot').textContent = bt(cartTotal()); $('[data-a=posCommit]').disabled = !S.v.pos.cart.length; $('.cart .pill').textContent = S.v.pos.cart.length + ' รายการ'; }
+function posRedraw(full) { if (S.v.pos.sellers.sync) S.v.pos.sellers.sync(); if (full) { $('#prods').innerHTML = prodButtons(); $$('#cats button').forEach(function (b) { b.classList.toggle('on', b.dataset.c === S.v.pos.cat && !S.v.pos.q); }); } $('#cart').innerHTML = cartHtml(); $('#ctot').textContent = bt(cartTotal()); $('[data-a=posCommit]').disabled = !S.v.pos.cart.length; $('.cart .pill').textContent = S.v.pos.cart.length + ' รายการ'; }
 SCR.pos.after = function () {
   var P = S.v.pos;
   $('#pq').oninput = function (e) { P.q = e.target.value.trim(); posRedraw(1); };
@@ -4450,7 +4617,7 @@ SCR.pos.after = function () {
     else if (b.dataset.dp) { i = +b.dataset.dp; P.cart[i].dpct = !P.cart[i].dpct; }
     else return; posRedraw(); };
   c.onchange = function (e) { var t = e.target; if (t.dataset.d != null) { var l = P.cart[+t.dataset.d]; l.disc = Math.max(0, nz(t.value)); if (l.dpct) l.disc = Math.min(100, l.disc); posRedraw(); } if (t.dataset.ch != null) P.cart[+t.dataset.ch].choice = t.value; if (t.dataset.qv != null) { var q = Math.round(nz(t.value) * 100) / 100; P.cart[+t.dataset.qv].qty = q > 0 ? q : 1; posRedraw(); } };
-  bindSellers($('.cart'), P.sellers);
+  bindSellers($('.cart'), P.sellers, cartTotal);
 };
 function quickAdd(P) {
   var cats = posCats().filter(function (c) { return c !== 'โปร'; }), T = [['proc', 'หัตถการ'], ['course', 'คอร์ส'], ['product', 'ยา/สินค้า'], ['service', 'ค่าบริการ']];
@@ -4485,6 +4652,7 @@ ACT.posCommit = function () {
   var miss = P.cart.filter(function (l) { return l.choices && !l.choice; })[0]; if (miss) return toast('เลือกตำแหน่งของ ' + miss.name + ' ก่อน', 1);
   var items = P.cart.map(function (l) { var g = l.price * l.qty; return { item: l.item, promo: l.promo, qty: l.qty, disc: l.dpct ? Math.round(g * l.disc) / 100 : l.disc, choice: l.choice }; });
   if (!P.sellers.length) return toast('เลือกผู้ขายอย่างน้อย 1 คน', 1);
+  if (P.sellers.toPct && !P.sellers.toPct()) return;
   call('saleCommit', { hn: P.hn, items: items, sellers: P.sellers }, { write: true }).then(function (r) {
     S.v.pos = null; toast('บันทึก ' + r.orders.length + ' รายการ');
     if (P.ret) { back(); return; }
@@ -4729,8 +4897,9 @@ SCR.arrivals = function () {
   });
 };
 POLL.arrivals = 1;
+function afterArrive(hn) { return call('patientPage', { hn: hn }).then(function (d) { if (d.patient.needConsent) { toast('คนไข้ใหม่จากลีด — กรอกประวัติและเซ็นยินยอม'); go('register', 'complete:' + hn); return true; } }).catch(function () {}); }
 ACT.arrive = function (el) {
-  call('apptArrive', { id: el.dataset.id }, { write: true }).then(function (v) { toast(el.dataset.n + ' เข้าคิว ' + v.queue + ' · ' + (v.stage === 'CONSULT' ? 'คุยความกังวลเบื้องต้นก่อน แล้วกด “คุยเสร็จ → ส่งต่อ”' : (STAGE[v.stage] || [''])[0])); refresh(); }).catch(fail);
+  call('apptArrive', { id: el.dataset.id }, { write: true }).then(function (v) { afterArrive(v.hn); toast(el.dataset.n + ' เข้าคิว ' + v.queue + ' · ' + (v.stage === 'CONSULT' ? 'คุยความกังวลเบื้องต้นก่อน แล้วกด “คุยเสร็จ → ส่งต่อ”' : (STAGE[v.stage] || [''])[0])); refresh(); }).catch(fail);
 };
 ACT.apptMenu = function (el) {
   var id = el.dataset.id;
@@ -4782,18 +4951,19 @@ function vitalTiles(v) {
     (!v.bp && !v.pr ? '<div><span>V/S</span><b style="font-size:1rem">' + esc(v.vitals) + '</b></div>' : '') + (f ? '<p class="small dn">⚠ ' + esc(f) + '</p>' : '') + '</div>';
 }
 TITLES.opd = 'บันทึก OPD';
-SCR.opd = function (vn) {
+SCR.opd = function (arg) {
+  var vn = String(arg).split('|')[0], fromTx = String(arg).split('|')[1] === 'tx';
   return call('visitDetail', { vn: vn }).then(function (d) {
-    S.v.opd = d; var p = d.patient, o = d.opd || {}, signed = !!o.signed, v = d.visit;
+    S.v.opd = d; d.fromTx = fromTx; var p = d.patient, o = d.opd || {}, signed = !!o.signed, v = d.visit;
     TITLES.opd = 'OPD · คิว ' + v.queue + ' · ' + p.name; renderTop();
     var pre = { cc: [v.cc, v.concern && 'กังวลเรื่อง ' + v.concern].filter(Boolean).join(' · '), pi: [v.concernNote, v.consultBy && '(ข้อมูลจากการคุยกับ ' + v.consultBy + ')'].filter(Boolean).join(' '), pe: v.vitals ? 'V/S: ' + v.vitals : '' };
     function f(k, l, ta) { return '<label>' + l + (ta ? '<textarea name="' + k + '"' + (signed ? ' readonly' : '') + '>' + esc(o[k] || pre[k] || '') + '</textarea>' : '<input name="' + k + '"' + (signed ? ' readonly' : '') + ' value="' + esc(o[k] || '') + '">') + '</label>'; }
     return '<div class="split"><form class="card stack" id="of"><div class="row"><h2 class="sp">' + esc(p.hn + ' ' + p.name) + '</h2>' + stagePill(v.stage) + '</div>' +
       healthBlock(p) + vitalTiles(v) + (v.concern ? '<div class="note small"><b>ลูกค้ากังวล:</b> ' + esc(v.concern) + (v.consultBy ? ' · คุยโดย ' + esc(v.consultBy) : '') + '</div>' : '') +
-      f('cc', 'CC · อาการสำคัญ', 1) + f('pi', 'PI · ประวัติปัจจุบัน', 1) + f('pe', 'PE · ตรวจร่างกาย', 1) + f('dx', 'Dx · วินิจฉัย') + f('plan', 'Plan · แผนการรักษา', 1) +
+      f('cc', 'CC · อาการสำคัญ', 1) + f('pi', 'PI · ประวัติปัจจุบัน', 1) + f('pe', 'PE · ตรวจร่างกาย', 1) + f('dx', 'Dx · วินิจฉัย') + f('plan', 'Plan · แผนการรักษา', 1) + f('proc', 'รายละเอียดหัตถการ (ถ้าทำในห้องตรวจ)', 1) +
       '<label>นัดติดตาม (วัน)<input name="followDays" type="number" inputmode="numeric" value="' + esc(o.followDays || '') + '"' + (signed ? ' readonly' : '') + '></label>' +
-      (signed ? '<div class="note small">ลงนามโดย ' + esc(o.signed) + ' · ' + esc(o.signedAt) + ' — แก้ไขไม่ได้ ใช้บันทึกเพิ่มเติม</div><label>บันทึกเพิ่มเติม (addendum)<textarea name="addendum"></textarea></label><button class="btn" type="button" data-a="opdAdd">บันทึกเพิ่มเติม</button>'
-        : '<div class="row"><button class="btn" type="button" data-a="opdSave">บันทึกร่าง</button><button class="btn p lg sp" type="button" data-a="opdSign">ลงนาม · ส่งต่อทำหัตถการ/เคาน์เตอร์</button></div><p class="xs muted">ลงนามด้วยชื่อและเลขใบประกอบวิชาชีพของแพทย์ที่เข้าระบบ หลังลงนามแก้ไม่ได้</p>') + '</form>' +
+      (signed ? '<div class="note small row"><span class="sp">ลงนามโดย ' + esc(o.signed) + ' · ' + esc(o.signedAt) + ' — แก้ไขไม่ได้ ใช้บันทึกเพิ่มเติม</span>' + (o.sigImg ? '<button type="button" class="btn sm q" data-a="viewDrSig">ดูลายเซ็น</button>' : '') + (['DONE', 'CANCEL'].indexOf(v.stage) < 0 ? '<button type="button" class="btn sm" data-a="opdReopen">แก้ไข</button>' : '') + '</div><label>บันทึกเพิ่มเติม (addendum)<textarea name="addendum"></textarea></label><button class="btn" type="button" data-a="opdAdd">บันทึกเพิ่มเติม</button>'
+        : sigBlock('dsig', 'ลายเซ็นแพทย์ * (เซ็นด้วยนิ้ว/ปากกา)') + (S.user.roles.indexOf('doctor') >= 0 ? '' : pinField('แพทย์ใส่รหัส (PIN) ของตัวเอง *')) + '<div class="row"><button class="btn" type="button" data-a="opdSave">บันทึกร่าง</button><button class="btn p lg sp" type="button" data-a="opdSign">' + (fromTx ? 'เซ็น · บันทึก' : 'เซ็น · ส่งต่อ') + '</button></div><p class="xs muted">ลงนามด้วยชื่อและเลขใบประกอบวิชาชีพของแพทย์ที่เข้าระบบ หลังลงนามแก้ไม่ได้</p>') + '</form>' +
       '<div class="stack"><div class="card stack"><div class="sec"><h2>รายการที่สั่ง</h2><button class="btn sm p" data-go="pos" data-arg=\'' + esc(JSON.stringify({ hn: p.hn, ret: 1 })) + '\'>+ สั่ง/ขายเพิ่ม</button></div>' +
       (d.orders.length ? '<div class="list">' + d.orders.map(function (x) { return orderRow(x, !x.receipt && x.status !== 'DONE'); }).join('') + '</div>' : '<div class="empty">ยังไม่มีรายการ — กด “สั่ง/ขายเพิ่ม” เลือกหัตถการ/ยา</div>') + '</div>' +
       '<button class="btn" data-go="patient" data-arg="' + esc(p.hn) + '">ดูประวัติ/คอร์สของคนไข้</button></div></div>';
@@ -4801,15 +4971,25 @@ SCR.opd = function (vn) {
 };
 // ปุ่ม pos รับ arg เป็น JSON
 (function () { var g = SCR.pos; SCR.pos = function (a) { if (typeof a === 'string' && a.charAt(0) === '{') a = JSON.parse(a); return g(a); }; SCR.pos.after = g.after; })();
-function opdData() { var F = $('#of'), d = { vn: S.v.opd.visit.vn }; $$('input,textarea', F).forEach(function (e) { d[e.name] = e.value; }); return d; }
+SCR.opd.after = function () { S.v.opdPads = mountSigs($('#of')); };
+function opdData() { var F = $('#of'), d = { vn: S.v.opd.visit.vn, pin: pinVal(F) }; $$('input[name],textarea[name]', F).forEach(function (e) { d[e.name] = e.value; }); return d; }
+ACT.viewDrSig = function (el) { var vn = (el && el.dataset.vn) || (S.v.opd && S.cur.name === 'opd' ? S.v.opd.visit.vn : S.v.tx.visit.vn); call('opdSig', { vn: vn }, { spin: true }).then(function (src) { dialog({ title: 'ลายเซ็นแพทย์', body: '<img src="' + esc(src) + '" alt="ลายเซ็นแพทย์" style="background:#fff;border-radius:10px;max-width:100%">', ok: false, cancel: 'ปิด' }); }).catch(fail); };
 ACT.opdSave = function () { call('saveOPD', opdData(), { write: true }).then(function () { toast('บันทึกร่างแล้ว'); }).catch(fail); };
 ACT.opdSign = function () {
-  var d = opdData(); if (!d.dx && !d.plan) return toast('ใส่ Dx หรือ Plan ก่อนลงนาม', 1);
-  ask('ลงนาม OPD', 'ลงนามโดย <b>' + esc(S.user.fullName) + '</b> แล้วส่งคนไข้ต่อ? หลังลงนามแก้ไขไม่ได้', 'ลงนามและส่งต่อ').then(function (ok) {
-    if (!ok) return; d.sign = true; d.finish = true;
+  var d = opdData(); if (!d.dx && !d.plan && !d.proc) return toast('ใส่ Dx หรือ Plan ก่อนลงนาม', 1);
+  d.sigImg = S.v.opdPads && S.v.opdPads.dsig ? S.v.opdPads.dsig.get() : ''; if (!d.sigImg) return toast('ให้แพทย์เซ็นชื่อในช่องลายเซ็นก่อน', 1);
+  ask('ลงนาม OPD', 'ลงนามโดย <b>' + esc(S.user.roles.indexOf('doctor') >= 0 ? S.user.fullName : 'แพทย์เจ้าของรหัส') + '</b> แล้วส่งคนไข้ต่อ? หลังลงนามแก้ไขไม่ได้', 'ลงนามและส่งต่อ').then(function (ok) {
+    if (!ok) return; d.sign = true; d.finish = !S.v.opd.fromTx;
+    if (S.v.opd.fromTx) return call('saveOPD', d, { write: true }).then(function () { toast('เซ็นบันทึกแล้ว'); back(); }).catch(fail);
     call('saveOPD', d, { write: true }).then(function () { toast('ลงนามแล้ว · ส่งต่อห้องทรีตเมนต์/เคาน์เตอร์'); go('doctor', null, true); S.stack = S.stack.filter(function (x) { return x.name !== 'opd'; }); }).catch(fail);
   });
 };
+ACT.opdReopen = function () { opdReopen(S.v.opd.visit.vn, refresh); };
+function opdReopen(vn, done) {
+  var isDoc = S.user.roles.indexOf('doctor') >= 0;
+  dialog({ title: 'แก้ไขบันทึกที่เซ็นแล้ว', ok: 'แก้ไข', body: '<p class="small">บันทึกจะกลับเป็นร่างให้แก้ได้ทุกช่อง แล้วต้อง<b>เซ็นใหม่</b> · ฉบับเดิมเก็บไว้ในบันทึกการใช้งาน (ตรวจย้อนหลังได้)</p>' + (isDoc ? '' : pinField('แพทย์ใส่รหัส (PIN) ของตัวเอง *')),
+    onOk: function (b) { return call('saveOPD', { vn: vn, reopen: true, pin: pinVal(b) }, { write: true }).then(function () { toast('เปิดแก้ไขแล้ว · แก้เสร็จอย่าลืมเซ็นใหม่'); done(); }); } });
+}
 ACT.opdAdd = function () { var a = $('#of [name=addendum]').value.trim(); if (!a) return toast('พิมพ์บันทึกเพิ่มเติมก่อน', 1); call('saveOPD', { vn: S.v.opd.visit.vn, addendum: a }, { write: true }).then(function () { toast('เพิ่มบันทึกแล้ว'); refresh(); }).catch(fail); };
 
 /* ---------- ห้องทรีตเมนต์ (แท็บเล็ตห้อง OR) ---------- */
@@ -4840,11 +5020,12 @@ SCR.tx = function (vn) {
     S.v.tx.used = used;
     var pend = d.orders.filter(function (o) { return o.status === 'PENDING'; }), done = d.orders.filter(function (o) { return o.status === 'DONE'; });
     return '<div class="split"><div class="stack"><div class="card stack"><div class="row"><div class="sp"><div class="small muted">' + esc(p.hn) + '</div><h2>' + esc(p.name) + (p.nickname ? ' (' + esc(p.nickname) + ')' : '') + '</h2></div>' + stagePill(v.stage) + '</div>' +
-      healthBlock(p) + vitalTiles(d.visit || {}) + (d.visit && d.visit.concern ? '<div class="note small"><b>ลูกค้ากังวล:</b> ' + esc(d.visit.concern) + (d.visit.concernNote ? ' · ' + esc(d.visit.concernNote) : '') + '</div>' : '') + (d.opd && d.opd.plan ? '<div class="small"><b>แผนแพทย์:</b> ' + esc(d.opd.plan) + (d.opd.dx ? ' · <b>Dx</b> ' + esc(d.opd.dx) : '') + '</div>' : '') +
+      healthBlock(p) + vitalTiles(d.visit || {}) + (d.visit && d.visit.concern ? '<div class="note small"><b>ลูกค้ากังวล:</b> ' + esc(d.visit.concern) + (d.visit.concernNote ? ' · ' + esc(d.visit.concernNote) : '') + '</div>' : '') + (d.opd && d.opd.plan && !d.opd.signed && false ? '<div class="small"><b>แผนแพทย์:</b> ' + esc(d.opd.plan) + (d.opd.dx ? ' · <b>Dx</b> ' + esc(d.opd.dx) : '') + '</div>' : '') +
       (v.stage === 'NUMB' ? '<div class="note row"><span class="sp">ทายาชาไปแล้ว ' + since(d.numbMins) + ' จาก ' + v.numbMin + ' นาที</span></div>' : '') +
       (v.room ? '<div class="row small"><span class="pill a">' + esc(v.room) + '</span><span class="muted">' + esc(v.claimedBy || '') + '</span></div>' : '') +
       '<div class="row">' + (v.stage !== 'IN_TX' ? '<button class="btn p lg" data-a="claim">รับงาน · เลือกห้อง</button>' : '<button class="btn" data-a="claim">ย้ายห้อง</button>') +
       (v.stage !== 'NUMB' && v.stage !== 'IN_TX' ? '<button class="btn w lg" data-a="numb">ทายาชา</button>' : '') + '</div></div>' +
+      drNoteCard(d) +
       '<div class="card stack"><div class="sec"><h2>รายการที่ต้องทำ</h2><span class="pill w">' + pend.length + '</span></div>' + (pend.length ? '<div class="list">' + pend.map(function (o) {
         return '<div class="li"><div class="main"><div class="t">' + esc(o.name) + (o.qty > 1 ? ' ×' + o.qty : '') + (o.choice ? ' · ' + esc(o.choice) : '') + '</div><div class="s">' + ({ doctor: 'แพทย์ทำ', staff: 'พนักงานทำ', both: 'แพทย์+พนักงาน', either: 'แพทย์หรือพนักงาน' }[o.performer] || '') +
           (o.receipt || o.courseRef ? ' · <span class="pill g">' + (o.courseRef ? 'ใช้คอร์ส' : 'จ่ายแล้ว') + '</span>' : ' · <span class="pill w">ยังไม่จ่าย</span>') + (o.consent ? ' · <span class="pill a">เซ็นยินยอมแล้ว</span>' : '') + '</div></div>' +
@@ -4860,6 +5041,39 @@ SCR.tx = function (vn) {
   });
 };
 POLL.tx = 0;
+SCR.tx.after = function () { var c = $('#drn'); S.v.txPads = c ? mountSigs(c) : {}; };
+// บันทึกแพทย์ในห้องหัตถการ: คนไข้มาห้องเลยไม่ผ่านห้องตรวจ แพทย์ก็จด Dx/รายละเอียดหัตถการ แล้วเซ็นได้ที่นี่
+function drNoteCard(d) {
+  var o = d.opd || {}, isDoc = S.user.roles.indexOf('doctor') >= 0, st = d.visit.stage;
+  if (['DONE', 'CANCEL'].indexOf(st) >= 0 && !o.vn) return '';
+  var pin = isDoc ? '' : pinField('แพทย์ใส่รหัส (PIN) ของตัวเอง *');
+  if (o.signed) return '<div class="card stack" id="drn"><div class="sec"><h2>บันทึกแพทย์ · หัตถการ</h2><span class="pill g">ลงนามแล้ว</span></div>' +
+    (o.dx ? '<div class="small"><b>Dx</b> ' + esc(o.dx) + '</div>' : '') + (o.proc ? '<div class="small" style="white-space:pre-wrap"><b>หัตถการ</b> ' + esc(o.proc) + '</div>' : '') + (o.plan ? '<div class="small" style="white-space:pre-wrap"><b>Plan</b> ' + esc(o.plan) + '</div>' : '') +
+    '<div class="row xs muted"><span class="sp">ลงนาม ' + esc(o.signed) + ' · ' + esc(o.signedAt) + '</span>' + (o.sigImg ? '<button class="btn sm q" data-a="viewDrSig">ดูลายเซ็น</button>' : '') + '</div>' +
+    (['DONE', 'CANCEL'].indexOf(st) < 0 ? '<div class="row"><button class="btn" data-a="txOpdEdit">แก้ไขบันทึก (ต้องเซ็นใหม่)</button><button class="btn q" data-go="opd" data-arg="' + esc(d.visit.vn) + '|tx">ดู OPD เต็ม</button></div>' : '') +
+    (['DONE', 'CANCEL'].indexOf(st) < 0 ? '<details><summary class="small b">+ เพิ่มรายละเอียดหัตถการ</summary><div class="stack" style="gap:.5rem;margin-top:.5rem"><textarea id="dpa" placeholder="ตำแหน่ง/จุดที่ทำ จำนวน U/cc เทคนิค ปฏิกิริยา คำแนะนำ"></textarea>' + pin + '<button class="btn p" data-a="txProcAdd">บันทึกเพิ่ม</button></div></details>' : '') + '</div>';
+  function f(k, l, ta, ph) { return '<label>' + l + (ta ? '<textarea name="' + k + '" placeholder="' + (ph || '') + '">' + esc(o[k] || '') + '</textarea>' : '<input name="' + k + '" value="' + esc(o[k] || '') + '" placeholder="' + (ph || '') + '">') + '</label>'; }
+  return '<div class="card stack" id="drn"><div class="sec"><h2>บันทึกแพทย์ · หัตถการ</h2>' + (o.vn ? '<span class="pill w">ร่าง</span>' : '<span class="pill">ยังไม่มี OPD</span>') + '</div>' +
+    (!o.vn ? '<p class="xs muted">คนไข้มาห้องเลย ไม่ได้ผ่านห้องตรวจ — แพทย์บันทึกและเซ็นที่นี่ได้</p>' : '') +
+    '<div class="stack" style="gap:.6rem">' +
+    f('cc', 'CC · อาการ/สิ่งที่ลูกค้าต้องการ', 0, d.visit.concern || '') + f('dx', 'Dx · วินิจฉัย') +
+    f('proc', 'รายละเอียดหัตถการ', 1, 'ตำแหน่ง/จุดที่ทำ จำนวน U/cc เข็ม/cannula เทคนิค ปฏิกิริยา คำแนะนำหลังทำ') + f('plan', 'Plan · แผน/นัดติดตาม', 1) +
+    sigBlock('dsig', 'ลายเซ็นแพทย์ (เซ็นตอนบันทึกเสร็จ)') + pin +
+    '<button type="button" class="btn q sm" data-go="opd" data-arg="' + esc(d.visit.vn) + '|tx">เปิดฟอร์ม OPD เต็ม (PI / PE / นัดติดตาม)</button>' +
+    '<div class="row"><button class="btn" data-a="txOpdSave">บันทึกร่าง</button><button class="btn p sp" data-a="txOpdSign">เซ็น · บันทึก</button></div></div></div>';
+}
+function txOpd(sign) {
+  var c = $('#drn'), d = { vn: S.v.tx.visit.vn, pin: pinVal(c) }; $$('input[name],textarea[name]', c).forEach(function (e) { d[e.name] = e.value.trim(); });
+  if (!d.cc && !d.dx && !d.proc && !d.plan) return toast('พิมพ์บันทึกก่อน', 1);
+  if (S.user.roles.indexOf('doctor') < 0 && !d.pin) return toast('ให้แพทย์ใส่รหัส (PIN) ของตัวเอง', 1);
+  if (sign) { d.sigImg = S.v.txPads.dsig ? S.v.txPads.dsig.get() : ''; if (!d.sigImg) return toast('ให้แพทย์เซ็นชื่อในช่องลายเซ็นก่อน', 1); if (!d.dx && !d.proc && !d.plan) return toast('ใส่ Dx หรือรายละเอียดหัตถการก่อนเซ็น', 1); d.sign = true; }
+  call('saveOPD', d, { write: true }).then(function () { toast(sign ? 'เซ็นบันทึกแล้ว' : 'บันทึกร่างแล้ว'); refresh(); }).catch(fail);
+}
+ACT.txOpdSave = function () { txOpd(false); };
+ACT.txOpdEdit = function () { opdReopen(S.v.tx.visit.vn, refresh); };
+ACT.txOpdSign = function () { txOpd(true); };
+ACT.txProcAdd = function () { var c = $('#drn'), a = $('#dpa').value.trim(); if (!a) return toast('พิมพ์รายละเอียดก่อน', 1); if (S.user.roles.indexOf('doctor') < 0 && !pinVal(c)) return toast('ให้แพทย์ใส่รหัส (PIN) ของตัวเอง', 1);
+  call('saveOPD', { vn: S.v.tx.visit.vn, procAdd: a, pin: pinVal(c) }, { write: true }).then(function () { toast('เพิ่มบันทึกแล้ว'); refresh(); }).catch(fail); };
 function stockCache(force) { if (S.stock && !force) return Promise.resolve(S.stock); return call('stockList').then(function (s) { S.stock = s; return s; }); }
 function roomPicker(cur, used, typeHint) {
   var rs = S.boot.rooms.filter(function (r) { return r.type !== 'ห้องตรวจ' || !typeHint; });
@@ -4908,12 +5122,12 @@ ACT.complete = function (el) {
   var d = S.v.tx, o = d.orders.filter(function (x) { return x.id === el.dataset.id; })[0], perf = o.performer;
   var docs = S.boot.staff.filter(function (s) { return s.roles.indexOf('doctor') >= 0; }), stf = S.boot.staff.filter(function (s) { return s.roles.some(function (r) { return ['nurse', 'assistant', 'therapist'].indexOf(r) >= 0; }); });
   var doc = S.user.roles.indexOf('doctor') >= 0 ? S.user.code : (docs.filter(function (x) { return x.name === d.visit.doctor; })[0] || {}).code || '', staffs = stf.some(function (x) { return x.code === S.user.code; }) ? [S.user.code] : [];
-  if (perf === 'staff') doc = ''; if (perf === 'doctor') staffs = [];
+  if (perf === 'staff') doc = '';
   var list = (o.bom || []).map(function (b) { return { stock: b.stock, qty: b.qty }; });
   var needLot = /Botox|Filler|Biostim/.test(o.category || ''), later = !S.user.stock || S.user.roles.indexOf('doctor') >= 0;
   dialog({ title: 'บันทึกทำเสร็จ · ' + o.name, ok: 'บันทึกทำเสร็จ', wide: true, noFocus: true,
     body: (perf !== 'staff' ? '<div class="stack" style="gap:.35rem"><div class="small b">แพทย์ผู้ทำ' + (perf === 'either' ? ' (หรือเลือกพนักงาน)' : ' *') + '</div><div class="chips" id="dc">' + docs.map(function (s) { return '<button type="button" data-c="' + esc(s.code) + '" class="' + (s.code === doc ? 'on' : '') + '">' + esc(s.name) + '</button>'; }).join('') + '</div></div>' : '') +
-      (perf !== 'doctor' ? '<div class="stack" style="gap:.35rem"><div class="small b">พนักงานผู้ทำ (เลือกได้หลายคน ค่ามือแบ่งเท่ากัน)' + (perf === 'staff' || perf === 'both' ? ' *' : '') + '</div><div class="chips" id="sc">' + stf.map(function (s) { return '<button type="button" data-c="' + esc(s.code) + '" class="' + (staffs.indexOf(s.code) >= 0 ? 'on' : '') + '">' + esc(s.name) + '</button>'; }).join('') + '</div></div>' : '') +
+      ('<div class="stack" style="gap:.35rem"><div class="small b">' + (perf === 'doctor' ? 'ผู้ช่วยแพทย์ / คนเตรียม (ไม่บังคับ · ได้ค่ามือตอนเตรียมตามที่ตั้งไว้)' : 'พนักงานผู้ทำ (เลือกได้หลายคน ค่ามือแบ่งเท่ากัน)' + (perf === 'staff' || perf === 'both' ? ' *' : '')) + '</div><div class="chips" id="sc">' + stf.map(function (s) { return '<button type="button" data-c="' + esc(s.code) + '" class="' + (staffs.indexOf(s.code) >= 0 ? 'on' : '') + '">' + esc(s.name) + '</button>'; }).join('') + '</div></div>') +
       (o.orTeam ? ['scrub', 'circ'].map(function (k) { return '<div class="stack" style="gap:.35rem"><div class="small b">' + (k === 'scrub' ? 'Scrub nurse' : 'Circulating nurse') + '</div><div class="chips" data-team="' + k + '">' + stf.map(function (s) { return '<button type="button" data-c="' + esc(s.code) + '">' + esc(s.name) + '</button>'; }).join('') + '</div></div>'; }).join('') : '') +
       (S.user.stock ? '<label class="ck"><input type="checkbox" id="lt"' + (later ? ' checked' : '') + '> ให้ผู้ช่วย/พยาบาลบันทึกของที่ใช้ทีหลัง</label>' : '<div class="note small">ของที่ใช้ ผู้ช่วย/พยาบาลจะบันทึกทีหลัง</div>') +
       '<div class="stack" id="supw" style="gap:.4rem"' + (later ? ' hidden' : '') + '><div class="small b">ของที่ใช้จริง (ตัดสต้อกสาขา)</div><div id="sup" class="stack" style="gap:.4rem"></div><button type="button" class="btn q sm" id="addsup">+ เพิ่มของ</button>' +
@@ -5022,7 +5236,7 @@ ACT.apptInfo = function (el) {
       (a.note ? '<div>หมายเหตุ: ' + esc(a.note) + '</div>' : '') + '<div class="muted">ลงนัดโดย ' + esc(a.by) + ' · ' + stagePill(a.stage || '') + ' ' + esc({ BOOKED: 'รอมา', ARRIVED: 'มาแล้ว', NOSHOW: 'ไม่มา' }[a.status] || '') + '</div></div>' +
       '<div class="row"><button class="btn sm" data-x="close" data-go2="patient" data-h="' + esc(a.hn) + '">หน้าคนไข้</button>' + (has(FRONT) && a.status === 'BOOKED' ? '<button class="btn sm" data-x="close" data-mn="' + esc(a.id) + '">ย้าย/ยกเลิก</button>' : '') + '</div>',
     mount: function (b) { b.addEventListener('click', function (e) { var x = e.target.closest('[data-go2]'); if (x) setTimeout(function () { go('patient', x.dataset.h); }, 10); var y = e.target.closest('[data-mn]'); if (y) setTimeout(function () { ACT.apptMenu({ dataset: { id: y.dataset.mn } }); }, 10); }, true); },
-    onOk: function () { return call('apptArrive', { id: a.id }, { write: true }).then(function (v) { toast(a.name + ' เข้าคิว ' + v.queue); refresh(); }); } });
+    onOk: function () { return call('apptArrive', { id: a.id }, { write: true }).then(function (v) { toast(a.name + ' เข้าคิว ' + v.queue); refresh(); setTimeout(function () { afterArrive(v.hn); }, 30); }); } });
 };
 
 TITLES.bookNew = 'ลงนัด';
@@ -5045,7 +5259,7 @@ SCR.bookNew = function (arg) {
 function bookPt() {
   var B = S.v.book;
   if (B.pt) return '<div class="row"><div class="sp"><b>' + esc(B.pt.patient.hn + ' ' + B.pt.patient.name) + '</b><div class="small muted">' + esc(B.pt.patient.phone) + (B.pt.seenDoctor ? ' · พบแพทย์ภายใน 12 เดือน' : ' · <span class="pill i">คนไข้ใหม่: ปรึกษาแพทย์ 15 นาทีก่อน</span>') + '</div></div>' + (B.leadId ? '' : '<button class="btn sm q" data-a="bookPtClear">เปลี่ยน</button>') + '</div>';
-  return '<div class="row"><input id="bq" class="sp" placeholder="ค้นหา HN · ชื่อ · เบอร์" style="flex:1 1 200px"><button class="btn" data-a="bookPtFind">ค้นหา</button></div><div id="bqr" class="list"></div>';
+  return '<div class="row"><input id="bq" class="sp" placeholder="ค้นหา HN · ชื่อ · เบอร์" style="flex:1 1 200px"><button class="btn" data-a="bookPtFind">ค้นหา</button><button class="btn p" data-a="bookNewPt">+ ลูกค้าใหม่</button></div><div id="bqr" class="list"></div>';
 }
 function bookItems(q) {
   var B = S.v.book, its = S.boot.items.filter(function (i) { return (i.type === 'proc' || i.type === 'service') && (!q || i.name.toLowerCase().indexOf(q.toLowerCase()) >= 0); });
@@ -5089,7 +5303,21 @@ SCR.bookNew.after = function () {
 };
 ACT.bookPtFind = function () {
   var q = $('#bq').value.trim(); if (q.length < 2) return;
-  call('searchPatients', { q: q }).then(function (rs) { $('#bqr').innerHTML = rs.map(function (p) { return '<div class="li tap" data-a="bookPtPick" data-h="' + esc(p.hn) + '"><div class="main"><div class="t">' + esc(p.hn + ' ' + p.name) + '</div><div class="s">' + esc(p.phone) + '</div></div></div>'; }).join('') || '<div class="empty">ไม่พบ — ลงทะเบียนคนไข้ก่อน</div>'; }).catch(fail);
+  call('searchPatients', { q: q }).then(function (rs) { $('#bqr').innerHTML = rs.map(function (p) { return '<div class="li tap" data-a="bookPtPick" data-h="' + esc(p.hn) + '"><div class="main"><div class="t">' + esc(p.hn + ' ' + p.name) + '</div><div class="s">' + esc(p.phone) + '</div></div></div>'; }).join('') || '<div class="empty">ไม่พบ — กด “+ ลูกค้าใหม่”</div>'; }).catch(fail);
+};
+// ลูกค้าใหม่ตอนลงนัด: ลงชื่อ+เบอร์ไว้ก่อน (ได้ HN) วันที่มาค่อยกรอกประวัติและเซ็นยินยอม
+ACT.bookNewPt = function () {
+  var q = ($('#bq') && $('#bq').value.trim()) || '', isPh = /^[\d\s+-]{9,}$/.test(q);
+  var sellers = S.boot.staff.filter(function (s) { return s.roles.some(function (r) { return ['sales', 'front', 'manager'].indexOf(r) >= 0; }); });
+  dialog({ title: 'ลูกค้าใหม่', ok: 'บันทึกแล้วเลือกเวลานัด',
+    body: '<div class="note small">ลงชื่อกับเบอร์ไว้ก่อน วันที่มาถึง ระบบจะเปิดหน้าให้กรอกประวัติและเซ็นยินยอมเอง</div>' +
+      '<label>ชื่อ-สกุล / ชื่อเล่น *<input id="nn" value="' + (isPh ? '' : esc(q)) + '"></label><div class="g2"><label>เบอร์โทร *<input id="np" type="tel" inputmode="tel" value="' + (isPh ? esc(q) : '') + '"></label><label>เพศ<select id="ng">' + opts(['', 'หญิง', 'ชาย', 'อื่นๆ']) + '</select></label></div>' +
+      '<div class="g2"><label>มาจาก<select id="nc">' + opts(CHANNELS, 'เซลหามาเอง') + '</select></label><label>เซลที่หามา<select id="ns">' + opts(sellers.map(function (s) { return [s.name, s.name]; }), has(['sales']) ? S.user.name : '', '— ไม่ระบุ —') + '</select></label></div>',
+    onOk: function (b) { var g = function (s) { return b.querySelector(s).value.trim(); }, sl = g('#ns');
+      return call('registerPatient', { name: need(g('#nn'), 'ใส่ชื่อ'), phone: need(g('#np'), 'ใส่เบอร์'), gender: g('#ng'), channel: g('#nc'), noEmail: true, pre: true, note: sl ? 'เซลที่หามา: ' + sl : '' }, { write: true }).then(function (p) {
+        var B = S.v.book; B.hn = p.hn; if (sl) B.note = 'เซลที่หามา: ' + sl;
+        return call('patientPage', { hn: p.hn }).then(function (d) { B.pt = d; $('#bp').innerHTML = bookPt(); bookItems($('#bi').value.trim()); bookCourses(); bookSlots(); var bn = $('#bn'); if (bn && B.note && !bn.value) bn.value = B.note; toast('ลงชื่อ ' + p.hn + ' แล้ว — เลือกรายการและเวลา'); });
+      }); } });
 };
 ACT.bookPtPick = function (el) { var B = S.v.book; B.hn = el.dataset.h; call('patientPage', { hn: B.hn }).then(function (d) { B.pt = d; $('#bp').innerHTML = bookPt(); bookItems($('#bi').value.trim()); bookCourses(); bookSlots(); }).catch(fail); };
 ACT.bookPtClear = function () { var B = S.v.book; B.pt = null; B.hn = ''; B.courseId = ''; $('#bp').innerHTML = bookPt(); var bq = $('#bq'); bq.onkeydown = function (e) { if (e.key === 'Enter') ACT.bookPtFind(); }; bookSlots(); };
@@ -5103,7 +5331,7 @@ ACT.bookSave = function () {
 TITLES.leads = 'ลีดรอลงนัด';
 SCR.leads = function () {
   return call('leadList', { status: 'NEW', from: addDays(today(), -60) }).then(function (ls) {
-    return '<div class="stack"><div class="note small">แอดมินเพจลงลีดจากที่บ้าน → ส่งเข้ากลุ่ม LINE → หน้าร้านกดลงนัดที่นี่ · ยอดซื้อจริงจะกลับไปที่ลีดอัตโนมัติ (ทำ offline conversion)</div><div class="card">' + (ls.length ? '<div class="list">' + ls.map(function (l) {
+    return '<div class="stack"><div class="note small">ลีดที่ลงไว้แต่ยังไม่ได้นัด — กด “ลงนัด” เมื่อลูกค้าเลือกเวลาแล้ว · ยอดซื้อจริงจะกลับไปที่ลีดอัตโนมัติ (Offline conversion)</div><div class="card">' + (ls.length ? '<div class="list">' + ls.map(function (l) {
       return '<div class="li"><div class="main"><div class="t">' + esc(l.fbName) + (l.gender ? ' · ' + esc(l.gender) : '') + ' <span class="muted small">' + esc(l.phone) + '</span></div><div class="s">สนใจ ' + esc(l.interest || '-') + (l.value ? ' (' + bt(l.value) + ')' : '') + ' · จากแอด ' + esc(l.ad || '-') + ' · ' + esc(l.channel) + '</div>' +
         (l.closed ? '<div class="s"><span class="pill g">แอดมินปิดแล้ว ' + bt(l.closed) + (l.closedNote ? ' · ' + esc(l.closedNote) : '') + '</span></div>' : '') + '<div class="s">สะดวก: <b>' + esc(l.prefer || '-') + '</b> · แอดมิน ' + esc(l.admin) + ' · ' + esc(thDate(l.date)) + (l.hn ? ' · <span class="pill a">คนไข้เก่า ' + esc(l.hn) + '</span>' : '') + '</div></div>' +
         '<button class="btn p" data-a="leadBook" data-id="' + esc(l.id) + '">ลงนัด</button></div>';
@@ -5124,27 +5352,52 @@ ACT.leadBook = function (el) {
     }).catch(fail);
   }).catch(fail);
 };
-TITLES.lead = 'ลงลีดใหม่';
+TITLES.lead = 'ลงลีด + นัด';
 SCR.lead = function () {
   var brs = S.boot.branches;
-  return '<form class="stack" id="lf" style="max-width:720px;margin:0 auto"><div class="card stack"><h2>ลูกค้าทักมา</h2>' +
-    '<label>สาขาที่จะมา<select name="branch">' + opts(brs.map(function (b) { return [b.code, b.name]; }), S.user.branch) + '</select></label>' +
+  return '<form class="stack" id="lf" style="max-width:720px;margin:0 auto"><div class="card stack"><h2>ลูกค้าจากแชท</h2><p class="small muted" style="margin:0">ลอกจากที่แอดมินส่งมาใน LINE · ลงครั้งเดียวได้ทั้ง ลีด + นัด + นัดรายวัน</p>' +
+    '<div class="g2"><label>สาขาที่จะมา<select name="branch">' + opts(brs.map(function (b) { return [b.code, b.name]; }), S.user.branch) + '</select></label>' +
+    '<label>ทักมาทางเพจ<select name="page">' + opts([['CNX', 'Dr.tan เชียงใหม่'], ['PTY', 'Tan พัทยา'], ['JB', 'Jungbin']], leadPage(S.user.branch)) + '</select></label></div>' +
+    '<label>คนที่ตอบแชท / ปิดการขาย * <span class="xs">(คนนี้ได้ยอดที่ปิดในแชทและมัดจำ)</span><select name="admin">' + opts(closers().map(function (x) { return [x.name, x.name + ' · ' + x.role]; }), has(['adminpage']) && !has(['front']) ? S.user.name : '', '— เลือก —') + '</select></label>' +
     '<div class="g2"><label>ชื่อ facebook / LINE *<input name="fbName"></label><label>เพศ<select name="gender">' + opts(['', 'หญิง', 'ชาย', 'อื่นๆ']) + '</select></label></div>' +
     '<div class="g2"><label>เบอร์โทร *<input name="phone" type="tel" inputmode="tel"></label><label>Channel<select name="channel">' + opts(['Facebook', 'TikTok', 'LINE OA', 'Instagram', 'Google', 'อื่นๆ']) + '</select></label></div>' +
     '<label>ทักมาจากแอดตัวไหน<select name="ad">' + opts(S.boot.ads.map(function (a) { return a.name; }), '', '— เลือกแอด —') + '</select></label>' +
     '<div class="g2"><label>บริการที่สนใจ<input name="interest" list="itl"></label><label>Value คาดการณ์ (บาท)<input name="value" type="number" inputmode="numeric"></label></div><datalist id="itl">' + S.boot.items.concat(S.boot.promos).map(function (i) { return '<option value="' + esc(i.name) + '">'; }).join('') + '</datalist>' +
     '<label>สะดวกวันไหน / เวลาไหน<input name="prefer" placeholder="เช่น เสาร์นี้หลังบ่ายสอง"></label>' +
     '<div class="card flat stack" style="gap:.5rem;background:var(--accent-soft);border:0"><b>ลูกค้าตกลงซื้อแล้ว? (ปิดยอดจากแชท)</b><div class="g2"><label>ปิดโปร/รายการ<input name="closedNote" list="itl" placeholder="เช่น Morpheus 8 โปรเดือนนี้"></label><label>ยอดที่ปิดได้ (บาท)<input name="closed" type="number" inputmode="numeric" placeholder="เช่น 15999"></label></div>' +
-    '<span class="xs muted">ยอดนี้นับเป็นของแอดมินวันที่ลูกค้ามาจ่าย · ถ้าเซลขายเพิ่มได้มากกว่านี้ เซลได้ส่วนที่เกิน · ยังไม่ปิดเว้นว่างไว้ แล้วมากดปิดยอดทีหลังได้ในหน้า “ลีด”</span></div>' +
-    '<button type="button" class="btn p lg blk" data-a="leadSave">บันทึกและส่งเข้ากลุ่ม LINE</button></div></form>';
+    '<div class="g3"><label>ลูกค้าโอนมัดจำแล้ว (บาท)<input name="depAmt" type="number" inputmode="numeric" placeholder="ไม่มี = เว้นว่าง"></label><label>โอนเข้าช่องทาง<select name="depMethod">' + opts(S.boot.payMethods.filter(function (m) { return !/beam/i.test(m.name) && m.name !== 'เงินสด'; }).map(function (m) { return m.name; }), '', '— เลือก —') + '</select></label><label>เลขอ้างอิงการโอน<input name="depRef"></label></div>' +
+    '<span class="xs muted">ยอดที่ปิดนับเป็นของคนปิดการขาย ส่วนที่ขายเพิ่มหน้าร้านเป็นของเซลที่ขาย · <b>มัดจำ</b> เข้ายอดร้านวันนี้ + นับค่าคอมคนปิดวันนี้ และเข้าวงเงินคนไข้ไว้หักตอนมาทำ · ยังไม่ปิดเว้นว่างไว้</span></div>' +
+    '<div class="card flat stack" style="gap:.5rem;border:1px solid var(--line)"><b>นัดเลย (ถ้าลูกค้าเลือกเวลาแล้ว)</b>' +
+    '<div class="g2"><label>รายการที่จะมาทำ<select id="lai">' + opts(S.boot.items.filter(function (i) { return i.type === 'proc' || i.type === 'service'; }).map(function (i) { return [i.code, i.name]; }), '', '— ไม่นัดตอนนี้ —') + '</select></label><label>วันที่<input id="lad" type="date" value="' + today() + '" min="' + today() + '"></label></div>' +
+    '<div id="las" class="slots"></div><span class="xs muted">เลือกเวลาแล้ว ระบบลงนัดในตารางให้เลย หน้าร้านไม่ต้องลงซ้ำ · คนไข้ใหม่ลงชื่อไว้ก่อน วันที่มาค่อยกรอกประวัติและเซ็นยินยอม</span></div>' +
+    '<button type="button" class="btn p lg blk" data-a="leadSave">บันทึกลีด</button></div></form>';
+};
+function closers() { var R = { manager: 'ผู้จัดการ', sales: 'เซล', adminpage: 'แอดมินเพจ' }; return S.boot.staff.filter(function (x) { return x.roles.some(function (r) { return R[r]; }); }).map(function (x) { var r = x.roles.filter(function (y) { return R[y]; })[0]; return { name: x.name, role: R[r] }; }).sort(function (a, b) { return a.role < b.role ? -1 : a.role > b.role ? 1 : 0; }); }
+function leadPage(b) { return b === 'TCPY' ? 'PTY' : /^JB/.test(String(b)) ? 'JB' : 'CNX'; }
+SCR.lead.after = function () {
+  var L = S.v.lap = { time: '' }, f = $('#lf');
+  f.querySelector('[name=branch]').addEventListener('change', function (e) { f.querySelector('[name=page]').value = leadPage(e.target.value); });
+  function load() { var it = $('#lai').value, d = $('#lad').value, b = f.querySelector('[name=branch]').value; L.time = ''; if (!it) { $('#las').innerHTML = ''; return; }
+    $('#las').innerHTML = '<div class="spin sm"></div>';
+    call('slots', { item: it, date: d, branch: b }).then(function (r) { L.slots = r.slots; $('#las').innerHTML = r.slots.length ? r.slots.map(function (x, i) { return '<button type="button" data-s="' + i + '"><b>' + esc(x.time) + '</b><br><span class="xs muted">' + esc(x.room) + '</span></button>'; }).join('') : '<div class="small muted">วันนี้ไม่มีช่องว่าง — ลองวันอื่น</div>'; })
+      .catch(function (e) { $('#las').innerHTML = '<div class="small dn">' + esc(e.message) + '</div>'; }); }
+  $('#lai').onchange = function () { load(); var b = $('[data-a=leadSave]'); if (b) b.textContent = $('#lai').value ? 'บันทึกลีด + ลงนัด' : 'บันทึกลีด'; }; $('#lad').onchange = load; f.querySelector('[name=branch]').addEventListener('change', load);
+  $('#las').onclick = function (e) { var x = e.target.closest('[data-s]'); if (!x) return; L.time = L.slots[+x.dataset.s].time; $$('#las button').forEach(function (y) { y.classList.toggle('on', y === x); }); };
 };
 ACT.leadSave = function () {
-  var F = $('#lf'), d = {}; $$('input,select', F).forEach(function (e) { d[e.name] = e.value.trim(); });
+  var F = $('#lf'), d = {}; $$('input[name],select[name]', F).forEach(function (e) { d[e.name] = e.value.trim(); });
+  if (num0(d.depAmt) > 0) { if (!d.depMethod) return toast('เลือกช่องทางที่ลูกค้าโอนมัดจำ', 1); d.deposit = { amount: d.depAmt, method: d.depMethod, ref: d.depRef }; } delete d.depAmt; delete d.depMethod; delete d.depRef;
+  var L = S.v.lap || {}, ai = $('#lai') && $('#lai').value;
+  if (ai && !L.time) return toast('เลือกเวลานัด หรือเปลี่ยนรายการเป็น "ไม่นัดตอนนี้"', 1);
+  if (ai) d.appt = { item: ai, date: $('#lad').value, time: L.time };
+  if (!d.admin) return toast('ใส่ชื่อคนที่ตอบแชท/ปิดการขาย (ยอดที่ปิดในแชทคิดจากช่องนี้)', 1);
   call('leadCreate', d, { write: true }).then(function (r) {
-    F.reset();
-    dialog({ title: 'บันทึกลีดแล้ว #' + r.lead.id, ok: false, cancel: 'ปิด',
-      body: '<p class="small muted">ส่งข้อความนี้เข้ากลุ่ม LINE ของสาขา หน้าร้านจะเห็นลีดใน “ลีดรอลงนัด” ด้วย</p><textarea readonly style="min-height:170px">' + esc(r.line) + '</textarea>' +
-        '<div class="row"><a class="btn p lg" style="background:#06c755;border-color:#06c755;color:#fff" target="_blank" rel="noopener" href="https://line.me/R/share?text=' + encodeURIComponent(r.line) + '">ส่งเข้า LINE</a><button class="btn lg" data-cp>คัดลอกข้อความ</button></div>',
+    F.reset(); if ($('#las')) $('#las').innerHTML = ''; L.time = ''; var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = 'บันทึกลีด';
+    dialog({ title: r.appt ? 'ลงลีด + นัดแล้ว' : 'บันทึกลีดแล้ว', ok: 'ลงลีดคนถัดไป', cancel: false,
+      body: '<div class="stack" style="gap:.4rem"><div><b>' + esc(r.lead.fbName) + '</b> · ' + esc(r.lead.phone) + ' · ลีด #' + esc(r.lead.id) + '</div>' +
+        (r.deposit ? '<div class="note" style="background:var(--good-soft);color:var(--good)">💰 รับมัดจำ ' + bt(r.deposit.amount) + ' แล้ว · ใบเสร็จ ' + esc(r.deposit.receipt) + ' · เข้าวงเงินคนไข้</div>' : '') +
+        (r.appt ? '<div class="note">📅 นัด ' + esc(thDate(r.appt.date, 1)) + ' ' + esc(r.appt.cStart || r.appt.start) + ' · ' + esc(r.appt.itemName) + ' · ' + esc(r.appt.room) + ' — ขึ้นในตารางนัดและนัดวันนั้นแล้ว</div>' : '<div class="note w">ยังไม่ได้นัด — ลีดอยู่ใน “ลีดรอลงนัด”</div>') +
+        '<details><summary class="small muted">คัดลอกข้อความไปตอบแอดมิน (ถ้าต้องการ)</summary><textarea readonly style="min-height:150px;margin-top:.4rem">' + esc(r.line) + '</textarea><button class="btn sm" data-cp>คัดลอก</button></details></div>',
       mount: function (b) { b.querySelector('[data-cp]').onclick = function () { copyText(r.line); }; } });
   }).catch(fail);
 };
@@ -5665,6 +5918,29 @@ ACT.attAdd = function () { var ps = S.v.ar.people;
   dialog({ title: 'เพิ่มวันที่ลืมเช็คอิน', ok: 'บันทึก', body: '<label>พนักงาน<select id="as">' + opts(ps.map(function (p) { return [p.code, p.nick + ' (' + p.branch + ')']; }), '', '— เลือก —') + '</select></label><div class="g3"><label>วันที่<input id="ad" type="date" value="' + today() + '"></label><label>เข้า<input id="ai" type="time"></label><label>ออก<input id="ao" type="time"></label></div><label>เหตุผล *<input id="aw"></label>',
     onOk: function (b) { var g = function (s) { return b.querySelector(s).value.trim(); }; return call('attFix', { staff: need(g('#as'), 'เลือกพนักงาน'), date: g('#ad'), in: need(g('#ai'), 'ใส่เวลาเข้า'), out: g('#ao'), reason: need(g('#aw'), 'ใส่เหตุผล') }, { write: true }).then(function () { toast('เพิ่มแล้ว'); refresh(); }); } }); };
 ACT.attExp = function () { var r = S.v.ar; saveText('เข้าออกงาน-' + r.from + '_' + r.to, toCsv([['วันที่', 'รหัส', 'ชื่อ', 'สาขา', 'เข้า', 'ออก', 'ชั่วโมง', 'สาย (นาที)', 'ห่างร้านตอนเข้า (ม.)', 'พิกัดเข้า', 'พิกัดออก', 'หมายเหตุ']].concat(r.rows.map(function (a) { return [a.date, a.staff, a.nick, a.branch, a.in, a.out, a.hours, a.late, a.inDist, a.inGps, a.outGps, a.note]; })))); };
+
+/* ---------- บิลแอดมิน (รายเดือน · ทุกสาขารวม) ---------- */
+TITLES.adm = 'บิลแอดมิน';
+SCR.adm = function (mo) {
+  mo = mo || S.v.admMo || today().slice(0, 7); S.v.admMo = mo;
+  return call('adminBills', { month: mo }).then(function (r) {
+    S.v.adm = r; var brs = S.boot.branches.map(function (b) { return b.code; });
+    function K(l, v) { return '<div class="card"><div class="l">' + l + '</div><div class="v">' + v + '</div></div>'; }
+    var head = '<div class="row"><label style="flex-direction:row;align-items:center;gap:.5rem">เดือน<input id="admMo" type="month" value="' + esc(r.month) + '" style="width:auto"></label><span class="sp"></span>' +
+      '<span class="small muted">' + (r.perBill > 0 ? 'ค่าคอมแอดมิน ' + bt(r.perBill) + ' / บิล' : 'ยังไม่ได้ตั้งค่าคอมต่อบิล (ชีต Settings → adminPerBill)') + '</span></div>';
+    var kpi = '<div class="kpi">' + K('บิลเดือนนี้', r.total.bills) + K('① เก็บมัดจำได้', r.total.dep) + K('② ไม่มัดจำ แต่มาใช้บริการ', r.total.came + (r.total.fromPrev ? ' <span class="small muted">(ยกมา ' + r.total.fromPrev + ')</span>' : '')) + K('ลีดเดือนนี้ที่ยังไม่มา', r.total.waiting) + (r.perBill > 0 ? K('ค่าคอมแอดมินรวม', bt(r.total.pay)) : '') + '</div>';
+    var tbl = r.admins.length ? '<div class="card stack"><div class="sec"><h2>รายคน</h2><span class="xs muted">เฉพาะลีดที่คนปิดเป็นแอดมินเพจ · ทุกสาขารวมกัน</span></div><div class="tbl"><table><thead><tr><th>แอดมิน</th><th class="n">บิล</th><th class="n">① มัดจำ</th><th class="n">② มาใช้บริการ</th><th class="n">ยกมาจากเดือนก่อน</th>' +
+      brs.map(function (b) { return '<th class="n">' + esc(b) + '</th>'; }).join('') + '<th class="n">ยอดมัดจำ</th><th class="n">ใช้จ่ายจริง</th><th class="n">มาแต่ไม่ซื้อ</th><th class="n">ลงลีดเดือนนี้</th><th class="n">ยอดปิดในแชท (ดูเฉยๆ)</th><th class="n">ยังไม่มา</th>' + (r.perBill > 0 ? '<th class="n">ค่าคอม</th>' : '') + '</tr></thead><tbody>' +
+      r.admins.map(function (a) { return '<tr><td>' + esc(a.admin) + '</td><td class="n"><b>' + a.bills + '</b></td><td class="n">' + a.dep + '</td><td class="n">' + a.came + '</td><td class="n">' + (a.fromPrev ? '<b>' + a.fromPrev + '</b>' : 0) + '</td>' +
+        brs.map(function (b) { return '<td class="n">' + (a.byBranch[b] || '') + '</td>'; }).join('') + '<td class="n">' + fm(a.depAmt) + '</td><td class="n">' + fm(a.actual) + '</td><td class="n">' + (a.cameNoBuy || '') + '</td><td class="n">' + a.leads + '</td><td class="n">' + fm(a.closedAmt) + '</td><td class="n">' + (a.waiting || '') + '</td>' +
+        (r.perBill > 0 ? '<td class="n">' + bt(a.pay) + '</td>' : '') + '</tr>'; }).join('') + '</tbody></table></div>' +
+      '<p class="xs muted">นับ 1 บิลต่อ 1 ลีด: ① เก็บมัดจำได้ → นับเดือนที่รับมัดจำ (วันมาทำไม่นับซ้ำ) · ② ไม่มีมัดจำ → นับเดือนที่ลูกค้ามาใช้บริการครั้งแรกและจ่ายเงิน ถ้ามาเดือนหน้าก็ไปนับเดือนหน้า (ขึ้นว่า "ยกมาจากเดือนก่อน") · มาแต่ไม่ซื้อ ไม่นับ · ลีดที่เซล/ผจก เป็นคนปิด ไม่อยู่ในหน้านี้ (ได้ค่าคอม % ตามยอด)</p></div>' : '<div class="empty">เดือนนี้ยังไม่มีบิลของแอดมิน</div>';
+    var det = r.rows.length ? '<div class="card stack"><div class="sec"><h2>รายบิล</h2><span class="pill">' + r.rows.length + '</span></div><div class="tbl"><table><thead><tr><th>วันที่</th><th>นับเพราะ</th><th>แอดมิน</th><th>สาขา</th><th>ลูกค้า</th><th>ลงลีดวันที่</th><th class="n">ยอด</th></tr></thead><tbody>' +
+      r.rows.map(function (x) { return '<tr><td>' + esc(thDate(x.date, 1)) + '</td><td><span class="pill ' + (x.type === 'มัดจำ' ? 'g' : x.bill ? 'a' : '') + '">' + esc(x.type) + '</span>' + (x.carried && x.type !== 'มัดจำ' ? ' <span class="pill w">ยกมาจากเดือนก่อน</span>' : '') + '</td><td>' + esc(x.admin) + '</td><td>' + esc(x.branch) + ' <span class="xs muted">เพจ ' + esc(x.page) + '</span></td><td>' + esc(x.hn + ' ' + x.name) + '</td><td>' + esc(thDate(x.leadDate, 1)) + '</td><td class="n">' + (x.type === 'มัดจำ' ? fm(x.dep) : x.bill ? fm(x.actual) : '—') + '</td></tr>'; }).join('') + '</tbody></table></div></div>' : '';
+    return '<div class="stack">' + head + kpi + tbl + det + '</div>';
+  });
+};
+SCR.adm.after = function () { var i = $('#admMo'); if (i) i.onchange = function () { if (i.value) { S.v.admMo = i.value; refresh(); } }; };
 
 /* เริ่มระบบ */
 (function () {
