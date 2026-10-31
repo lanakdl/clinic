@@ -301,6 +301,32 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:
 .idc-st.ok{background:#15803d}.idc-st.bad{background:#b45309}
 .oc-p.oc-v{background:var(--info-soft);color:var(--info)}
 
+/* ตารางยอดเซลรายวัน */
+.sb{border-collapse:collapse;font-size:.74rem;font-variant-numeric:tabular-nums;width:100%;min-width:max-content;background:var(--surface)}
+.sb th,.sb td{border:1px solid var(--line);padding:.18rem .45rem;text-align:right;white-space:nowrap}
+.sb th{background:var(--surface2);text-align:center;font-weight:700}
+.sb td:first-child{text-align:center}
+.sb .sb-t{background:color-mix(in srgb,var(--bad) 22%,var(--surface));font-weight:600}
+.sb .sb-sum td.sb-g{background:#ffe600;color:#c00;font-weight:800}
+.sb .sb-s{font-weight:600;font-size:.7rem}
+.sb .sb-h{background:var(--surface)}
+.sb .sb-n{color:var(--bad);font-weight:600;white-space:normal;max-width:34rem;text-align:right}
+.sb .sb-sum td{font-weight:700;background:var(--surface2)}
+.sb .sb-l{text-align:left!important;font-weight:700}
+.sb .sb-gap td{border:0;height:.5rem;background:transparent}
+.sb .sb-m td{color:#c026d3;font-weight:600}
+.sb b.up{color:var(--good)}.sb b.dn{color:var(--bad)}
+.sb-wrap{padding:.5rem}
+.sb-full{position:fixed;inset:0;z-index:80;margin:0;border-radius:0;overflow:auto;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 12px max(12px,env(safe-area-inset-left,0px));background:var(--surface)}
+.sb-full .sb{font-size:.8rem;width:auto}
+.sb-x{position:fixed;z-index:81;opacity:.85;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+
+.sf-w{border-left:4px solid var(--warn)}
+
+.qtr{display:flex;flex-wrap:wrap;gap:.15rem .3rem;align-items:center;font-size:.7rem;color:var(--ink3);margin-top:.15rem}
+.qtr span{white-space:nowrap}.qtr span.on{color:var(--accent);font-weight:700}.qtr i{font-style:normal;opacity:.8}.qtr b{opacity:.5;font-weight:400}
+@media (max-width:520px){.qrow{flex-wrap:wrap}.qrow>.stack.r{flex-direction:row;flex-wrap:wrap;width:100%;padding-left:3.4rem}}
+
 </style>
 </head>
 <body>
@@ -1622,7 +1648,7 @@ var SCHEMA = {
                ['hn','HN'],['name','ชื่อ'],['phone','โทร'],['item','รายการ'],['itemName','ชื่อรายการ'],['courseId','ใช้คอร์ส'],['note','หมายเหตุ'],['status','สถานะ'],['vn','VN'],['leadId','ลีด'],['by','ผู้ลงนัด'],['created','เวลาลงนัด','t'],['ipdRoom','ห้องพักฟื้น'],['ipdEnd','พักฟื้นถึง'],['noConsult','ไม่ต้องตรวจก่อน']],
   Visits:     [['vn','VN'],['date','วันที่'],['branch','สาขา'],['queue','คิว','n'],['hn','HN'],['name','ชื่อ'],['stage','สถานะ'],['stageAt','เข้าสถานะเมื่อ','t'],['cc','อาการสำคัญ'],['vitals','สัญญาณชีพ'],
                ['doctor','แพทย์'],['room','ห้อง'],['claimedBy','ผู้รับงาน'],['numbAt','ทายาชาเมื่อ','t'],['numbMin','ยาชา (นาที)','n'],['created','เวลาเข้า','t'],['updated','อัปเดต','t'],['apptId','นัด'],['leadId','ลีด'],['buyMore','ซื้อเพิ่ม','b'],
-               ['route','ส่งต่อไป (หลังคุย)'],['concern','ความกังวล/สิ่งที่อยากแก้'],['consultBy','ผู้คุยเบื้องต้น'],
+               ['route','ส่งต่อไป (หลังคุย)'],['trail','ลำดับขั้นตอน (ระบบบันทึก)'],['concern','ความกังวล/สิ่งที่อยากแก้'],['consultBy','ผู้คุยเบื้องต้น'],
                ['concernNote','รายละเอียดที่คุย'],['bp','ความดัน (BP)'],['pr','ชีพจร (PR)','n']],
   OPD:        [['vn','VN'],['hn','HN'],['doctor','แพทย์'],['cc','CC'],['pi','PI'],['pe','PE'],['dx','Dx'],['plan','แผนการรักษา'],['followDays','นัดติดตาม (วัน)','n'],['signed','ลงนามโดย'],['signedAt','ลงนามเมื่อ','t'],['time','บันทึกเมื่อ','t'],['proc','บันทึกหัตถการ (แพทย์)'],['sigImg','ไฟล์ลายเซ็นแพทย์']],
   Orders:     [['id','เลขรายการ'],['vn','VN'],['item','รหัส'],['name','รายการ'],['type','ประเภท'],['category','หมวด'],['qty','จำนวน','n'],['price','ราคา/หน่วย','n'],['disc','ส่วนลด','n'],['total','รวม','n'],
@@ -1642,6 +1668,7 @@ var SCHEMA = {
   PayMethods: [['name','ช่องทางชำระ'],['needRef','ต้องใส่เลขอ้างอิง','b'],['feePct','บวกค่าธรรมเนียม %','n'],['branches','ใช้ที่สาขา (ว่าง=ทุกสาขา)'],['active','ใช้งาน','b']],
   Installments: [['id','เลข'],['hn','HN'],['name','ชื่อ'],['branch','สาขา'],['receipt','ใบเสร็จ'],['no','งวดที่','n'],['of','จากทั้งหมด','n'],['due','ครบกำหนด'],['amount','ยอดงวด','n'],['paid','จ่ายแล้ว','n'],['status','สถานะ'],['paidAt','จ่ายครบเมื่อ','t'],['created','สร้างเมื่อ','t'],['by','อนุมัติโดย']],
   OTs:        [['id','เลข'],['staff','รหัสพนักงาน'],['name','ชื่อ'],['branch','สาขา'],['date','วันที่'],['start','เริ่ม OT'],['end','ถึง'],['hours','ชั่วโมง','n'],['reason','ทำอะไร'],['photo','รูปแนบ (Drive)'],['status','สถานะ'],['rate','เรท/ชม.','n'],['amount','เงิน OT','n'],['created','ขอเมื่อ','t'],['by','อนุมัติโดย'],['at','อนุมัติเมื่อ','t'],['note','หมายเหตุ']],
+  Targets:    [['month','เดือน (เช่น 2026-11)'],['branch','สาขา'],['who','ใคร (ชื่อเล่น/รหัส · ทั้งสาขา · Page)'],['target','เป้า (บาท)','n'],['note','หมายเหตุ']],
   Holidays:   [['date','วันที่ (ค.ศ. เช่น 2026-12-05)'],['name','ชื่อวันหยุด'],['mode','แบบ: ปิดคลินิก / ปิด หักวันหยุด / เลือกลงเอง'],['branches','สาขา (ว่าง = ทุกสาขา · หลายสาขาคั่นด้วย ,)'],['note','หมายเหตุ']],
   Vacation:   [['code','รหัสพนักงาน'],['name','ชื่อ'],['year','ปี (ค.ศ.)'],['days','สิทธิ์พักร้อน (วัน) — เติมเอง','n'],['used','ใช้/ขอไปแล้ว (ระบบคำนวณ)','n'],['left','คงเหลือ (ระบบคำนวณ)','n'],['note','หมายเหตุ']],
   DayOffs:    [['id','เลข'],['staff','รหัสพนักงาน'],['name','ชื่อ'],['branch','สาขา'],['date','วันหยุด'],['kind','แบบ'],['status','สถานะ'],['reason','เหตุผล'],['created','ลงเมื่อ','t'],['mgrBy','ผจก.อนุมัติ'],['mgrAt','ผจก.อนุมัติเมื่อ','t'],['admBy','ผู้ดูแลระบบอนุมัติ'],['admAt','ผู้ดูแลระบบอนุมัติเมื่อ','t'],['note','หมายเหตุ']],
@@ -1755,11 +1782,11 @@ function makeCore(store) {
   var ALL = '*', WALLET = 'วงเงินสมาชิก', AR = 'ค้างชำระ (ผ่อนกับคลินิก)';
   var PERM = {
     boot: ALL, searchPatients: ALL, patientPage: ALL, getPhoto: SELLERS.concat(['adminpage']),
-    registerPatient: FRONTISH, patientConsent: FRONTISH, setPhoto: FRONTISH.concat(CLIN), ocrIdCard: FRONTISH, addLegacyCourse: FRONTISH,
-    dayBook: ALL, slots: FRONTISH.concat(['adminpage']), apptCreate: FRONTISH, apptCancel: FRONTISH, apptMove: FRONTISH, apptArrive: FRONTISH, apptNoShow: FRONTISH,
-    createVisit: FRONTISH, queue: ALL, cancelVisit: FRONTISH,
+    registerPatient: FRONTISH.concat(['sales']), patientConsent: FRONTISH.concat(['sales']), setPhoto: FRONTISH.concat(CLIN).concat(['sales']), ocrIdCard: FRONTISH.concat(['sales']), addLegacyCourse: FRONTISH,
+    dayBook: ALL, slots: FRONTISH.concat(['adminpage', 'sales']), apptCreate: FRONTISH.concat(['sales']), apptCancel: FRONTISH.concat(['sales']), apptMove: FRONTISH.concat(['sales']), apptArrive: FRONTISH.concat(['sales']), apptNoShow: FRONTISH.concat(['sales']),
+    createVisit: FRONTISH.concat(['sales']), queue: ALL, cancelVisit: FRONTISH,
     callDoctor: ['doctor'], saveOPD: CLIN, opdSig: ALL, startNumb: CLIN, claim: CLIN, moveRoom: CLIN, completeOrder: CLIN, sendBack: CLIN, visitDetail: ALL,
-    saleCommit: SELLERS, useCourse: SELLERS, removeOrder: FRONTISH.concat(['doctor']), dueList: FRONTISH.concat(['account']), bill: FRONTISH.concat(['account']), pay: FRONTISH,
+    saleCommit: SELLERS, useCourse: SELLERS, removeOrder: FRONTISH.concat(['doctor']), dueList: FRONTISH.concat(['account', 'sales']), bill: FRONTISH.concat(['account', 'sales']), pay: FRONTISH.concat(['sales']),
     reviewConsent: CLIN.concat(FRONTISH),
     leadCreate: ['adminpage', 'front', 'manager'], leadList: ['adminpage', 'front', 'manager', 'marketing'], ads: ALL,
     exportAudience: ['account', 'marketing'], exportConversions: ['account', 'marketing'],
@@ -1774,7 +1801,7 @@ function makeCore(store) {
     leadCreate: 1, clock: 1, reqCreate: 1, reqApprove: 1, reqReceive: 1, centralReceive: 1, countSubmit: 1 };
 
   /* ---------- LINE OA (พนักงานเช็คอิน/ดูค่ามือของตัวเอง ผ่าน LIFF) ---------- */
-  var LINE_ACTIONS = ['lineMe', 'clock', 'myDay', 'myEarnings', 'lineUnbind', 'offInfo', 'offBook', 'vacBook', 'offCancel', 'offPending', 'offDecide', 'offCalendar', 'myTasks', 'otInfo', 'otRequest', 'otCancel', 'otPending', 'otDecide', 'otPhoto', 'countSheet', 'countPreview', 'countSubmit'], LINE_ONLY = ['clock', 'myEarnings'];
+  var LINE_ACTIONS = ['lineQueue', 'lineVisits', 'photoAdd', 'saleFeed', 'lineMe', 'clock', 'myDay', 'myEarnings', 'lineUnbind', 'offInfo', 'offBook', 'vacBook', 'offCancel', 'offPending', 'offDecide', 'offCalendar', 'myTasks', 'otInfo', 'otRequest', 'otCancel', 'otPending', 'otDecide', 'otPhoto', 'countSheet', 'countPreview', 'countSubmit'], LINE_ONLY = ['clock', 'myEarnings'];
   function lineUser(st, prof) {
     var br = find('Branches', 'code', String(st.branch)) || rows('Branches')[0] || {}, roles = rolesOf(st);
     return { code: String(st.code), name: String(st.nick || st.name), fullName: String(st.name), roles: roles, branch: String(br.code || ''), branchName: String(br.name || ''), brand: String(br.brand || ''),
@@ -2383,7 +2410,7 @@ function makeCore(store) {
 
   /* ---------- คิว ---------- */
   function openVisit(hn, b) { var d = today(); return rows('Visits').filter(function (v) { return v.hn === hn && v.date === d && v.branch === b && ['DONE', 'CANCEL'].indexOf(v.stage) < 0; }).slice(-1)[0] || null; }
-  function setStage(v, st, extra) { var p = extra || {}; p.stage = st; p.stageAt = stamp(); p.updated = stamp(); upd('Visits', v, p); }
+  function setStage(v, st, extra) { var p = extra || {}, now = stamp(); p.stage = st; p.stageAt = now; p.updated = now; if (st !== v.stage) p.trail = (v.trail ? String(v.trail) + '|' : '') + st + '@' + now.slice(11, 16); upd('Visits', v, p); }
   function createVisit(hn, cc, vitals, u, route, apptId, leadId, consult, concern) {
     var pt = find('Patients', 'hn', hn); if (!pt) err('ไม่พบคนไข้');
     var open = openVisit(hn, u.branch), st = consult ? 'CONSULT' : route === 'treat' ? 'WAIT_TX' : 'WAIT_DR';
@@ -2391,7 +2418,7 @@ function makeCore(store) {
     if (open) err('คนไข้มีคิวค้างอยู่วันนี้ (คิว ' + open.queue + ')');
     var d = today(), q = store.next('q_' + u.branch + d.replace(/-/g, ''));
     var ld = leadId ? find('Leads', 'id', leadId) : leadOf(pt.phone);
-    return add('Visits', { vn: u.branch + '-' + d.slice(2).replace(/-/g, '') + '-' + pad(q, 3), date: d, branch: u.branch, queue: q, hn: hn, name: pt.name, stage: st, stageAt: stamp(),
+    return add('Visits', { vn: u.branch + '-' + d.slice(2).replace(/-/g, '') + '-' + pad(q, 3), date: d, branch: u.branch, queue: q, hn: hn, name: pt.name, stage: st, stageAt: stamp(), trail: st + '@' + stamp().slice(11, 16),
       cc: txt(cc), vitals: txt(vitals), doctor: '', room: '', claimedBy: '', numbAt: '', numbMin: 0, created: stamp(), updated: stamp(), apptId: apptId || '', leadId: ld && !ld.vn ? ld.id : '', buyMore: false, route: route, concern: txt(concern), consultBy: '' });
   }
   A.createVisit = function (p, u) {
@@ -2427,6 +2454,17 @@ function makeCore(store) {
   function visitOf(vn, u) { var v = find('Visits', 'vn', vn); if (!v) err('ไม่พบ VN ' + vn); if (u && v.branch !== u.branch) err('รายการนี้เป็นของสาขาอื่น'); return v; }
   function ordersOf(vn) { return rows('Orders').filter(function (o) { return o.vn === vn; }); }
 
+  function trailOf(v) { var t = String(v.trail || ''); if (!t) return [{ s: String(v.stage), t: String(v.stageAt || '').slice(11, 16) }]; return t.split('|').map(function (x) { var q = x.split('@'); return { s: q[0], t: q[1] || '' }; }); }
+  // คิววันนี้แบบย่อ (ใช้ใน LINE ให้ทุกคน รวมเซล) — HN + ชื่อย่อ · รอรวมกี่นาที · อยู่ขั้นไหน · ผ่านขั้นไหนมาแล้ว
+  A.lineQueue = function (p, u) {
+    var stf = find('Staff', 'code', u.code) || {}, bs = rows('Branches').filter(function (b) { return on(b.active) && canBranch(stf, String(b.code)); }).map(function (b) { return String(b.code); });
+    var br = p.branch && bs.indexOf(String(p.branch)) >= 0 ? String(p.branch) : (bs.indexOf(String(stf.branch)) >= 0 ? String(stf.branch) : bs[0] || u.branch), d = today();
+    var vs = rows('Visits').filter(function (v) { return v.branch === br && v.date === d && v.stage !== 'SALE' && v.stage !== 'CANCEL'; }), ords = rows('Orders');
+    return { branch: br, branches: bs.length > 1 ? bs : [], list: vs.map(function (v) { var os = ords.filter(function (o) { return o.vn === v.vn; }), due = sum(os.filter(function (x) { return !x.receipt; }), function (x) { return x.total; });
+      return { vn: v.vn, queue: v.queue, hn: v.hn, name: shortName(v.name), stage: v.stage, mins: minsSince(v.stageAt), total: minsSince(v.created), done: v.stage === 'DONE' ? String(v.stageAt).slice(11, 16) : '', start: String(v.created).slice(11, 16),
+        items: os.filter(function (o) { return o.type !== 'wallet'; }).map(function (o) { return String(o.name); }).slice(0, 4), room: String(v.room || ''), doctor: String(v.doctor || ''), trail: trailOf(v), due: due, paid: os.length > 0 && due === 0, consultBy: String(v.consultBy || '') }; }) };
+  };
+  PERM.lineQueue = ALL;
   A.queue = function (p, u) {
     var d = today(), pts = {}, vs = rows('Visits').filter(function (v) { return v.branch === u.branch && v.date === d && v.stage !== 'SALE'; });
     vs.forEach(function (v) { pts[v.hn] = 1; });
@@ -2435,7 +2473,7 @@ function makeCore(store) {
     return vs.map(function (v) {
       var os = ords.filter(function (o) { return o.vn === v.vn; });
       var o = clean(v);
-      o.mins = minsSince(v.stageAt); o.numbMins = v.numbAt ? minsSince(v.numbAt) : 0;
+      o.mins = minsSince(v.stageAt); o.numbMins = v.numbAt ? minsSince(v.numbAt) : 0; o.total = minsSince(v.created); o.trail = trailOf(v);
       o.allergy = (al[v.hn] || {}).allergy || ''; o.chronic = (al[v.hn] || {}).chronic || ''; o.nick = (al[v.hn] || {}).nick || '';
       o.items = os.map(function (x) { return { id: x.id, name: x.name, status: x.status, paid: !!x.receipt, type: x.type, stockPending: on(x.stockPending) }; });
       o.due = sum(os.filter(function (x) { return !x.receipt; }), function (x) { return x.total; });
@@ -2911,7 +2949,7 @@ function makeCore(store) {
   A.pay = function (p, u) {
     var v = visitOf(p.vn, u);
     if (['DONE', 'CANCEL'].indexOf(v.stage) >= 0) err('บิลนี้ปิดแล้ว');
-    var os = ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; });
+    var os = ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0 && (!p.only || p.only.indexOf(String(o.id)) >= 0); });
     if (!os.length) err('ไม่มีรายการค้างชำระ');
     var ssel = sellersCheck(p, u), dl0 = adminDeal(v), man = dl0 ? null : adminManualOf(p);
     var sub = sum(os, function (o) { return o.total; });
@@ -2984,9 +3022,10 @@ function makeCore(store) {
     // ลีด: นับเฉพาะ visit แรก
     var pt = find('Patients', 'hn', v.hn), ld = v.leadId ? find('Leads', 'id', v.leadId) : null;
     if (ld && (!ld.vn || ld.vn === v.vn)) upd('Leads', ld, { status: 'BOUGHT', vn: v.vn, hn: v.hn, actual: r2(num(ld.actual) + net), value: r2(num(ld.actual) + net) });
-    var all = ordersOf(v.vn), pend = all.some(function (o) { return o.status === 'PENDING'; });
-    if (v.stage === 'SALE' || (v.stage === 'BACK' && !pend)) setStage(v, 'DONE');
+    var all = ordersOf(v.vn), pend = all.some(function (o) { return o.status === 'PENDING'; }), owe = all.some(function (o) { return !o.receipt && num(o.total) > 0; });
+    if (!owe && (v.stage === 'SALE' || (v.stage === 'BACK' && !pend))) setStage(v, 'DONE');
     log(u, 'pay', rc + ' ' + v.vn + ' ' + net + ' · ' + detail);
+    try { saleQueue(rc); } catch (e) {}
     var mail = null;
     if (p.emailTo) { try { mail = sendReceipt(rc, p.emailTo, u); if (p.saveEmail && pt && !pt.email) upd('Patients', pt, { email: mail.to }); } catch (e) { mail = { error: String(e && e.message || e) }; } }
     var op = find('OPD', 'vn', v.vn);
@@ -3025,7 +3064,7 @@ function makeCore(store) {
     var all = has(u, ['account', 'owner', 'admin']) && p.all, ahead = num(p.ahead) || 3;
     return rows('Installments').filter(function (x) { return x.status !== 'PAID' && (all || x.branch === u.branch); }).map(instOut).filter(function (o) { return o.days <= ahead; }).sort(function (a, b) { return a.due < b.due ? -1 : 1; });
   };
-  PERM.instList = FRONTISH.concat(['account']);
+  PERM.instList = FRONTISH.concat(['account', 'sales']);
   A.courseToCredit = function (p, u) {
     var c = find('Courses', 'id', p.id); if (!c) err('ไม่พบคอร์ส');
     if (c.status !== 'ACTIVE') err('คอร์สนี้ไม่ได้ใช้งานอยู่'); if (on(c.buffet)) err('บุฟเฟต์แปลงเป็นวงเงินไม่ได้');
@@ -3151,7 +3190,7 @@ function makeCore(store) {
     var v = visitOf(p.vn, u), d = p.draft || {}, lines = (d.lines || []).map(function (l) { return { method: txt(l.method, 60), amount: r2(num(l.amount)), ref: txt(l.ref, 60) }; }).filter(function (l) { return l.amount > 0; });
     var bl = lines.filter(function (l) { return isBeam(l.method); }); if (bl.length !== 1) err('ใส่ช่องทาง Beam ได้ 1 บรรทัดต่อบิล');
     var meth = find('PayMethods', 'name', bl[0].method) || {}, fee = num(meth.feePct) > 0 ? Math.round(bl[0].amount * num(meth.feePct) / 100) : 0, amt = r2(bl[0].amount + fee);
-    var due = sum(ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; }), function (o) { return o.total; });
+    var due = sum(ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0 && (!p.only || p.only.indexOf(String(o.id)) >= 0); }), function (o) { return o.total; });
     if (!(amt >= 1)) err('ยอดต้องมากกว่า 0'); if (!(due > 0)) err('ไม่มีรายการค้างชำระ');
     if (lines.some(function (l) { return l.method === AR; })) err('ค้างชำระใช้คู่กับ Beam ไม่ได้');
     // เช็กล่วงหน้าให้ปิดบิลได้แน่ ก่อนให้ลูกค้าจ่าย
@@ -3165,7 +3204,7 @@ function makeCore(store) {
       if (x.kind === 'LINK') { try { beamApi('PATCH', '/api/v1/payment-links/' + encodeURIComponent(x.id) + '/disable', {}); } catch (e) {} } upd('BeamCharges', x, { status: 'CANCELLED' }); });
     var br = find('Branches', 'code', u.branch) || {}, ref = v.vn + '-B' + store.next('beam_' + v.vn), satang = Math.round(amt * 100), name = String(br.name || u.branch);
     var back = /^https:\/\//.test(String(p.returnUrl || '')) ? String(p.returnUrl) + (String(p.returnUrl).indexOf('?') >= 0 ? '&' : '?') + 'beam=' + encodeURIComponent(ref) : '';
-    var body = { collectDeliveryAddress: false, expiresAt: new Date(store.now().getTime() + num(setting('beamMinutes', 30)) * 60000).toISOString(),
+    var body = { collectDeliveryAddress: false, expiresAt: new Date(store.now().getTime() + (p.remote ? num(setting('beamRemoteHours', 48)) * 60 : num(setting('beamMinutes', 30))) * 60000).toISOString(),
       order: { currency: 'THB', netAmount: satang, referenceId: ref, description: (name + ' · ' + v.hn).slice(0, 100),
         orderItems: [{ itemName: (name + ' · ค่าบริการ').slice(0, 100), description: v.vn, price: satang, quantity: 1, sku: 'CLINIC', productId: v.vn }] },
       linkSettings: { card: { isEnabled: true }, qrPromptPay: { isEnabled: true }, eWallets: { isEnabled: true }, mobileBanking: { isEnabled: true } } };
@@ -3175,7 +3214,7 @@ function makeCore(store) {
     if (!id || !l.url) err('Beam ไม่ส่งลิงก์กลับมา');
     bl[0].ref = id;
     applySellers(ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; }), sellersCheck(d, u)); adminManualOf(d);
-    var draft = { vn: v.vn, discount: r2(num(d.discount)), lines: lines, adminManual: d.adminManual || null, who: { code: u.code, name: u.name, branch: u.branch, roles: u.roles, brand: u.brand } };
+    var draft = { vn: v.vn, discount: r2(num(d.discount)), lines: lines, adminManual: d.adminManual || null, remote: p.remote ? { what: txt(p.what, 80), exp: body.expiresAt } : null, only: p.only || null, who: { code: u.code, name: u.name, branch: u.branch, roles: u.roles, brand: u.brand } };
     add('BeamCharges', { id: id, kind: 'LINK', vn: v.vn, hn: v.hn, branch: u.branch, method: bl[0].method, amount: amt, ref: ref, url: l.url, status: 'PENDING', created: stamp(), by: u.name, paidAt: '', receipt: '', draft: JSON.stringify(draft) });
     log(u, 'beamCreate', v.vn + ' ' + amt + ' ' + id); return { id: id, ref: ref, url: l.url, amount: amt };
   };
@@ -3185,9 +3224,10 @@ function makeCore(store) {
       var r0 = find('BeamCharges', 'id', row.id); if (!r0) return null; if (r0.receipt) return r0.receipt;
       if (beamCheck(r0).status !== 'PAID') return null;
       var d = JSON.parse(r0.draft || '{}'); if (!d.who) return null;
-      var v = find('Visits', 'vn', r0.vn), unpaid = ordersOf(r0.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; });
+      var v = find('Visits', 'vn', r0.vn), unpaid = ordersOf(r0.vn).filter(function (o) { return !o.receipt && num(o.total) > 0 && (!d.only || d.only.indexOf(String(o.id)) >= 0); });
       if (!v || !unpaid.length) { upd('BeamCharges', r0, { status: 'PAID-ต้องตรวจ (บิลปิดไปแล้ว)', paidAt: stamp() }); return null; }
-      try { var out = A.pay({ vn: r0.vn, discount: d.discount, lines: d.lines, adminManual: d.adminManual }, d.who); return out.receipt; }
+      var em = ''; if (d.remote) { var ptE = find('Patients', 'hn', r0.hn); em = ptE && ptE.email ? String(ptE.email) : ''; }
+      try { var out = A.pay({ vn: r0.vn, discount: d.discount, lines: d.lines, adminManual: d.adminManual, only: d.only, emailTo: em }, d.who); return out.receipt; }
       catch (e) { upd('BeamCharges', r0, { status: 'PAID-ต้องตรวจ: ' + String(e.message).slice(0, 80), paidAt: stamp() }); return null; }
     });
   }
@@ -3212,7 +3252,41 @@ function makeCore(store) {
     rows('BeamCharges').filter(function (x) { return x.status === 'PENDING' && !x.receipt && ids.indexOf(String(x.id)) >= 0; }).forEach(function (x) { var rc = beamFinish(x); if (rc) done.push(rc); });
     return { ok: true, receipts: done };
   }
-  PERM.beamCreate = FRONTISH; PERM.beamStatus = FRONTISH; PERM.beamCancel = FRONTISH; WRITES.beamCreate = 1; WRITES.beamCancel = 1;
+  /* ---------- ลิงก์ให้ลูกค้าจ่ายเองทาง LINE (มัดจำ / ชำระงวด / ยอดค้าง) — ปิดการขายในแชทได้ก่อนลูกค้ามา
+   * สร้างบิลมัดจำ (เข้าวงเงินลูกค้า) + ลิงก์ Beam อายุ beamRemoteHours (48 ชม.) → ลูกค้าจ่าย → ระบบออกใบเสร็จเอง (ส่งอีเมลถ้ามี) · ค่าคอมเป็นของคนสร้างลิงก์ */
+  function beamMethodName() { var m = rows('PayMethods').filter(function (x) { return on(x.active === '' ? true : x.active) && /beam/i.test(String(x.name)); })[0]; return m ? String(m.name) : ''; }
+  A.payLinkCreate = function (p, u) {
+    if (!beamReady()) err('ยังไม่ได้ตั้งค่า Beam (BEAM_MERCHANT_ID / BEAM_API_KEY) — ส่งลิงก์จ่ายเงินไม่ได้');
+    var bm = beamMethodName(); if (!bm) err('ไม่มีช่องทางชื่อ Beam ในแท็บ PayMethods');
+    var pt = find('Patients', 'hn', p.hn); if (!pt) err('ไม่พบคนไข้'); var am = r2(num(p.amount)); if (!(am >= 1)) err('ใส่จำนวนเงิน');
+    var ov = openVisit(pt.hn, u.branch); if (ov && ordersOf(ov.vn).some(function (o) { return !o.receipt && num(o.total) > 0; })) err('ลูกค้ามีบิลค้างในคิววันนี้ — ให้รับเงินที่หน้ารับเงิน (เลือก Beam ได้)');
+    var what = p.kind === 'debt' ? (txt(p.note, 60) || 'ชำระยอดค้าง') : (txt(p.note, 60) || 'มัดจำ');
+    var sc = A.saleCommit({ hn: pt.hn, items: [{ topup: am, deposit: true, surg: !!p.surg, note: what + ' (ลิงก์ LINE)' }] }, u);
+    var only = (sc.orders || []).map(function (o) { return String(o.id); });
+    try { var r = A.beamCreate({ vn: sc.vn, remote: true, what: what, only: only.length ? only : null, draft: { lines: [{ method: bm, amount: am }] } }, u); }
+    catch (e) { ordersOf(sc.vn).filter(function (o) { return !o.receipt && only.indexOf(String(o.id)) >= 0; }).forEach(function (o) { store.remove('Orders', o); }); throw e; }
+    var row = find('BeamCharges', 'vn', sc.vn) && rows('BeamCharges').filter(function (x) { return x.vn === sc.vn && x.status === 'PENDING'; }).slice(-1)[0];
+    var br = find('Branches', 'code', u.branch) || {}, exp = JSON.parse(row.draft).remote.exp;
+    log(u, 'payLinkCreate', pt.hn + ' ' + am + ' ' + what);
+    return { id: row.id, url: row.url, amount: num(row.amount), what: what, hn: pt.hn, nick: String(pt.nickname || shortName(pt.name)), branchName: String(br.name || u.branch), expires: stamp(new Date(exp)) };
+  };
+  A.payLinks = function (p, u) {
+    var from = addDays(today(), -14);
+    return rows('BeamCharges').filter(function (x) { return x.branch === u.branch && String(x.created).slice(0, 10) >= from && /"remote":\{/.test(String(x.draft || '')); }).reverse().slice(0, 60).map(function (x) {
+      var st = x.receipt ? 'PAID' : x.status, d = {}; try { d = JSON.parse(x.draft || '{}'); } catch (e) {}
+      if (st === 'PENDING') { try { var s = beamCheck(x); if (s.status === 'PAID') { var rc = beamFinish(x); st = rc ? 'PAID' : 'PROBLEM'; } else if (d.remote && d.remote.exp && new Date(d.remote.exp) < store.now()) st = 'EXPIRED'; else st = s.status || st; } catch (e) {} }
+      var pt = find('Patients', 'hn', x.hn), r1 = find('BeamCharges', 'id', x.id);
+      return { id: String(x.id), hn: String(x.hn), name: pt ? shortName(pt.name) : '', amount: num(x.amount), what: d.remote ? d.remote.what : '', url: st === 'PENDING' ? String(x.url) : '', status: st, created: String(x.created), by: String(x.by), receipt: String((r1 && r1.receipt) || ''), expires: d.remote && d.remote.exp ? stamp(new Date(d.remote.exp)) : '' }; });
+  };
+  A.payLinkCancel = function (p, u) {
+    var row = find('BeamCharges', 'id', txt(p.id, 80)); if (!row || row.branch !== u.branch) err('ไม่พบลิงก์'); if (row.receipt) err('ลูกค้าจ่ายแล้ว');
+    if (row.status === 'PENDING') A.beamCancel({ id: row.id }, u); else upd('BeamCharges', row, { status: 'CANCELLED' });
+    ordersOf(row.vn).filter(function (o) { return !o.receipt && o.type === 'wallet'; }).forEach(function (o) { store.remove('Orders', o); });
+    var v = find('Visits', 'vn', row.vn); if (v && v.stage === 'SALE' && !ordersOf(v.vn).length) setStage(v, 'CANCEL');
+    log(u, 'payLinkCancel', row.hn + ' ' + row.amount); return true;
+  };
+  PERM.payLinkCreate = FRONTISH.concat(['sales']); PERM.payLinks = FRONTISH.concat(['sales']); PERM.payLinkCancel = FRONTISH.concat(['sales']); WRITES.payLinkCreate = 1; WRITES.payLinkCancel = 1;
+  PERM.beamCreate = FRONTISH.concat(['sales']); PERM.beamStatus = FRONTISH.concat(['sales']); PERM.beamCancel = FRONTISH.concat(['sales']); WRITES.beamCreate = 1; WRITES.beamCancel = 1;
   PERM.courseToCredit = FRONTISH; PERM.walletHistory = ALL; PERM.walletAdjust = FRONTISH;
   WRITES.courseToCredit = 1; WRITES.walletAdjust = 1;
 
@@ -3722,6 +3796,113 @@ function makeCore(store) {
     upd('Payments', py, { time: newT, method: fmt(lines.map(function (l) { return { method: l.method, amount: r2(num(l.amount) - num(l.fee)), ref: l.ref }; }))});
     log(u, 'payEdit', py.receipt + ' ' + changed.join(',') + ' · ' + why); return { changed: changed };
   };
+  /* ---------- ตารางยอดเซลรายวัน (แบบที่บัญชีส่งทุกเช้า) — คิดจากเงินจริงที่รับ (หลังหักมัดจำ/วงเงิน) ตามผู้ขายที่เลือกตอนรับเงิน
+   * Page = ส่วนที่แอดมินเพจปิด · คลินิก = ไม่มีเซล · เซล/ผู้จัดการ แยก สกิน/ศัลยกรรม · เป้าอยู่แท็บ Targets */
+  A.salesBoard = function (p, u) {
+    var mon = /^\d{4}-\d{2}$/.test(String(p.month || '')) ? String(p.month) : today().slice(0, 7);
+    var br = has(u, ['owner', 'admin', 'account']) && p.branch ? String(p.branch) : u.branch;
+    var y = +mon.slice(0, 4), m = +mon.slice(5, 7), dim = new Date(Date.UTC(y, m, 0)).getUTCDate(), t = today();
+    var last = mon < t.slice(0, 7) ? dim : mon === t.slice(0, 7) ? +t.slice(8, 10) : 0;
+    var surgCats = String(setting('surgCategories', 'ผ่าตัด,ศัลยกรรม')).split(/\s*,\s*/);
+    var staffBy = {}; rows('Staff').forEach(function (s) { [s.nick, s.name, s.code].forEach(function (k) { if (k) staffBy[String(k)] = s; }); });
+    var pays = {}; rows('Payments').forEach(function (x) { if (String(x.branch) === br && String(x.time).slice(0, 7) === mon) pays[x.receipt] = x; });
+    var cols = {}, data = {}, tot = {};
+    function col(key, st, kind) { if (!cols[key]) { var nm = st ? String(st.nick || st.name) : key, rl = st ? rolesOf(st) : [];
+        var ord = key === 'CLINIC' ? 0 : key === 'PAGE' ? 2 : rl.indexOf('doctor') >= 0 ? 1 : rl.indexOf('manager') >= 0 ? 3 : rl.indexOf('sales') >= 0 ? 4 : 5;
+        cols[key] = { key: key, label: key === 'CLINIC' ? 'ยอดคลินิก' : key === 'PAGE' ? 'ยอด Page' : (rl.indexOf('doctor') >= 0 ? 'แพทย์ ' : rl.indexOf('manager') >= 0 ? 'ผู้จัดการ ' : '') + nm, split: kind === 'split', ord: ord, code: st ? String(st.code) : '' }; } return cols[key]; }
+    function put(d, key, st, kind, surg, amt) { var c = col(key, st, kind), r = data[d] = data[d] || {}; amt = r2(amt);
+      if (c.split) { var o = r[key] = r[key] || { s: 0, g: 0 }; if (surg) o.g = r2(o.g + amt); else o.s = r2(o.s + amt); } else r[key] = r2((r[key] || 0) + amt);
+      tot[d] = r2((tot[d] || 0) + amt); }
+    function kindOf(st) { var rl = st ? rolesOf(st) : []; return rl.indexOf('manager') >= 0 || rl.indexOf('sales') >= 0 ? 'split' : 'one'; }
+    rows('Orders').forEach(function (o) {
+      if (!o.receipt) return; var pay = pays[o.receipt]; if (!pay) return;
+      var d = String(pay.time).slice(0, 10), full = o.cashNet === '' || o.cashNet == null ? num(o.paidNet) : num(o.cashNet); if (full <= 0) return;
+      var surg = surgCats.indexOf(String(o.category)) >= 0, aS = Math.min(full, num(o.adminShare));
+      if (aS > 0) { var ast = staffBy[String(o.adminBy)], ak = kindOf(ast); if (ak === 'split') put(d, String(ast.code), ast, ak, surg, aS); else put(d, 'PAGE', null, 'one', surg, aS); }
+      full = r2(full - aS); if (full <= 0) return;
+      var raw = String(o.seller || '').trim();
+      if (!raw || raw === '-' || raw === 'คลินิก') return put(d, 'CLINIC', null, 'one', surg, full);
+      var parts = raw.split(',').map(function (x) { var q = x.split(':'); return { name: q[0].trim(), pct: q.length > 1 ? num(q[1]) : 0 }; }).filter(function (x) { return x.name; });
+      parts.forEach(function (x) { if (!x.pct) x.pct = 100 / parts.length; });
+      parts.forEach(function (sp) { var st = staffBy[sp.name]; put(d, st ? String(st.code) : sp.name, st, kindOf(st), surg, full * sp.pct / 100); });
+    });
+    col('CLINIC', null, 'one'); col('PAGE', null, 'one');
+    var tg = {}, tgTotal = 0;
+    rows('Targets').filter(function (x) { return String(x.month).slice(0, 7) === mon && (!x.branch || String(x.branch) === br); }).forEach(function (x) {
+      var w = String(x.who || '').trim(), v = num(x.target); if (!w) return;
+      if (/^(ทั้งสาขา|รวม|สาขา|total)$/i.test(w)) { tgTotal = v; return; }
+      if (/^page$/i.test(w) || /เพจ/.test(w)) { tg.PAGE = v; return; }
+      var st = staffBy[w]; if (st) { col(String(st.code), st, kindOf(st)); tg[String(st.code)] = v; } });
+    var days = []; for (var i = 1; i <= last; i++) days.push(mon + '-' + ('0' + i).slice(-2));
+    var bn = find('Branches', 'code', br);
+    return { month: mon, branch: br, branchName: bn ? String(bn.name) : br, canAll: has(u, ['owner', 'admin', 'account']), branches: has(u, ['owner', 'admin', 'account']) ? rows('Branches').filter(function (b) { return on(b.active); }).map(function (b) { return { code: String(b.code), name: String(b.name) }; }) : [],
+      cols: Object.keys(cols).map(function (k) { return cols[k]; }).sort(function (a, b) { return a.ord - b.ord || (a.label < b.label ? -1 : 1); }), days: days, data: data, total: tot,
+      target: { total: tgTotal, by: tg }, daysInMonth: dim, elapsed: last, note: String(setting('salesBoardNote', 'ทุกคนมีหน้าที่เช็คยอดขายของตนเอง หากพบยอดหาย แจ้งบัญชีภายในวันถัดไปก่อน 12.00 น. หลังจากนั้นจะไม่มีการแก้ไขยอดใดๆ ทั้งสิ้น')) };
+  };
+  PERM.salesBoard = ['front', 'manager', 'sales', 'account', 'adminpage'];
+
+  /* ---------- ฟีดยอดขายสด (แทนการพิมพ์สรุปลงกลุ่ม LINE) — ให้เจ้าของ/ผู้จัดการ ผ่านตาว่าขายราคาถูกไหม ใครขาย ยอดเท่าไหร่แล้ว
+   * คนไข้แสดงแค่ HN + ชื่อย่อ · ไม่มีเบอร์โทร/รูปเวชระเบียน · ธงเตือน: ลดเกิน saleAlertDiscPct% · รายการที่หน้าร้านเพิ่มเอง · ค้างชำระ/ผ่อน */
+  function saleCard(rc) {
+    var py = find('Payments', 'receipt', rc); if (!py) return null;
+    var os = rows('Orders').filter(function (o) { return o.receipt === rc; }), lim = num(setting('saleAlertDiscPct', 20)) || 20, flags = [];
+    var items = os.map(function (o) { var it = itemByCode(o.item), gross = r2(num(o.price) * num(o.qty)), dp = gross > 0 ? Math.round(num(o.disc) / gross * 100) : 0;
+      if (dp >= lim) flags.push('ลด ' + dp + '% ' + String(o.name).slice(0, 30));
+      if (it && it.addedBy && !on(it.reviewed)) flags.push('รายการใหม่ที่หน้าร้านเพิ่มเอง: ' + String(o.name).slice(0, 30));
+      return { name: String(o.name), qty: num(o.qty), gross: gross, disc: num(o.disc), total: num(o.total), type: String(o.type), choice: String(o.choice || '') }; });
+    var sub = num(py.subtotal), bd = num(py.discount); if (sub > 0 && bd / sub * 100 >= lim) flags.push('ลดท้ายบิล ' + Math.round(bd / sub * 100) + '%');
+    if (num(py.ar) > 0) flags.push('ค้างชำระ/ผ่อน ' + num(py.ar));
+    var sellers = {}; os.forEach(function (o) { String(o.seller || 'คลินิก').split(',').forEach(function (x) { var q = x.split(':'); sellers[q[0].trim() || 'คลินิก'] = 1; }); });
+    var aS = sum(os, function (o) { return o.adminShare; }), aBy = (os.filter(function (o) { return o.adminBy; })[0] || {}).adminBy || '';
+    var br = find('Branches', 'code', py.branch);
+    return { receipt: rc, time: String(py.time), branch: String(py.branch), branchName: br ? String(br.name) : String(py.branch), hn: String(py.hn), name: shortName(py.name), items: items, subtotal: sub, discount: bd, net: num(py.net), wallet: num(py.wallet), ar: num(py.ar),
+      cash: r2(num(py.net) - num(py.wallet) - num(py.ar)), method: String(py.method || ''), by: String(py.by || ''), sellers: Object.keys(sellers).join(', '), admin: aS > 0 ? { by: String(aBy), amount: r2(aS) } : null, flags: flags, voided: os.some(function (o) { return o.voidOf; }) && !os.length };
+  }
+  function saleDay(d, brF) {
+    var ps = rows('Payments').filter(function (p) { return String(p.time).slice(0, 10) === d && (!brF || brF(String(p.branch))); }), by = {};
+    ps.forEach(function (p) { var b = by[p.branch] = by[p.branch] || { branch: String(p.branch), bills: 0, net: 0, cash: 0 }; b.bills++; b.net = r2(b.net + num(p.net)); b.cash = r2(b.cash + num(p.net) - num(p.wallet) - num(p.ar)); });
+    return { list: ps, by: Object.keys(by).map(function (k) { var x = by[k], br = find('Branches', 'code', k); x.name = br ? String(br.name) : k; return x; }) };
+  }
+  A.saleFeed = function (p, u) {
+    var d = isDate(p.date) ? p.date : today(), all = has(u, ['owner', 'admin', 'account']), brF = all ? (p.branch ? function (b) { return b === String(p.branch); } : null) : function (b) { return b === u.branch; };
+    var sd = saleDay(d, brF), lim = Math.min(200, num(p.limit) || 60);
+    return { date: d, by: sd.by, total: { bills: sum(sd.by, function (x) { return x.bills; }), net: sum(sd.by, function (x) { return x.net; }), cash: sum(sd.by, function (x) { return x.cash; }) },
+      cards: sd.list.slice().sort(function (a, b) { return String(a.time) < String(b.time) ? -1 : 1; }).slice(-lim).reverse().map(function (x) { return saleCard(x.receipt); }).filter(Boolean), canAll: all,
+      branches: all ? rows('Branches').filter(function (b) { return on(b.active); }).map(function (b) { return { code: String(b.code), name: String(b.name) }; }) : [] };
+  };
+  PERM.saleFeed = ['owner', 'admin', 'account', 'manager'];
+  // แจ้ง LINE: saleNotify = ทุกบิล / เฉพาะผิดปกติ (ค่าเริ่มต้น) / ไม่ · ส่งถึงใคร = saleNotifyRoles (ค่าเริ่มต้น owner) ที่ผูก LINE แล้ว
+  var NOTIFY = [];
+  function saleRecips(branch) { var rs = String(setting('saleNotifyRoles', 'owner')).split(/\s*,\s*/);
+    return rows('Staff').filter(function (s) { if (!on(s.active) || !s.lineId) return false; var rl = rolesOf(s); if (!rl.some(function (r) { return rs.indexOf(r) >= 0; })) return false; return rl.indexOf('owner') >= 0 || rl.indexOf('admin') >= 0 || rl.indexOf('account') >= 0 || canBranch(s, branch); }); }
+  function saleText(c, dayTot) {
+    var L = ['💰 ' + c.branchName + ' · ' + c.time.slice(11, 16) + ' · ' + c.receipt, c.hn + ' ' + c.name];
+    c.items.forEach(function (i) { L.push('• ' + i.name + (i.qty !== 1 ? ' ×' + i.qty : '') + (i.choice ? ' (' + i.choice + ')' : '') + ' = ' + fmt(i.total) + (i.disc ? ' (ลด ' + fmt(i.disc) + ' จาก ' + fmt(i.gross) + ')' : '')); });
+    if (c.discount) L.push('ลดท้ายบิล ' + fmt(c.discount));
+    L.push('รวม ' + fmt(c.net) + (c.wallet ? ' · หักมัดจำ/วงเงิน ' + fmt(c.wallet) : '') + (c.ar ? ' · ค้าง ' + fmt(c.ar) : '') + ' · รับจริง ' + fmt(c.cash));
+    L.push('ผู้ขาย: ' + c.sellers + (c.admin ? ' · แอดมิน ' + c.admin.by + ' ' + fmt(c.admin.amount) : '') + ' · รับเงินโดย ' + c.by);
+    if (c.flags.length) L.push('⚠️ ' + c.flags.join(' · '));
+    if (dayTot) L.push('ยอดวันนี้ ' + c.branchName + ': ' + dayTot.bills + ' บิล · ' + fmt(dayTot.net));
+    return L.join('\n');
+  }
+  function fmt(n) { return Number(r2(n)).toLocaleString('en-US'); }
+  function saleQueue(rc) {
+    var mode = String(setting('saleNotify', 'เฉพาะผิดปกติ')); if (/ไม่|ปิด|off/i.test(mode)) return;
+    var c = saleCard(rc); if (!c) return; if (!/ทุก|all/i.test(mode) && !c.flags.length) return;
+    var dt = saleDay(today(), function (b) { return b === c.branch; }).by[0], txt0 = saleText(c, dt);
+    saleRecips(c.branch).forEach(function (s) { NOTIFY.push({ to: String(s.lineId), text: txt0 }); });
+  }
+  // บิลที่รับเงินหลังเวลา since (สำหรับอีเมลสรุปรายชั่วโมง) + ยอดวันนี้แต่ละสาขา
+  function saleSince(since) { var t = today(); since = String(since || t + ' 00:00'); var ps = rows('Payments').filter(function (p) { return String(p.time) > since; });
+    return { cards: ps.map(function (p) { return saleCard(p.receipt); }).filter(Boolean), last: ps.length ? String(ps[ps.length - 1].time) : '', day: saleDay(t, null).by, date: t }; }
+  function takeNotify() { var o = NOTIFY; NOTIFY = []; return o; }
+  // สรุปยอดขายปิดวัน (เรียกจาก trigger ตอนค่ำ) → ข้อความถึงเจ้าของ
+  function saleDailyText(d) { d = d || today(); var sd = saleDay(d, null); if (!sd.list.length) return '';
+    var fl = sd.list.map(function (p) { return saleCard(p.receipt); }).filter(function (c) { return c && c.flags.length; });
+    return ['📊 สรุปยอดขาย ' + d].concat(sd.by.map(function (b) { return b.name + ': ' + b.bills + ' บิล · ' + fmt(b.net) + ' (รับจริง ' + fmt(b.cash) + ')'; }))
+      .concat(['รวม ' + fmt(sum(sd.by, function (x) { return x.net; }))]).concat(fl.length ? ['⚠️ บิลที่ควรดู ' + fl.length + ' ใบ: ' + fl.slice(0, 15).map(function (c) { return c.receipt.slice(-8) + ' ' + c.flags[0]; }).join(' | ')] : []).join('\n'); }
+  function saleDailyMsgs(d) { var t = saleDailyText(d); if (!t) return []; var rs = String(setting('saleNotifyRoles', 'owner')).split(/\s*,\s*/);
+    return rows('Staff').filter(function (s) { return on(s.active) && s.lineId && rolesOf(s).some(function (r) { return rs.indexOf(r) >= 0 && ['owner', 'admin', 'account'].indexOf(r) >= 0; }); }).map(function (s) { return { to: String(s.lineId), text: t }; }); }
   PERM.incomeReport = ['account', 'manager']; PERM.receiptLines = ['account']; PERM.payEdit = ['account']; WRITES.payEdit = 1;
   /* ---------- ยกเลิกบิล: หน้าร้านขอ → บัญชีอนุมัติ → บิลเดิมคงเลขไว้ (สถานะยกเลิก) รายการกลับเป็นยังไม่จ่าย ให้เก็บเงินใหม่ ---------- */
   function voidBlockers(py) {
@@ -3904,10 +4085,21 @@ function makeCore(store) {
     upd('Orders', o, { consent: stamp() + ' ' + u.name + ' ' + f }); log(u, 'signConsent', o.id); return true;
   };
   A.photoAdd = function (p, u) {
-    var v = visitOf(p.vn, u), imgs = (p.imgs || []).slice(0, 12); if (!imgs.length) err('ยังไม่ได้เลือกรูป');
-    imgs.forEach(function (im, i) { add('Photos', { id: nextId('PH', 'seq_PH', 7), hn: v.hn, vn: v.vn, time: stamp(), kind: p.kind === 'after' ? 'หลัง' : 'ก่อน', item: txt(p.item, 120), file: store.savePhoto(v.hn + '_' + v.vn + '_' + i, im), by: u.name, pick: false }); });
-    log(u, 'photoAdd', v.vn + ' ' + imgs.length); return imgs.length;
+    var v = visitOf(p.vn, u.line ? null : u), imgs = (p.imgs || []).slice(0, 12); if (!imgs.length) err('ยังไม่ได้เลือกรูป');
+    if (u.line) { var stf = find('Staff', 'code', u.code); if (!stf || !canBranch(stf, v.branch)) err('คนไข้นี้อยู่สาขาอื่น'); if (v.date !== today()) err('ถ่ายรูปผ่าน LINE ได้เฉพาะคนไข้ในคิววันนี้'); }
+    var KIND = { before: 'ก่อน', after: 'หลัง', or: 'ระหว่างผ่าตัด (OR)', doc: 'เอกสาร/ใบ OPD' };
+    imgs.forEach(function (im, i) { add('Photos', { id: nextId('PH', 'seq_PH', 7), hn: v.hn, vn: v.vn, time: stamp(), kind: KIND[p.kind] || 'ก่อน', item: txt(p.item, 120), file: store.savePhoto(v.hn + '_' + v.vn + '_' + i, im), by: u.name, pick: false }); });
+    log(u, 'photoAdd', v.vn + ' ' + imgs.length + (u.line ? ' (LINE)' : '')); return imgs.length;
   };
+  // รายชื่อคนไข้ในคิววันนี้ (สาขาที่พนักงานคนนี้ทำงาน) สำหรับถ่ายรูปผ่าน LINE — แสดงแค่ HN + ชื่อย่อ
+  A.lineVisits = function (p, u) {
+    var stf = find('Staff', 'code', u.code) || {}, t = today(), ph = {};
+    rows('Photos').forEach(function (x) { if (String(x.time).slice(0, 10) === t) ph[x.vn] = (ph[x.vn] || 0) + 1; });
+    return rows('Visits').filter(function (v) { return v.date === t && v.stage !== 'CANCEL' && canBranch(stf, v.branch); }).map(function (v) {
+      var its = ordersOf(v.vn).filter(function (o) { return o.type !== 'wallet'; }).map(function (o) { return String(o.name); }).slice(0, 3);
+      return { vn: v.vn, hn: v.hn, name: shortName(v.name), queue: v.queue, stage: v.stage, branch: v.branch, items: its, photos: ph[v.vn] || 0 }; }).reverse();
+  };
+  PERM.lineVisits = CLIN.concat(FRONTISH);
   A.photoList = function (p, u) {
     var pt = find('Patients', 'hn', p.hn); if (!pt) err('ไม่พบคนไข้');
     log(u, 'viewPhotos', pt.hn);
@@ -3915,7 +4107,7 @@ function makeCore(store) {
   };
   A.gallery = function (p, u) {
     var ok = {}; rows('Patients').forEach(function (x) { var lv = String(x.reviewOk || '').split(' ')[0]; if (lv === 'face' || lv === 'cover') ok[x.hn] = lv; });
-    return rows('Photos').filter(function (x) { return ok[x.hn]; }).reverse().slice(0, 60).map(function (x) { return { id: x.id, hn: x.hn, time: x.time, kind: x.kind, item: x.item, level: ok[x.hn], pick: on(x.pick), src: store.getPhoto(x.file) }; });
+    return rows('Photos').filter(function (x) { return ok[x.hn] && (x.kind === 'ก่อน' || x.kind === 'หลัง'); }).reverse().slice(0, 60).map(function (x) { return { id: x.id, hn: x.hn, time: x.time, kind: x.kind, item: x.item, level: ok[x.hn], pick: on(x.pick), src: store.getPhoto(x.file) }; });
   };
   A.galleryPick = function (p, u) { var x = find('Photos', 'id', p.id); if (!x) err('ไม่พบรูป'); upd('Photos', x, { pick: !!p.pick }); return true; };
   PERM.signConsent = CLIN.concat(FRONTISH); PERM.photoAdd = CLIN.concat(FRONTISH); PERM.photoList = CLIN.concat(FRONTISH); PERM.gallery = ['marketing']; PERM.galleryPick = ['marketing'];
@@ -4011,7 +4203,7 @@ function makeCore(store) {
   };
   PERM.countPreview = ['manager'];
 
-  return { api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook, adsExport: adsExport, countRemind: countRemind, offAutoFill: offAutoFill };
+  return { saleSince: saleSince, takeNotify: takeNotify, saleDailyMsgs: saleDailyMsgs, api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook, adsExport: adsExport, countRemind: countRemind, offAutoFill: offAutoFill };
 }
 
 /* ---------- อ่านบัตรประชาชน (ข้อความจาก OCR) ---------- */
@@ -4320,7 +4512,7 @@ function makeSeed() {
   T.ReqLines = [{ req: 'RQ00001', stock: 'ST01', name: 'Nabota 100U', qty: 200, approved: '', received: '' }, { req: 'RQ00001', stock: 'ST12', name: 'ยาชา EMLA', qty: 6, approved: '', received: '' }];
   T.OpenVials = [{ id: 'VL00001', branch: 'DTCM', stock: 'ST01', name: 'Nabota 100U', unit: 'U', size: 100, left: 40, lot: 'L2600', openedAt: day(-3) + ' 14:20', expireAt: day(25) + ' 14:20', openedBy: 'พยาบาลภา (N01)', status: 'OPEN', closedBy: '' },
     { id: 'VL00002', branch: 'DTCM', stock: 'ST10', name: 'Mounjaro 15mg', unit: 'mg', size: 15, left: 5, lot: 'L2609', openedAt: day(-30) + ' 11:00', expireAt: day(-2) + ' 11:00', openedBy: 'หมอแทน (D01)', status: 'OPEN', closedBy: '' }];
-  T.Counts = []; T.CountLines = []; T.DayOffs = []; T.Vacation = []; T.Holidays = [{ date: '2026-12-05', name: 'วันพ่อแห่งชาติ', mode: 'เลือกลงเอง', branches: '', note: '' }, { date: '2026-12-10', name: 'วันรัฐธรรมนูญ', mode: 'เลือกลงเอง', branches: '', note: '' }, { date: '2026-12-14', name: 'ปิดรวม (ตัวอย่าง: ไม่มีลูกค้า)', mode: 'ปิด หักวันหยุด', branches: 'DTCM', note: '' }, { date: '2026-12-31', name: 'วันสิ้นปี', mode: 'ปิดคลินิก', branches: '', note: '' }, { date: '2027-01-01', name: 'วันขึ้นปีใหม่', mode: 'ปิดคลินิก', branches: '', note: '' }]; T.Staff.forEach(function (s) { if (!/doctor|แพทย์/.test(String(s.role))) s.vacDays = 6; }); T.OTs = []; T.Installments = []; T.Photos = []; T.Log = [];
+  T.Counts = []; T.CountLines = []; T.DayOffs = []; T.Vacation = []; T.Targets = []; (function () { var d = new Date(Date.now() + 7 * 3600e3), m0 = d.toISOString().slice(0, 7), d2 = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 1, 1)).toISOString().slice(0, 7); [m0, d2].forEach(function (mo) { ['DTCM', 'TCPY', 'JBCM', 'JBMS'].forEach(function (b) { T.Targets.push({ month: mo, branch: b, who: 'ทั้งสาขา', target: 1300000, note: '' }, { month: mo, branch: b, who: 'Page', target: 200000, note: '' }); }); T.Targets.push({ month: mo, branch: 'DTCM', who: 'M01', target: 550000, note: '' }, { month: mo, branch: 'DTCM', who: 'S01', target: 550000, note: '' }); }); })(); T.Holidays = [{ date: '2026-12-05', name: 'วันพ่อแห่งชาติ', mode: 'เลือกลงเอง', branches: '', note: '' }, { date: '2026-12-10', name: 'วันรัฐธรรมนูญ', mode: 'เลือกลงเอง', branches: '', note: '' }, { date: '2026-12-14', name: 'ปิดรวม (ตัวอย่าง: ไม่มีลูกค้า)', mode: 'ปิด หักวันหยุด', branches: 'DTCM', note: '' }, { date: '2026-12-31', name: 'วันสิ้นปี', mode: 'ปิดคลินิก', branches: '', note: '' }, { date: '2027-01-01', name: 'วันขึ้นปีใหม่', mode: 'ปิดคลินิก', branches: '', note: '' }]; T.Staff.forEach(function (s) { if (!/doctor|แพทย์/.test(String(s.role))) s.vacDays = 6; }); T.OTs = []; T.Installments = []; T.Photos = []; T.Log = [];
   T.Wallet = [{ time: day(-20) + ' 15:10', hn: 'DT10002', name: T.Patients[1].name, amount: 2500, type: 'แปลงคอร์ส', ref: 'CS-OLD Pico เหลือ 1 ครั้ง', by: 'มิ้นท์', balance: 2500, branch: 'DTCM' }];
   return { v: 'demo6-' + TODAY, tables: T, seq: { seq_CS: 10, seq_AP: 10, seq_OR: seq.OR + 1, seq_L: 9100, seq_RQ: 5, seq_VL: 3, seq_AT: T.Attendance.length + 1 } };
 }
@@ -4575,14 +4767,17 @@ function logout() { S.token = null; S.user = null; S.boot = null; LS.sset('hs_to
 var FRONT = ['front', 'manager'], CLINS = ['doctor', 'nurse', 'assistant', 'therapist'];
 var TILES = [
   { k: 'lead', t: 'ลงลีด + นัด', s: 'จากแชทที่แอดมินส่งมา · ลงนัดในตัว', ic: 'chat', r: FRONT.concat(['adminpage']), hero: 1 },
-  { k: 'walkin', t: 'Walk-in', s: 'คนไข้เดินเข้ามา · ค้นหา/ลงทะเบียน', ic: 'walk', r: FRONT, hero: 1 },
-  { k: 'arrivals', t: 'คนไข้นัดไว้แล้ว', s: 'กดรับเข้าคิวเมื่อมาถึง', ic: 'cal', r: FRONT, b: 'booked' },
-  { k: 'bookNew', t: 'ลงนัด', s: 'ระบบจัดห้องให้ · เปลี่ยนห้องเองได้', ic: 'plus', r: FRONT },
-  { k: 'due', t: 'เก็บเงิน / ค้างจ่าย', s: 'บิลที่ยังไม่ได้ชำระ', ic: 'cash', r: FRONT, b: 'due' },
+  { k: 'walkin', t: 'Walk-in', s: 'คนไข้เดินเข้ามา · ค้นหา/ลงทะเบียน', ic: 'walk', r: FRONT.concat(['sales']), hero: 1 },
+  { k: 'arrivals', t: 'คนไข้นัดไว้แล้ว', s: 'กดรับเข้าคิวเมื่อมาถึง', ic: 'cal', r: FRONT.concat(['sales']), b: 'booked' },
+  { k: 'bookNew', t: 'ลงนัด', s: 'ระบบจัดห้องให้ · เปลี่ยนห้องเองได้', ic: 'plus', r: FRONT.concat(['sales']) },
+  { k: 'due', t: 'เก็บเงิน / ค้างจ่าย', s: 'บิลที่ยังไม่ได้ชำระ', ic: 'cash', r: FRONT.concat(['sales']), b: 'due' },
+  { k: 'payLinks', t: 'ลิงก์จ่ายเงิน (LINE)', s: 'มัดจำ · ชำระงวด · ลูกค้าจ่ายเองในแชท', ic: 'cash', r: FRONT.concat(['sales']), beam: 1 },
+  { k: 'saleFeed', t: 'ยอดขายวันนี้ (สด)', s: 'ทุกบิล · ใครขาย · ลดเท่าไหร่ · ⚠️ ผิดปกติ', ic: 'cash', r: ['manager', 'account'] },
+  { k: 'salesBoard', t: 'ตารางยอดเซลรายวัน', s: 'ยอดแต่ละคน · เทียบเป้า · แคปส่งกลุ่มได้', ic: 'chart', r: FRONT.concat(['sales', 'account', 'adminpage']) },
   { k: 'rcFind', t: 'ใบเสร็จย้อนหลัง', s: 'ค้นหา · ดู · พิมพ์ซ้ำ', ic: 'search', r: FRONT.concat(['account']) },
-  { k: 'queue', t: 'คิววันนี้', s: 'สถานะคนไข้ทุกคน', ic: 'list', r: FRONT.concat(['sales']) },
+  { k: 'queue', t: 'คิววันนี้', s: 'รอกี่นาที · ถึงขั้นไหนแล้ว', ic: 'list', r: null },
   { k: 'leads', t: 'ลีดรอลงนัด', s: 'ลีดที่ยังไม่ได้นัด', ic: 'chat', r: FRONT, b: 'leads' },
-  { k: 'sched', t: 'ตารางนัด', s: 'ห้อง · เตียง · ทั้งวัน', ic: 'grid', r: FRONT.concat(CLINS) },
+  { k: 'sched', t: 'ตารางนัด', s: 'ห้อง · เตียง · ทั้งวัน', ic: 'grid', r: FRONT.concat(CLINS).concat(['sales']) },
   { k: 'doctor', t: 'ห้องแพทย์', s: 'คนไข้รอตรวจ · บันทึก OPD', ic: 'steth', r: ['doctor'], hero: 1 },
   { k: 'or', t: 'ห้องทรีตเมนต์ / หัตถการ', s: 'รับงาน · ทายาชา · เบิกของ', ic: 'bed', r: CLINS, hero: 1 },
   { k: 'search', t: 'ค้นหาคนไข้', s: 'ประวัติ · คอร์สคงเหลือ · ขาย', ic: 'search', r: FRONT.concat(CLINS, ['sales']) },
@@ -4602,7 +4797,7 @@ var TILES = [
 ];
 TITLES.home = '';
 SCR.home = function () {
-  var ts = TILES.filter(function (t) { return (!t.r || has(t.r)) && (!t.stock || S.user.stock) && (t.k !== 'me' || S.boot.tabletMe); });
+  var ts = TILES.filter(function (t) { return (!t.r || has(t.r)) && (!t.beam || S.boot.beam) && (!t.stock || S.user.stock) && (t.k !== 'me' || S.boot.tabletMe); });
   if (has(['owner'])) ts.sort(function (a, b) { return (b.k === 'owner') - (a.k === 'owner'); });
   var h = '<div class="stack"><div class="row"><div class="sp"><div class="muted small">' + thDate(today(), 1) + '</div><h1>สวัสดี ' + esc(S.user.name) + '</h1></div></div>' +
     (DEMO ? '<div class="note w small">โหมดทดลอง · ลองกดได้ทุกปุ่ม ข้อมูลรีเซ็ตทุกวัน</div>' : '') + '<div id="alerts"></div>' +
@@ -4673,6 +4868,32 @@ function pinField(lbl) { return '<label>' + (lbl || 'ผู้เบิก: ใ�
 function pinVal(root) { var i = (root || document).querySelector('.wpin'); return i ? i.value.trim() : ''; }
 function since(m, extra) { return '<span class="timer" data-m0="' + m + '" data-t0="' + Date.now() + '"' + (extra || '') + '>' + mins(m) + '</span>'; }
 
+/* ---------- ฟีดยอดขายสด (ใช้ทั้งแท็บเล็ตและ LINE) ---------- */
+function saleFeedHtml(r) {
+  var tot = '<div class="card stack" style="gap:.4rem"><div class="row"><b class="sp">💰 ยอดขาย ' + esc(thDate(r.date, 1)) + '</b><b>' + bt(r.total.net) + '</b></div>' +
+    r.by.map(function (b) { return '<div class="row small"><span class="sp">' + esc(b.name) + ' · ' + b.bills + ' บิล</span><span>' + bt(b.net) + ' <span class="xs muted">(รับจริง ' + bt(b.cash) + ')</span></span></div>'; }).join('') + (r.by.length ? '' : '<div class="small muted">ยังไม่มีบิล</div>') + '</div>';
+  return tot + r.cards.map(function (c) {
+    return '<div class="card stack sf' + (c.flags.length ? ' sf-w' : '') + '" style="gap:.3rem"><div class="row small"><b class="sp">' + esc(c.time.slice(11, 16)) + ' · ' + esc(c.branchName) + '</b><span class="xs muted">' + esc(c.receipt) + '</span></div>' +
+      '<div class="small">' + esc(c.hn + ' ' + c.name) + '</div>' +
+      c.items.map(function (i) { return '<div class="row small"><span class="sp">• ' + esc(i.name) + (i.qty !== 1 ? ' ×' + i.qty : '') + (i.choice ? ' <span class="xs muted">(' + esc(i.choice) + ')</span>' : '') + '</span><span>' + (i.disc ? '<s class="xs muted">' + fm(i.gross) + '</s> ' : '') + '<b>' + fm(i.total) + '</b></span></div>'; }).join('') +
+      (c.discount ? '<div class="row small"><span class="sp">ลดท้ายบิล</span><span class="dn">−' + fm(c.discount) + '</span></div>' : '') +
+      '<div class="row small"><span class="sp b">รวม ' + bt(c.net) + '</span><span class="xs muted">' + (c.wallet ? 'หักมัดจำ ' + fm(c.wallet) + ' · ' : '') + (c.ar ? 'ค้าง ' + fm(c.ar) + ' · ' : '') + 'รับจริง ' + fm(c.cash) + '</span></div>' +
+      '<div class="xs muted">ผู้ขาย: ' + esc(c.sellers) + (c.admin ? ' · แอดมิน ' + esc(c.admin.by) + ' ' + fm(c.admin.amount) : '') + ' · ' + esc(c.method) + ' · รับเงิน ' + esc(c.by) + '</div>' +
+      (c.flags.length ? '<div class="note w small">⚠️ ' + c.flags.map(esc).join(' · ') + '</div>' : '') + '</div>';
+  }).join('') + '<p class="xs muted">แสดง HN + ชื่อย่อ · ไม่มีเบอร์โทร/รูปเวชระเบียน · ⚠️ = ลดราคาเกินกำหนด / รายการที่หน้าร้านเพิ่มเอง / ค้างชำระ</p>';
+}
+
+/* ---------- สถานะคิว: รอรวมกี่นาที · อยู่ขั้นไหน (กี่นาทีแล้ว) · ผ่านขั้นไหนมา — ใช้ทั้งแท็บเล็ตและ LINE ---------- */
+var STG_SHORT = { CONSULT: 'คุย', WAIT_DR: 'รอหมอ', IN_DR: 'พบหมอ', DR_DONE: 'หมอเสร็จ', WAIT_TX: 'รอทำ', NUMB: 'ยาชา', IN_TX: 'ทำ', BACK: 'เคาน์เตอร์', DONE: 'เสร็จ', SALE: 'ซื้อ', CANCEL: 'ยกเลิก' };
+function waitCls(m, st) { if (st === 'DONE') return 'g'; var lim = /WAIT|CONSULT|BACK/.test(st) ? [15, 30] : [30, 60]; return m >= lim[1] ? 'd' : m >= lim[0] ? 'w' : ''; }
+function qTrail(tr) { return '<div class="qtr">' + tr.map(function (x, i) { return '<span class="' + (i === tr.length - 1 ? 'on' : '') + '">' + esc(STG_SHORT[x.s] || x.s) + (x.t ? ' <i>' + esc(x.t) + '</i>' : '') + '</span>'; }).join('<b>›</b>') + '</div>'; }
+function qRow(v, tap) {
+  var live = v.stage !== 'DONE';
+  return '<div class="li qrow' + (tap ? ' tap' : '') + '"' + (tap ? ' data-go="patient" data-arg="' + esc(v.hn) + '"' : '') + '><div class="qn">' + v.queue + '</div><div class="main"><div class="t">' + esc(v.name) + (v.nick ? ' <span class="muted">(' + esc(v.nick) + ')</span>' : '') + ' ' + stagePill(v.stage) + (live ? ' <span class="xs muted" style="white-space:nowrap">ขั้นนี้ ' + since(v.mins) + '</span>' : '') + '</div>' +
+    '<div class="s">' + esc(((v.items || []).map(function (i) { return i.name || i; }).join(', ')) || v.cc || '—') + (v.room ? ' · ' + esc(v.room) : '') + (v.doctor ? ' · ' + esc(v.doctor) : '') + '</div>' + qTrail(v.trail || []) + '</div>' +
+    '<div class="stack r" style="gap:.15rem"><span class="pill ' + waitCls(v.stage === 'DONE' ? 0 : v.total, v.stage) + '">' + (live ? 'รอรวม ' + since(v.total) : 'เสร็จ') + '</span>' + (v.due > 0 ? '<span class="pill d">ค้าง ' + bt(v.due) + '</span>' : v.paid ? '<span class="pill g">จ่ายแล้ว</span>' : '') + '</div></div>';
+}
+
 /* =====================================================================
  * หน้าร้าน: ค้นหา/ลงทะเบียน · หน้าคนไข้ · ขาย · เก็บเงิน · คิว
  * ===================================================================== */
@@ -4681,7 +4902,7 @@ function searchScreen(mode) {
   return '<div class="stack"><div class="card stack"><h2>' + (mode === 'walkin' ? 'คนไข้เคยมาหรือยัง?' : 'ค้นหาคนไข้') + '</h2>' +
     '<div class="row"><input id="q" class="sp" placeholder="HN · ชื่อ · ชื่อเล่น · เบอร์โทร · เลขบัตร" autocomplete="off" style="flex:1 1 240px"><button class="btn p" data-a="doSearch">' + ic('search', 18) + ' ค้นหา</button></div>' +
     '<div id="res"></div></div>' +
-    (has(FRONT) ? '<div class="g2"><button class="tile hero" data-go="register"><span class="ic">' + ic('plus') + '</span><b>คนไข้ใหม่ (ยังไม่เคยมา)</b><span class="small muted">ถ่ายบัตรประชาชน → กรอกให้อัตโนมัติ</span></button>' +
+    (has(FRONT.concat(['sales'])) ? '<div class="g2"><button class="tile hero" data-go="register"><span class="ic">' + ic('plus') + '</span><b>คนไข้ใหม่ (ยังไม่เคยมา)</b><span class="small muted">ถ่ายบัตรประชาชน → กรอกให้อัตโนมัติ</span></button>' +
       '<button class="tile" data-go="register" data-arg="paper"><span class="ic">' + ic('list') + '</span><b>คนไข้เก่า มีแฟ้มกระดาษ</b><span class="small muted">ยังไม่อยู่ในระบบ · ใช้ HN เดิม</span></button></div>' : '') + '</div>';
 }
 SCR.walkin = function () { return searchScreen('walkin'); };
@@ -4831,7 +5052,7 @@ SCR.patient = function (hn) {
     TITLES.patient = p.hn + ' ' + p.name; renderTop();
     var act = [];
     if (o && o.stage === 'CONSULT' && has(FRONT.concat(['sales']))) act.push('<button class="btn p lg" data-a="consult" data-vn="' + esc(o.vn) + '" data-n="' + esc(p.name) + '" data-r="' + esc(o.route || 'doctor') + '" data-s="' + (d.seenDoctor ? 1 : '') + '" data-c="' + esc(o.concern || '') + '" data-al="' + esc(p.allergy || '') + '" data-ch="' + esc(p.chronic || '') + '">' + ic('steth', 20) + ' คุยเสร็จ → ส่งต่อ</button>');
-    if (has(FRONT)) {
+    if (has(FRONT.concat(['sales']))) {
       if (!o || o.stage === 'SALE') {
         act.push('<button class="btn p lg" data-a="toDoctor">' + ic('steth', 20) + ' ส่งพบแพทย์</button>');
         if (d.seenDoctor) act.push('<button class="btn lg" data-a="toTreat">' + ic('bed', 20) + ' ส่งทำทรีตเมนต์เลย</button>');
@@ -4839,7 +5060,7 @@ SCR.patient = function (hn) {
       act.push('<button class="btn lg" data-go="bookNew" data-arg="' + esc(p.hn) + '">' + ic('cal', 20) + ' ลงนัด</button>');
     }
     act.push('<button class="btn lg" data-go="pos" data-arg="' + esc(p.hn) + '">' + ic('plus', 20) + ' ขาย / ซื้อคอร์ส</button>');
-    if (o && d.due > 0 && has(FRONT)) act.push('<button class="btn w lg" data-go="pay" data-arg="' + esc(o.vn) + '">' + ic('cash', 20) + ' เก็บเงิน ' + bt(d.due) + '</button>');
+    if (o && d.due > 0 && has(FRONT.concat(['sales']))) act.push('<button class="btn w lg" data-go="pay" data-arg="' + esc(o.vn) + '">' + ic('cash', 20) + ' เก็บเงิน ' + bt(d.due) + '</button>');
     var cs = d.courses.filter(function (c) { return c.status === 'ACTIVE'; }), oldc = d.courses.filter(function (c) { return c.status !== 'ACTIVE'; });
     return '<div class="stack">' +
       (p.needConsent ? '<div class="note w row"><span class="sp">คนไข้ยังไม่ได้เซ็นใบยินยอม (PDPA)</span><button class="btn sm w" data-a="consentDlg">ให้คนไข้เซ็นตอนนี้</button></div>' : '') +
@@ -4852,7 +5073,7 @@ SCR.patient = function (hn) {
       ((p.chronic || p.silicone === 'เคย' || p.supplements) ? '<div class="small"><b>ประวัติ:</b> ' + esc([p.chronic && 'โรคประจำตัว ' + p.chronic, p.silicone === 'เคย' && 'เคยฉีดซิลิโคน/ฟิลเลอร์', p.supplements && 'ทาน ' + p.supplements].filter(Boolean).join(' · ')) + '</div>' : '') +
       '<div class="row">' + act.join('') + '</div>' +
       '<div class="row"><div class="card flat sp" style="padding:.6rem .9rem;background:var(--accent-soft);border:0"><div class="xs muted">' + (p.wallet < 0 ? 'ค้างชำระ (ผ่อนกับคลินิก)' : 'วงเงินสมาชิก / มัดจำคงเหลือ') + '</div><div class="num" style="font-size:1.3rem;color:' + (p.wallet < 0 ? 'var(--bad)' : 'var(--accent)') + '">' + bt(Math.abs(p.wallet || 0)) + '</div></div>' +
-      '<button class="btn sm" data-a="walletDlg">ประวัติวงเงิน</button>' + (has(FRONT) ? '<button class="btn sm p" data-a="depositDlg">รับมัดจำ' + (p.wallet < 0 ? ' / ชำระยอดค้าง' : '') + '</button><button class="btn sm" data-a="topupDlg">+ เติมวงเงิน</button>' : '') + '</div>' +
+      '<button class="btn sm" data-a="walletDlg">ประวัติวงเงิน</button>' + (S.boot.beam && has(FRONT.concat(['sales'])) ? '<button class="btn sm" data-a="linkDlg" data-hn="' + esc(p.hn) + '" data-k="' + (p.wallet < 0 ? 'debt' : 'deposit') + '" data-am="' + (p.wallet < 0 ? -p.wallet : '') + '">🔗 ส่งลิงก์จ่ายทาง LINE</button>' : '') + (has(FRONT.concat(['sales'])) ? '<button class="btn sm p" data-a="depositDlg">รับมัดจำ' + (p.wallet < 0 ? ' / ชำระยอดค้าง' : '') + '</button><button class="btn sm" data-a="topupDlg">+ เติมวงเงิน</button>' : '') + '</div>' +
       '<div id="instbox" data-hn="' + esc(p.hn) + '"></div>' +
       '<div class="row small"><span class="muted sp">ยอดใช้จ่ายสะสม ' + bt(d.spend) + '</span>' +
       (p.hasPhoto ? '<button class="btn q sm" data-a="viewId">ดูรูปบัตร</button>' : '') + '<button class="btn q sm" data-a="photos">' + ic('img', 16) + ' รูปก่อน/หลัง</button>' +
@@ -5067,7 +5288,7 @@ function posHtml() {
   var P = S.v.pos, cats = posCats(); if (cats.indexOf(P.cat) < 0) P.cat = cats[0];
   var sellers = S.boot.staff.filter(function (s) { return s.roles.some(function (r) { return ['front', 'sales', 'manager', 'doctor', 'nurse', 'assistant', 'therapist'].indexOf(r) >= 0; }); });
   return '<div class="split"><div class="stack"><div class="card stack"><div class="row"><div class="sp"><div class="small muted">ขายให้</div><h2>' + esc(P.pt.hn + ' ' + P.pt.name) + '</h2></div>' + (P.pt.allergy ? '<span class="pill d">แพ้ ' + esc(P.pt.allergy) + '</span>' : '') + '</div>' +
-    (has(FRONT) ? '<div class="row"><button class="btn w sm" data-a="depositDlg" data-hn="' + esc(P.pt.hn) + '">💰 เก็บแค่มัดจำ</button>' + (P.pt.wallet ? '<span class="xs ' + (P.pt.wallet < 0 ? 'dn' : 'muted') + '">' + (P.pt.wallet < 0 ? 'ค้างชำระ ' : 'วงเงิน/มัดจำคงเหลือ ') + bt(Math.abs(P.pt.wallet)) + '</span>' : '') + '</div>' : '') +
+    (has(FRONT.concat(['sales'])) ? '<div class="row"><button class="btn w sm" data-a="depositDlg" data-hn="' + esc(P.pt.hn) + '">💰 เก็บแค่มัดจำ</button>' + (P.pt.wallet ? '<span class="xs ' + (P.pt.wallet < 0 ? 'dn' : 'muted') + '">' + (P.pt.wallet < 0 ? 'ค้างชำระ ' : 'วงเงิน/มัดจำคงเหลือ ') + bt(Math.abs(P.pt.wallet)) + '</span>' : '') + '</div>' : '') +
     '<input id="pq" placeholder="ค้นหารายการ…" value="' + esc(P.q) + '"><div class="tabs" id="cats">' + cats.map(function (c) { return '<button class="' + (c === P.cat && !P.q ? 'on' : '') + '" data-c="' + esc(c) + '">' + esc(c) + '</button>'; }).join('') + '</div>' +
     '<div class="prod" id="prods">' + prodButtons() + '</div></div></div>' +
     '<div class="card stack cart" style="position:sticky;top:calc(70px + env(safe-area-inset-top,0px))"><div class="sec"><h2>ตะกร้า</h2><span class="pill">' + P.cart.length + ' รายการ</span></div><div class="list" id="cart">' + cartHtml() + '</div>' +
@@ -5163,7 +5384,7 @@ ACT.posCommit = function () {
   call('saleCommit', { hn: P.hn, items: items }, { write: true }).then(function (r) {
     S.v.pos = null; toast('บันทึก ' + r.orders.length + ' รายการ');
     if (P.ret) { back(); return; }
-    if (has(FRONT)) go('pay', r.vn, true); else back();
+    if (has(FRONT.concat(['sales']))) go('pay', r.vn, true); else back();
   }).catch(fail);
 };
 
@@ -5174,7 +5395,7 @@ SCR.due = function () {
     var rs = r0[0], ins = r0[1]; S.v.ins = ins;
     var instH = ins.length ? '<div class="card" style="border:2px solid var(--warn)"><div class="sec"><h2>งวดผ่อนครบกำหนด</h2><span class="pill d">' + ins.filter(function (x) { return x.days <= 0; }).length + '</span><span class="xs muted">เลยกำหนด · วันนี้ · อีก 3 วัน</span></div><div class="list">' + ins.map(function (x, i) {
       return '<div class="li"><div class="main"><div class="t">' + esc(x.name) + ' <span class="muted small">' + esc(x.hn) + '</span></div><div class="s">งวด ' + x.no + '/' + x.of + ' · ครบ ' + esc(thDate(x.due, 1)) + ' · <b>' + bt(x.left) + '</b>' + (x.paid > 0 ? ' (จ่ายแล้ว ' + bt(x.paid) + ')' : '') + '</div></div>' + instPill(x) +
-        '<button class="btn sm" data-go="patient" data-arg="' + esc(x.hn) + '">ดูคนไข้</button><button class="btn sm p" data-a="instPay" data-i="' + i + '">รับชำระ</button></div>'; }).join('') + '</div></div>' : '';
+        '<button class="btn sm" data-go="patient" data-arg="' + esc(x.hn) + '">ดูคนไข้</button><button class="btn sm p" data-a="instPay" data-i="' + i + '">รับชำระ</button>' + (S.boot.beam ? '<button class="btn sm" data-a="linkDlg" data-hn="' + esc(x.hn) + '" data-k="debt" data-am="' + x.left + '" data-nt="' + esc('ชำระงวด ' + x.no + '/' + x.of) + '">🔗 ส่งลิงก์</button>' : '') + '</div>'; }).join('') + '</div></div>' : '';
     return '<div class="stack">' + instH + '<div class="card"><div class="sec"><h2>บิลค้างชำระวันนี้</h2><span class="pill d">' + rs.length + '</span></div>' + (rs.length ? '<div class="list">' + rs.map(function (v) {
       return '<div class="li tap" data-go="pay" data-arg="' + esc(v.vn) + '"><div class="qn">' + v.queue + '</div><div class="main"><div class="t">' + esc(v.name) + '</div><div class="s">' + esc(v.hn) + ' · ' + stagePill(v.stage) + (v.upsell ? ' <span class="pill i">มีอัพเซล</span>' : '') + ' · ' + mins(v.mins) + '</div></div><div class="num">' + bt(v.due) + '</div></div>';
     }).join('') + '</div>' : '<div class="empty">ไม่มีบิลค้าง 🎉</div>') + '</div></div>';
@@ -5513,9 +5734,7 @@ SCR.queue = function () {
     var cnt = {}; q.forEach(function (v) { cnt[v.stage] = (cnt[v.stage] || 0) + 1; });
     return '<div class="stack"><div class="row">' + ORDER.filter(function (s) { return cnt[s]; }).map(function (s) { return stagePill(s).replace('</span>', ' ' + cnt[s] + '</span>'); }).join('') + '</div>' +
       '<div class="card">' + (q.length ? '<div class="list">' + q.map(function (v) {
-        return '<div class="li tap" data-go="patient" data-arg="' + esc(v.hn) + '"><div class="qn">' + v.queue + '</div><div class="main"><div class="t">' + esc(v.name) + (v.nick ? ' <span class="muted">(' + esc(v.nick) + ')</span>' : '') + ' ' + stagePill(v.stage) + '</div>' +
-          '<div class="s">' + esc(v.items.map(function (i) { return i.name; }).join(', ') || v.cc || '—') + (v.room ? ' · ' + esc(v.room) : '') + (v.doctor ? ' · ' + esc(v.doctor) : '') + '</div></div>' +
-          '<div class="stack r" style="gap:.15rem">' + (['DONE', 'CANCEL'].indexOf(v.stage) < 0 ? since(v.mins) : '') + (v.due > 0 ? '<span class="pill d">ค้าง ' + bt(v.due) + '</span>' : v.paid ? '<span class="pill g">จ่ายแล้ว</span>' : '') + '</div></div>';
+        return qRow(v, has(FRONT.concat(['sales'])));
       }).join('') + '</div>' : '<div class="empty">ยังไม่มีคิววันนี้</div>') + '</div></div>';
   });
 };
@@ -5548,6 +5767,44 @@ ACT.apptMenu = function (el) {
       if (x.dataset.m === 'cancel') dialog({ title: 'ยกเลิกนัด', body: '<label>เหตุผล<input id="rs"></label>', ok: 'ยกเลิกนัด', danger: true, onOk: function (bb) { return call('apptCancel', { id: id, reason: bb.querySelector('#rs').value }, { write: true }).then(function () { toast('ยกเลิกแล้ว'); refresh(); }); } });
     }; } });
 };
+
+/* ---------- ส่งลิงก์ให้ลูกค้าจ่ายเองทาง LINE (มัดจำ / ชำระงวด / ยอดค้าง) ---------- */
+ACT.linkDlg = function (el) {
+  var hn = el.dataset.hn, kind = el.dataset.k || 'deposit';
+  dialog({ title: '🔗 ส่งลิงก์จ่ายเงินทาง LINE · ' + hn, ok: 'สร้างลิงก์',
+    body: '<div class="chips" id="lk"><button type="button" data-k="deposit" class="' + (kind === 'deposit' ? 'on' : '') + '">มัดจำ / ปิดการขาย</button><button type="button" data-k="debt" class="' + (kind === 'debt' ? 'on' : '') + '">ชำระงวด / ยอดค้าง</button></div>' +
+      '<label>จำนวนเงิน (บาท) *<input id="la" type="number" inputmode="decimal" value="' + esc(el.dataset.am || '') + '"></label>' +
+      '<label>ค่าอะไร (ขึ้นในใบเสร็จ)<input id="ln" value="' + esc(el.dataset.nt || '') + '" placeholder="เช่น มัดจำตาสองชั้น / ชำระงวด 2/3"></label>' +
+      '<label class="ck"><input type="checkbox" id="lsg"> งานศัลยกรรม (คิดค่าคอมเรทศัลยกรรม)</label>' +
+      '<p class="xs muted">ลูกค้าจ่ายได้ทั้ง บัตร · QR พร้อมเพย์ · โมบายแบงก์กิ้ง · ผ่อนบัตร · ลิงก์ใช้ได้ 48 ชม. · จ่ายแล้วระบบออกใบเสร็จ เงินเข้าวงเงินลูกค้า (วันมาทำหักจากวงเงิน) · ค่าคอมเป็นของคนส่งลิงก์</p>',
+    mount: function (b) { b.querySelector('#lk').onclick = function (e) { var x = e.target.closest('[data-k]'); if (!x) return; kind = x.dataset.k; $$('#lk button', b).forEach(function (y) { y.classList.toggle('on', y === x); }); }; },
+    onOk: function (b) { var am = nz(b.querySelector('#la').value); need(am >= 1 || '', 'ใส่จำนวนเงิน');
+      return call('payLinkCreate', { hn: hn, amount: am, kind: kind, note: b.querySelector('#ln').value.trim(), surg: b.querySelector('#lsg').checked }, { write: true, msg: 'กำลังสร้างลิงก์…' }).then(function (r) { setTimeout(function () { linkShow(r); }, 30); }); } });
+};
+function linkMsg(r) { return 'สวัสดีค่ะ คุณ' + r.nick + ' 🙏\n' + r.what + ' ' + fm(r.amount) + ' บาท\nชำระผ่านลิงก์นี้ได้เลยค่ะ (บัตร / QR พร้อมเพย์ / โมบายแบงก์กิ้ง / ผ่อนบัตร)\n' + r.url + '\nลิงก์ใช้ได้ถึง ' + thDate(r.expires.slice(0, 10), 1) + ' ' + r.expires.slice(11, 16) + ' น.\nชำระแล้วระบบออกใบเสร็จให้อัตโนมัติค่ะ\n— ' + r.branchName; }
+function linkShow(r) {
+  var msg = linkMsg(r);
+  dialog({ title: 'ลิงก์พร้อมส่ง ✓', ok: false, cancel: 'ปิด',
+    body: '<p class="small">คัดลอกข้อความแล้ววางในแชท LINE ของลูกค้า</p><textarea id="lmsg" rows="8" style="width:100%;font-size:.9rem">' + esc(msg) + '</textarea>' +
+      '<div class="row"><button class="btn p" id="lcp">📋 คัดลอกข้อความ</button><button class="btn" id="lcu">คัดลอกแค่ลิงก์</button></div>' +
+      '<p class="xs muted">ดูสถานะ (จ่ายแล้ว / ยังไม่จ่าย / หมดอายุ) ได้ที่หน้า "ลิงก์จ่ายเงิน (LINE)" · ลูกค้าจ่ายแล้วจะแจ้งในอีเมลสรุปยอดขายด้วย</p>',
+    mount: function (b) { function cp(t, btn) { var done = function () { btn.textContent = 'คัดลอกแล้ว ✓'; }; try { navigator.clipboard.writeText(t).then(done, function () { fb(); }); } catch (e) { fb(); } function fb() { var ta = b.querySelector('#lmsg'); ta.value = t; ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} } }
+      b.querySelector('#lcp').onclick = function (e) { cp(msg, e.target); }; b.querySelector('#lcu').onclick = function (e) { cp(r.url, e.target); }; } });
+}
+TITLES.payLinks = 'ลิงก์จ่ายเงิน (LINE)';
+var LK_ST = { PENDING: ['รอลูกค้าจ่าย', 'w'], PAID: ['จ่ายแล้ว', 'g'], EXPIRED: ['หมดอายุ', ''], CANCELLED: ['ยกเลิก', ''], PROBLEM: ['จ่ายแล้ว — ต้องให้บัญชีตรวจ', 'd'] };
+SCR.payLinks = function () {
+  return call('payLinks').then(function (ls) { S.v.lks = ls;
+    return '<div class="stack" style="max-width:720px;margin:0 auto"><div class="note small">ส่งลิงก์ได้จาก <b>หน้าคนไข้</b> (ปุ่ม 🔗 ส่งลิงก์จ่ายทาง LINE) หรือหน้า <b>เก็บเงิน/ค้างจ่าย</b> (งวดผ่อน) · ลูกค้าจ่ายแล้วระบบออกใบเสร็จเอง</div><div class="card">' +
+      (ls.length ? '<div class="list">' + ls.map(function (x, i) { var st = LK_ST[x.status] || [x.status, ''];
+        return '<div class="li" style="flex-wrap:wrap"><div class="main" style="flex:1 1 220px"><div class="t">' + esc(x.hn + ' ' + x.name) + ' · <b>' + bt(x.amount) + '</b></div><div class="s">' + esc(x.what) + ' · ส่งโดย ' + esc(x.by) + ' ' + esc(x.created.slice(5, 16)) + (x.status === 'PENDING' && x.expires ? ' · หมดอายุ ' + esc(x.expires.slice(5, 16)) : '') + (x.receipt ? ' · ' + esc(x.receipt) : '') + '</div></div>' +
+          '<span class="pill ' + st[1] + '">' + st[0] + '</span>' + (x.status === 'PENDING' ? '<button class="btn sm" data-a="lkCopy" data-i="' + i + '">คัดลอกลิงก์</button>' : '') + (x.status === 'PENDING' || x.status === 'EXPIRED' ? '<button class="btn q sm" data-a="lkCancel" data-i="' + i + '">ยกเลิก</button>' : '') + (x.receipt ? '<button class="btn sm" data-go="receipt" data-arg="' + esc(x.receipt) + '">ใบเสร็จ</button>' : '') + '</div>'; }).join('') + '</div>' : '<div class="empty">ยังไม่มีลิงก์ใน 14 วันนี้</div>') + '</div></div>';
+  });
+};
+POLL.payLinks = 1;
+ACT.lkCopy = function (el) { var x = S.v.lks[+el.dataset.i]; try { navigator.clipboard.writeText(x.url).then(function () { toast('คัดลอกลิงก์แล้ว'); }, function () { prompt0(x.url); }); } catch (e) { prompt0(x.url); } };
+function prompt0(u) { dialog({ title: 'ลิงก์', ok: false, cancel: 'ปิด', body: '<input value="' + esc(u) + '" onfocus="this.select()" style="width:100%">' }); }
+ACT.lkCancel = function (el) { var x = S.v.lks[+el.dataset.i]; ask('ยกเลิกลิงก์ ' + bt(x.amount) + '?', 'ลูกค้าจะจ่ายผ่านลิงก์นี้ไม่ได้แล้ว และลบบิลมัดจำที่ยังไม่จ่ายออก', 'ยกเลิกลิงก์').then(function (ok) { if (ok) call('payLinkCancel', { id: x.id }, { write: true }).then(function () { toast('ยกเลิกแล้ว'); refresh(); }).catch(fail); }); };
 
 /* =====================================================================
  * ห้องแพทย์ · ห้องทรีตเมนต์ · ตารางนัด · ลีด
@@ -5859,7 +6116,7 @@ SCR.sched = function (date) {
     var nowM = m(new Date(Date.now() + 7 * 3600e3).toISOString().slice(11, 16)), nowLine = date === today() && nowM > o && nowM < c ? '<div class="now" style="top:' + (44 + (nowM - o) / 15 * H) + 'px"></div>' : '';
     S.v.sbook = d;
     return '<div class="stack"><div class="row"><button class="btn sm" data-a="sday" data-d="-1">‹</button><input type="date" id="sd" value="' + date + '" style="width:auto"><button class="btn sm" data-a="sday" data-d="1">›</button>' +
-      '<b class="sp">' + thDate(date, 1) + ' · ' + d.appts.filter(function (a) { return a.status !== 'CANCEL'; }).length + ' นัด</b>' + (has(FRONT) ? '<button class="btn p" data-go="bookNew">+ ลงนัด</button>' : '') + '</div>' +
+      '<b class="sp">' + thDate(date, 1) + ' · ' + d.appts.filter(function (a) { return a.status !== 'CANCEL'; }).length + ' นัด</b>' + (has(FRONT.concat(["sales"])) ? '<button class="btn p" data-go="bookNew">+ ลงนัด</button>' : '') + '</div>' +
       '<div class="row xs"><span class="pill a">หัตถการ/ทรีตเมนต์</span><span class="pill i">ปรึกษาแพทย์ (คนไข้ใหม่)</span><span class="pill w">พักฟื้นหลังผ่าตัด</span><span class="pill g">มาถึงแล้ว</span><span class="muted">มาสายเกิน 15 นาที ระบบปล่อยเตียงให้นัดอื่นได้</span></div>' +
       '<div class="sched"><div style="display:flex;position:relative;min-width:max-content"><div style="width:48px;flex:none"><div class="hdr" style="border-left:0">&nbsp;<br>&nbsp;</div>' + times + '</div>' + cols + nowLine + '</div></div></div>';
   });
@@ -5869,12 +6126,12 @@ POLL.sched = 1;
 ACT.sday = function (el) { var d = addDays(S.v.sdate || today(), +el.dataset.d); S.cur.arg = d; S.v.sdate = d; refresh(); };
 ACT.apptInfo = function (el) {
   var a = S.v.sbook.appts.filter(function (x) { return x.id === el.dataset.id; })[0]; if (!a) return;
-  var canArrive = has(FRONT) && a.status === 'BOOKED' && a.date === today();
+  var canArrive = has(FRONT.concat(["sales"])) && a.status === 'BOOKED' && a.date === today();
   dialog({ title: a.name, ok: canArrive ? 'มาถึงแล้ว · เข้าคิว' : false, cancel: 'ปิด', noFocus: true,
     body: '<div class="small stack" style="gap:.3rem"><div>' + esc(a.hn + ' · ' + a.phone) + '</div><div><b>' + esc(a.itemName) + '</b> · ' + esc(a.room) + ' ' + esc(a.start + '–' + a.end) + '</div>' +
       (a.cRoom ? '<div>ปรึกษาแพทย์ ' + esc(a.cRoom + ' ' + a.cStart + '–' + a.cEnd) + '</div>' : '') + (a.ipdRoom ? '<div>พักฟื้น ' + esc(a.ipdRoom + ' ถึง ' + a.ipdEnd) + '</div>' : '') +
       (a.note ? '<div>หมายเหตุ: ' + esc(a.note) + '</div>' : '') + '<div class="muted">ลงนัดโดย ' + esc(a.by) + ' · ' + stagePill(a.stage || '') + ' ' + esc({ BOOKED: 'รอมา', ARRIVED: 'มาแล้ว', NOSHOW: 'ไม่มา' }[a.status] || '') + '</div></div>' +
-      '<div class="row"><button class="btn sm" data-x="close" data-go2="patient" data-h="' + esc(a.hn) + '">หน้าคนไข้</button>' + (has(FRONT) && a.status === 'BOOKED' ? '<button class="btn sm" data-x="close" data-mn="' + esc(a.id) + '">ย้าย/ยกเลิก</button>' : '') + '</div>',
+      '<div class="row"><button class="btn sm" data-x="close" data-go2="patient" data-h="' + esc(a.hn) + '">หน้าคนไข้</button>' + (has(FRONT.concat(["sales"])) && a.status === 'BOOKED' ? '<button class="btn sm" data-x="close" data-mn="' + esc(a.id) + '">ย้าย/ยกเลิก</button>' : '') + '</div>',
     mount: function (b) { b.addEventListener('click', function (e) { var x = e.target.closest('[data-go2]'); if (x) setTimeout(function () { go('patient', x.dataset.h); }, 10); var y = e.target.closest('[data-mn]'); if (y) setTimeout(function () { ACT.apptMenu({ dataset: { id: y.dataset.mn } }); }, 10); }, true); },
     onOk: function () { return call('apptArrive', { id: a.id }, { write: true }).then(function (v) { toast(a.name + ' เข้าคิว ' + v.queue); refresh(); setTimeout(function () { afterArrive(v.hn); }, 30); }); } });
 };
@@ -6684,6 +6941,56 @@ SCR.rcFind = function () {
 SCR.rcFind.after = function () { var q = $('#rcq'); if (q) q.onkeydown = function (e) { if (e.key === 'Enter') ACT.rcGo(); }; };
 ACT.rcGo = function () { var F = S.v.rcf; F.q = $('#rcq').value.trim(); F.from = $('#rcf').value || F.from; F.to = $('#rct').value || F.to; refresh(); };
 ACT.rcPrint = function (el) { S.v.autoPrint = true; go('receipt', el.dataset.r); };
+
+/* ---------- ตารางยอดเซลรายวัน (แบบที่บัญชีส่งทุกเช้า · แคปหน้าจอส่งกลุ่มได้) ---------- */
+TITLES.salesBoard = 'ตารางยอดเซลรายวัน';
+SCR.salesBoard = function () {
+  return call('salesBoard', { month: S.v.sbMon, branch: S.v.sbBr }).then(function (r) {
+    S.v.sbMon = r.month; var y = +r.month.slice(0, 4), m = +r.month.slice(5, 7);
+    var f = function (n) { return n ? fm(n, 2).replace(/(\.\d)$/, '$10') : ''; }, f2 = function (n) { return (Number(n) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+    var cs = r.cols, sub = [], colTot = {};
+    cs.forEach(function (c) { if (c.split) { sub.push([c.key, 's', 'สกิน']); sub.push([c.key, 'g', 'ศัลยกรรม']); } else sub.push([c.key, '', c.key === 'CLINIC' || c.key === 'PAGE' ? '' : 'ยอดขาย']); });
+    var body = r.days.map(function (d) { var row = r.data[d] || {};
+      return '<tr><td>' + d.slice(8) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) + '</td><td class="sb-t">' + f2(r.total[d] || 0) + '</td>' + sub.map(function (x) { var v = row[x[0]], n = x[1] ? (v ? v[x[1]] : 0) : (v || 0); colTot[x[0] + x[1]] = (colTot[x[0] + x[1]] || 0) + n; return '<td>' + (n ? f2(n) : '') + '</td>'; }).join('') + '</tr>'; }).join('');
+    var grand = r.days.reduce(function (a, d) { return a + (r.total[d] || 0); }, 0);
+    var tgt = r.target, perDay = function (v) { return v / r.daysInMonth; }, cum = function (v) { return v / r.daysInMonth * r.elapsed; };
+    var actOf = function (c) { return c.split ? (colTot[c.key + 's'] || 0) + (colTot[c.key + 'g'] || 0) : (colTot[c.key] || 0); };
+    var tgRow = function (lab, fn, cls) { return '<tr class="' + (cls || '') + '"><td colspan="2" class="sb-l">' + lab + '</td>' + cs.map(function (c) { var v = tgt.by[c.key]; return '<td colspan="' + (c.split ? 2 : 1) + '">' + (v ? fn(v, c) : '') + '</td>'; }).join('') + '</tr>'; };
+    var sign = function (n) { return '<b class="' + (n < 0 ? 'dn' : 'up') + '">' + f2(n) + '</b>'; };
+    var tbl = '<table class="sb"><thead><tr><th colspan="' + (2 + sub.length) + '" class="sb-h"><div class="row"><b>' + esc(r.branchName) + ' — ' + TH_MN[m - 1] + ' ' + y + '</b><span class="sp"></span><span class="sb-n">' + esc(r.note) + '</span></div></th></tr>' +
+      '<tr><th rowspan="2">วันที่</th><th rowspan="2" class="sb-t">ยอดรวมรายวัน</th>' + cs.map(function (c) { return '<th colspan="' + (c.split ? 2 : 1) + '"' + (c.split || c.key === 'CLINIC' || c.key === 'PAGE' ? '' : '') + '>' + esc(c.label) + '</th>'; }).join('') + '</tr>' +
+      '<tr>' + sub.map(function (x) { return '<th class="sb-s">' + x[2] + '</th>'; }).join('') + '</tr></thead><tbody>' + body + '</tbody>' +
+      '<tfoot><tr class="sb-sum"><td>รวม</td><td class="sb-g">' + f2(grand) + '</td>' + sub.map(function (x) { return '<td>' + f2(colTot[x[0] + x[1]] || 0) + '</td>'; }).join('') + '</tr>' +
+      (tgt.total || Object.keys(tgt.by).length ? '<tr class="sb-gap"><td colspan="' + (2 + sub.length) + '"></td></tr>' +
+        '<tr><td class="sb-l">Target</td><td class="b">' + (tgt.total ? f2(tgt.total) : '—') + '</td>' + cs.map(function (c) { var v = tgt.by[c.key]; return '<td colspan="' + (c.split ? 2 : 1) + '" class="b">' + (v ? f2(v) : '') + '</td>'; }).join('') + '</tr>' +
+        '<tr><td class="sb-l">ส่วนต่าง</td><td>' + (tgt.total ? sign(grand - tgt.total) : '') + '</td>' + cs.map(function (c) { var v = tgt.by[c.key]; return '<td colspan="' + (c.split ? 2 : 1) + '">' + (v ? sign(actOf(c) - v) : '') + '</td>'; }).join('') + '</tr>' +
+        '<tr class="sb-gap"><td colspan="' + (2 + sub.length) + '"></td></tr>' +
+        '<tr class="sb-m"><td class="sb-l">ยอดเฉลี่ยต่อวันตาม Target</td><td>' + (tgt.total ? f2(perDay(tgt.total)) : '') + '</td>' + cs.map(function (c) { var v = tgt.by[c.key]; return '<td colspan="' + (c.split ? 2 : 1) + '">' + (v ? f2(perDay(v)) : '') + '</td>'; }).join('') + '</tr>' +
+        '<tr><td class="sb-l">Target สะสมถึงวันที่ ' + r.elapsed + '</td><td class="b">' + (tgt.total ? f2(cum(tgt.total)) : '') + '</td>' + cs.map(function (c) { var v = tgt.by[c.key]; return '<td colspan="' + (c.split ? 2 : 1) + '">' + (v ? f2(cum(v)) : '') + '</td>'; }).join('') + '</tr>' +
+        '<tr><td class="sb-l">ส่วนต่าง (เทียบสะสม)</td><td>' + (tgt.total ? sign(grand - cum(tgt.total)) : '') + '</td>' + cs.map(function (c) { var v = tgt.by[c.key]; return '<td colspan="' + (c.split ? 2 : 1) + '">' + (v ? sign(actOf(c) - cum(v)) : '') + '</td>'; }).join('') + '</tr>' : '') + '</tfoot></table>';
+    return '<div class="stack"><div class="row"><button class="btn" data-a="sbNav" data-n="-1">‹</button><h2 style="min-width:10rem;text-align:center">' + TH_MN[m - 1] + ' ' + (y + 543) + '</h2><button class="btn" data-a="sbNav" data-n="1">›</button><span class="sp"></span>' +
+      (r.canAll ? '<select id="sbbr" style="width:auto">' + r.branches.map(function (b) { return '<option value="' + esc(b.code) + '"' + (b.code === r.branch ? ' selected' : '') + '>' + esc(b.name) + '</option>'; }).join('') + '</select>' : '') +
+      '<button class="btn" data-a="sbFull">⛶ เต็มจอ (ไว้แคป)</button></div>' +
+      '<div class="card tbl sb-wrap" id="sbw">' + tbl + '</div>' +
+      '<p class="xs muted">คิดจาก<b>เงินจริงที่รับ</b> (หลังหักมัดจำ/วงเงิน) ตามผู้ขายที่เลือกตอนรับเงิน · ยอด Page = ส่วนที่แอดมินเพจปิด · ยอดคลินิก = ไม่มีเซล · เป้าแก้ได้ที่แท็บ <b>Targets</b> ใน CLINICDB (เดือน · สาขา · ใคร · เป้า) · ข้อความสีแดงแก้ที่ Settings: salesBoardNote</p></div>';
+  });
+};
+SCR.salesBoard.after = function () { var s = $('#sbbr'); if (s) s.onchange = function () { S.v.sbBr = s.value; refresh(); }; };
+ACT.sbNav = function (el) { var mo = S.v.sbMon, y = +mo.slice(0, 4), m = +mo.slice(5, 7) - 1 + +el.dataset.n; y += Math.floor(m / 12); m = ((m % 12) + 12) % 12; S.v.sbMon = y + '-' + ('0' + (m + 1)).slice(-2); refresh(); };
+// เต็มจอ: ย่อตารางทั้งเดือนให้พอดีจอเดียว → แคปหน้าจอได้ทีเดียวจบ
+ACT.sbFull = function () { var w = $('#sbw'); if (!w) return; var t = w.querySelector('.sb'), on = w.classList.toggle('sb-full');
+  function fit() { t.style.transform = ''; if (!w.classList.contains('sb-full')) return; var sc = Math.min(1, (w.clientWidth - 24) / t.offsetWidth, (w.clientHeight - 24) / t.offsetHeight); t.style.transformOrigin = 'top left'; t.style.transform = 'scale(' + sc + ')'; }
+  if (on) { var x = document.createElement('button'); x.className = 'btn p sb-x'; x.textContent = '✕ ปิด'; x.onclick = function () { w.classList.remove('sb-full'); t.style.transform = ''; x.remove(); removeEventListener('resize', fit); }; document.body.appendChild(x); addEventListener('resize', fit); setTimeout(fit, 30); } else fit(); };
+
+TITLES.saleFeed = 'ยอดขายวันนี้ (สด)';
+SCR.saleFeed = function () {
+  return call('saleFeed', { date: S.v.sfDate, branch: S.v.sfBr }).then(function (r) {
+    return '<div class="stack" style="max-width:640px;margin:0 auto"><div class="row"><input type="date" id="sfd" value="' + r.date + '" max="' + today() + '" style="width:auto">' +
+      (r.canAll ? '<select id="sfb" style="width:auto"><option value="">ทุกสาขา</option>' + r.branches.map(function (b) { return '<option value="' + esc(b.code) + '"' + (b.code === S.v.sfBr ? ' selected' : '') + '>' + esc(b.name) + '</option>'; }).join('') + '</select>' : '') + '</div>' + saleFeedHtml(r) + '</div>';
+  });
+};
+SCR.saleFeed.after = function () { $('#sfd').onchange = function (e) { S.v.sfDate = e.target.value; refresh(); }; var b = $('#sfb'); if (b) b.onchange = function () { S.v.sfBr = b.value; refresh(); }; };
+POLL.saleFeed = 1;
 
 /* เริ่มระบบ */
 (function () {
