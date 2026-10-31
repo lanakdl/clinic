@@ -373,7 +373,7 @@ var SCHEMA = {
   Rooms:      [['branch','สาขา'],['name','ชื่อห้อง/เตียง'],['type','ประเภท'],['machine','เครื่องประจำห้อง'],['active','ใช้งาน','b']],
   Staff:      [['code','รหัสพนักงาน'],['name','ชื่อ-สกุล'],['nick','ชื่อเล่น'],['role','บทบาท'],['role2','บทบาทที่ 2'],['branch','สาขาหลัก'],
                ['branches','สาขาที่เข้าได้ (ว่าง=ทุกสาขา)'],['phone','เบอร์โทร'],['email','อีเมล'],['license','เลขใบประกอบวิชาชีพ'],['pin','รหัสเข้าระบบ'],
-               ['shiftIn','เวลาเข้างาน'],['shiftOut','เวลาออกงาน'],['dayOff','วันหยุดประจำ'],['commPct','ค่าคอม %','n'],['salary','เงินเดือน (บาท/เดือน)','n'],['hourly','ค่าชั่วโมง (บาท/ชม. · แพทย์ว่าง=700)','n'],['sso','ประกันสังคม (บาท/เดือน)','n'],['partTime','แพทย์ Part-time (ไม่ยุ่งสต้อก)','b'],['active','ใช้งาน','b'],['sign','ลายเซ็น (Drive)'],
+               ['shiftIn','เวลาเข้างาน'],['shiftOut','เวลาออกงาน'],['dayOff','วันหยุดประจำ'],['commPct','ค่าคอม %','n'],['salary','เงินเดือน (บาท/เดือน)','n'],['hourly','ค่าชั่วโมง (บาท/ชม. · แพทย์ว่าง=700)','n'],['sso','ประกันสังคม (บาท/เดือน)','n'],['vacDays','พักร้อน (วัน/ปี)','n'],['partTime','แพทย์ Part-time (ไม่ยุ่งสต้อก)','b'],['active','ใช้งาน','b'],['sign','ลายเซ็น (Drive)'],
                ['lineId','LINE (ผูกแล้ว — ลบเพื่อผูกใหม่)'],['lineName','ชื่อ LINE'],['lineAt','ผูก LINE เมื่อ','t']],
   Items:      [['code','รหัสรายการ'],['name','ชื่อรายการ'],['category','หมวด'],['type','ประเภท'],['performer','ผู้ทำ'],
                ['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
@@ -421,6 +421,7 @@ var SCHEMA = {
   PayMethods: [['name','ช่องทางชำระ'],['needRef','ต้องใส่เลขอ้างอิง','b'],['feePct','บวกค่าธรรมเนียม %','n'],['branches','ใช้ที่สาขา (ว่าง=ทุกสาขา)'],['active','ใช้งาน','b']],
   Installments: [['id','เลข'],['hn','HN'],['name','ชื่อ'],['branch','สาขา'],['receipt','ใบเสร็จ'],['no','งวดที่','n'],['of','จากทั้งหมด','n'],['due','ครบกำหนด'],['amount','ยอดงวด','n'],['paid','จ่ายแล้ว','n'],['status','สถานะ'],['paidAt','จ่ายครบเมื่อ','t'],['created','สร้างเมื่อ','t'],['by','อนุมัติโดย']],
   OTs:        [['id','เลข'],['staff','รหัสพนักงาน'],['name','ชื่อ'],['branch','สาขา'],['date','วันที่'],['start','เริ่ม OT'],['end','ถึง'],['hours','ชั่วโมง','n'],['reason','ทำอะไร'],['photo','รูปแนบ (Drive)'],['status','สถานะ'],['rate','เรท/ชม.','n'],['amount','เงิน OT','n'],['created','ขอเมื่อ','t'],['by','อนุมัติโดย'],['at','อนุมัติเมื่อ','t'],['note','หมายเหตุ']],
+  Holidays:   [['date','วันที่ (ค.ศ. เช่น 2026-12-05)'],['name','ชื่อวันหยุด'],['mode','แบบ: ปิดคลินิก / ปิด หักวันหยุด / เลือกลงเอง'],['branches','สาขา (ว่าง = ทุกสาขา · หลายสาขาคั่นด้วย ,)'],['note','หมายเหตุ']],
   Vacation:   [['code','รหัสพนักงาน'],['name','ชื่อ'],['year','ปี (ค.ศ.)'],['days','สิทธิ์พักร้อน (วัน) — เติมเอง','n'],['used','ใช้/ขอไปแล้ว (ระบบคำนวณ)','n'],['left','คงเหลือ (ระบบคำนวณ)','n'],['note','หมายเหตุ']],
   DayOffs:    [['id','เลข'],['staff','รหัสพนักงาน'],['name','ชื่อ'],['branch','สาขา'],['date','วันหยุด'],['kind','แบบ'],['status','สถานะ'],['reason','เหตุผล'],['created','ลงเมื่อ','t'],['mgrBy','ผจก.อนุมัติ'],['mgrAt','ผจก.อนุมัติเมื่อ','t'],['admBy','ผู้ดูแลระบบอนุมัติ'],['admAt','ผู้ดูแลระบบอนุมัติเมื่อ','t'],['note','หมายเหตุ']],
   Attendance: [['id','เลข'],['staff','รหัสพนักงาน'],['name','ชื่อ'],['branch','สาขา'],['date','วันที่'],['in','เข้า'],['out','ออก'],['late','สาย (นาที)','n'],['inPhoto','เซลฟี่เข้า'],['outPhoto','เซลฟี่ออก'],['note','หมายเหตุ'],
@@ -619,9 +620,30 @@ function makeCore(store) {
   var OFF_LIVE = ['OK', 'PENDING', 'APPROVED'], OFF_TH = { OK: 'ลงแล้ว', PENDING: 'รออนุมัติ', APPROVED: 'อนุมัติแล้ว', REJECTED: 'ไม่อนุมัติ', CANCEL: 'ยกเลิก' };
   function offWin() { var w = String(setting('dayOffWindow', '21-25')).split(/[^\d]+/).filter(String).map(num); return { a: w[0] || 21, b: w[1] || 25 }; }
   function offQuota() { return num(setting('dayOffPerMonth', 4)) || 4; }
+  /* วันหยุดนักขัตฯ (แท็บ Holidays · เติมเองทุกปี)
+   * ปิดคลินิก = ทุกคนหยุด ไม่รับนัด ไม่นับใน 4 วัน · เลือกลงเอง = เดือนนั้นได้วันหยุดเพิ่ม +1 ต่อวันนักขัตฯ (ไปเลือกวันหยุดเองตามกติกาเดิม) */
+  function holList(br) { return rows('Holidays').filter(function (h) { var bs = String(h.branches || '').split(/\s*,\s*/).filter(String); return isDate(String(h.date)) && /ปิด|เลือก/.test(String(h.mode)) && (!br || !bs.length || bs.indexOf(String(br)) >= 0); }); }
+  function holClosed(br, d) { return holList(br).filter(function (h) { return String(h.date) === d && /ปิด/.test(String(h.mode)); })[0] || null; }
+  function holExtra(br, mon) { return holList(br).filter(function (h) { return String(h.date).slice(0, 7) === mon && /เลือก/.test(String(h.mode)); }).length; }
+  // ปิด หักวันหยุด = ปิดรวมทั้งสาขา (เช่น วันไม่มีลูกค้า) นับเป็น 1 ใน 4 วันหยุดของเดือนนั้น
+  function holDeduct(br, mon) { return holList(br).filter(function (h) { return String(h.date).slice(0, 7) === mon && /ปิด/.test(String(h.mode)) && /หัก/.test(String(h.mode)); }).length; }
+  function offQuotaFor(code, mon) { var br = offBr(code); return Math.max(0, offQuota() + holExtra(br, mon) - holDeduct(br, mon)); }
+  // ปิดรวมแบบหักวันหยุด ที่ประกาศทีหลัง: คนที่ลงครบไปแล้ว → ยกเลิกวันที่ "ระบบลงให้" ก่อน (วันท้ายสุด) ที่เหลือเกินให้เจ้าตัวเลือกยกเลิกเอง
+  function holTrim() {
+    var t = today(), done = {};
+    holList('').filter(function (h) { return String(h.date) > t && /ปิด/.test(String(h.mode)) && /หัก/.test(String(h.mode)); }).forEach(function (h) {
+      var mon = String(h.date).slice(0, 7);
+      rows('Staff').filter(function (s) { return on(s.active); }).forEach(function (s) { var k = s.code + mon; if (done[k]) return; done[k] = 1;
+        var br = String(s.branch); if (!holDeduct(br, mon)) return;
+        var mine = offsOf(s.code, mon), over = mine.length - offQuotaFor(s.code, mon); if (over <= 0) return;
+        mine.filter(function (x) { return x.kind === 'ระบบลงให้' && String(x.date) > t; }).sort(function (a, b) { return a.date < b.date ? 1 : -1; }).slice(0, over).forEach(function (x) { upd('DayOffs', x, { status: 'CANCEL', note: 'ยกเลิกอัตโนมัติ: คลินิกปิดรวม ' + h.date + ' นับเป็นวันหยุดแล้ว' }); });
+      });
+    });
+  }
+  function holMap(br, mons) { var o = {}; holList(br).forEach(function (h) { if (mons.indexOf(String(h.date).slice(0, 7)) >= 0) o[String(h.date)] = { name: String(h.name || 'วันหยุดนักขัตฯ'), closed: /ปิด/.test(String(h.mode)), deduct: /ปิด/.test(String(h.mode)) && /หัก/.test(String(h.mode)) }; }); return o; }
   function monNext(d) { var y = +d.slice(0, 4), m = +d.slice(5, 7) + 1; if (m > 12) { m = 1; y++; } return y + '-' + ('0' + m).slice(-2); }
   function wkEnd(d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(); return w === 0 || w === 6; }
-  function offsOf(code, mon) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน'; }); }
+  function offsOf(code, mon) { var br = offBr(code); return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน' && !holClosed(br, String(x.date)); }); }
   function roleIn(u, r) { return u.roles.some(function (x) { return r.indexOf(x) >= 0; }); }
   function staffRoles(code) { var s = find('Staff', 'code', code); return s ? rolesOf(s) : []; }
   function offWhy(code, d, extra) {   // เหตุผลที่ลงเองไม่ได้ (ว่าง = ลงเองได้)
@@ -629,7 +651,7 @@ function makeCore(store) {
     if (day < w.a || day > w.b) why.push('ลงเองได้เฉพาะวันที่ ' + w.a + '–' + w.b + ' ของเดือน');
     else if (d.slice(0, 7) !== monNext(t)) why.push('ช่วงนี้ลงเองได้เฉพาะวันหยุดของเดือนหน้า');
     if (wkEnd(d)) why.push('ห้ามหยุดเสาร์–อาทิตย์');
-    if (offsOf(code, d.slice(0, 7)).length + (extra || 0) >= offQuota()) why.push('เกิน ' + offQuota() + ' วันต่อเดือน');
+    var qm = offQuotaFor(code, d.slice(0, 7)); if (offsOf(code, d.slice(0, 7)).length + (extra || 0) >= qm) why.push('เกิน ' + qm + ' วันต่อเดือน');
     var cl = offClash(code, d); if (cl.length) why.push('ตรงกับ ' + cl.join(', ') + ' ที่ลงหยุดไว้ก่อน');
     return why;
   }
@@ -648,15 +670,15 @@ function makeCore(store) {
     var flag = find('Settings', 'key', 'offAutoDone'); if (!force && flag && String(flag.value) === mon) return { month: mon, added: [] };
     var y = +mon.slice(0, 4), m = +mon.slice(5, 7), n = new Date(Date.UTC(y, m, 0)).getUTCDate(), days = [];
     for (var d = 1; d <= n; d++) { var ds = mon + '-' + ('0' + d).slice(-2); if (!wkEnd(ds)) days.push(ds); }
-    var skip = String(setting('dayOffSkip', '')).split(/[\s,]+/), q = offQuota(), added = [];
+    var skip = String(setting('dayOffSkip', '')).split(/[\s,]+/), q = offQuota() + rows('Branches').reduce(function (mx, b) { return Math.max(mx, holExtra(String(b.code), mon)); }, 0), added = [];
     var staff = rows('Staff').filter(function (s) { var rs = rolesOf(s); return on(s.active) && !on(s.partTime) && rs.length && rs.indexOf('owner') < 0 && rs.indexOf('admin') < 0 && rs.indexOf('doctor') < 0 && skip.indexOf(String(s.code)) < 0; });
     function mine(code) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน'; }).map(function (x) { return String(x.date); }); }
     function offOn(br, ds) { return rows('DayOffs').filter(function (x) { return x.date === ds && String(x.branch) === br && OFF_LIVE.indexOf(x.status) >= 0; }).length; }
     // แจกทีละ 1 วันต่อคนวนไปเรื่อยๆ (คนที่มีน้อยได้ก่อน) จะได้ไม่มีใครเหมาวันดีๆ ไปหมด
     for (var round = 0; round < q; round++) {
-      staff.map(function (s) { return { s: s, have: mine(s.code) }; }).filter(function (o) { return o.have.length < q; }).sort(function (a, b) { return a.have.length - b.have.length; }).forEach(function (o) {
-        var s = o.s, br = String(s.branch), have = mine(s.code); if (have.length >= q) return;
-        var best = null; days.forEach(function (ds) { if (have.indexOf(ds) >= 0 || ds <= t) return;
+      staff.map(function (s) { return { s: s, have: mine(s.code) }; }).filter(function (o) { return o.have.length < offQuotaFor(o.s.code, mon); }).sort(function (a, b) { return a.have.length - b.have.length; }).forEach(function (o) {
+        var s = o.s, br = String(s.branch), have = mine(s.code); if (have.length >= offQuotaFor(s.code, mon)) return;
+        var best = null; days.forEach(function (ds) { if (have.indexOf(ds) >= 0 || ds <= t || holClosed(br, ds)) return;
           var clash = offOn(br, ds), gap = have.length ? Math.min.apply(null, have.map(function (h) { return Math.abs(Date.parse(h) - Date.parse(ds)) / 864e5; })) : 99;
           var sc = clash * 1000 - Math.min(gap, 14) * 10 + (Date.parse(ds) / 864e5 % 7) * 0.01; if (!best || sc < best.sc) best = { ds: ds, sc: sc, clash: clash }; });
         if (!best) return;
@@ -668,23 +690,25 @@ function makeCore(store) {
     if (added.length) log({ code: 'SYSTEM', name: 'ระบบ' }, 'offAutoFill', mon + ' ' + added.length + ' วัน');
     return { month: mon, added: added };
   }
-  function offAutoMaybe() { var t = today(), w = offWin(); if (+t.slice(8, 10) <= w.b) return; var f = find('Settings', 'key', 'offAutoDone'); if (f && String(f.value) === monNext(t)) return; try { store.lock(function () { offAutoFill(false); }); } catch (e) {} }
+  function offAutoMaybe() { try { store.lock(function () { holTrim(); }); } catch (e) {} var t = today(), w = offWin(); if (+t.slice(8, 10) <= w.b) return; var f = find('Settings', 'key', 'offAutoDone'); if (f && String(f.value) === monNext(t)) return; try { store.lock(function () { offAutoFill(false); }); } catch (e) {} }
 
   /* ---------- พักร้อน: สิทธิ์ต่อปีในแท็บ Vacation (เติมเอง) · ขอใน LINE → ผู้จัดการ + ผู้ดูแลระบบ อนุมัติ · ไม่นับใน 4 วันหยุด/เดือน ---------- */
   function vacUsed(code, year) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && x.kind === 'พักร้อน' && String(x.date).slice(0, 4) === String(year) && OFF_LIVE.indexOf(x.status) >= 0; }).length; }
   function vacRow(code, year) { return rows('Vacation').filter(function (r) { return String(r.code) === String(code) && String(r.year) === String(year); })[0]; }
-  function vacSync(code, year) { var r = vacRow(code, year); if (!r) return; var used = vacUsed(code, year); upd('Vacation', r, { used: used, left: blank(r.days) ? '' : r2(num(r.days) - used) }); }
+  // สิทธิ์: แท็บ Vacation ปีนั้น (ถ้าเติมไว้ = ใช้ค่านี้ เช่น ปีแรกใส่วันที่เหลือจริง) ไม่งั้นใช้ช่อง "พักร้อน (วัน/ปี)" ในชีต Staff
+  function vacDaysOf(code, year) { var r = vacRow(code, year); if (r && !blank(r.days)) return num(r.days); var st = find('Staff', 'code', String(code)); return st && !blank(st.vacDays) ? num(st.vacDays) : null; }
+  function vacSync(code, year) { var r = vacRow(code, year); if (!r) return; var used = vacUsed(code, year), d = vacDaysOf(code, year); upd('Vacation', r, { used: used, left: d === null ? '' : r2(d - used) }); }
   function vacEnsure() {   // ต้นปี/ครั้งแรก: ใส่ชื่อพนักงานทุกคนไว้ให้ (ช่องสิทธิ์ว่างไว้ให้เติม)
     var y = today().slice(0, 4), have = {}; rows('Vacation').forEach(function (r) { if (String(r.year) === y) have[String(r.code)] = 1; });
     rows('Staff').filter(function (s) { return on(s.active) && rolesOf(s).length && !have[String(s.code)]; }).forEach(function (s) { add('Vacation', { code: String(s.code), name: String(s.nick || s.name), year: y, days: '', used: vacUsed(s.code, y), left: '', note: '' }); });
   }
-  function vacInfo(code, year) { var r = vacRow(code, year), used = vacUsed(code, year); return { year: String(year), days: r && !blank(r.days) ? num(r.days) : null, used: used, left: r && !blank(r.days) ? r2(num(r.days) - used) : null }; }
+  function vacInfo(code, year) { var d = vacDaysOf(code, year), used = vacUsed(code, year); return { year: String(year), days: d, used: used, left: d === null ? null : r2(d - used), until: year + '-12-31' }; }
   A.vacBook = function (p, u) {
     try { vacEnsure(); } catch (e) {}
     var ds = (p.dates || []).map(String).filter(isDate).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort(); if (!ds.length) err('เลือกวันพักร้อน');
     var t = today(); ds.forEach(function (d) { if (d <= t) err('ขอพักร้อนย้อนหลัง/วันนี้ไม่ได้ — แจ้งผู้จัดการ'); if (rows('DayOffs').some(function (x) { return String(x.staff) === u.code && x.date === d && OFF_LIVE.indexOf(x.status) >= 0; })) err(thD(d) + ' ลงหยุดไว้แล้ว'); });
     var byY = {}; ds.forEach(function (d) { byY[d.slice(0, 4)] = (byY[d.slice(0, 4)] || 0) + 1; });
-    Object.keys(byY).forEach(function (y) { var v = vacInfo(u.code, y); if (v.days === null) err('ยังไม่มีสิทธิ์พักร้อนปี ' + (+y + 543) + ' — ให้ผู้ดูแลระบบเติมในแท็บ Vacation'); if (byY[y] > v.left) err('พักร้อนปี ' + (+y + 543) + ' เหลือ ' + v.left + ' วัน (ขอ ' + byY[y] + ' วัน)'); });
+    Object.keys(byY).forEach(function (y) { var v = vacInfo(u.code, y); if (v.days === null) err('ยังไม่มีสิทธิ์พักร้อนปี ' + (+y + 543) + ' — ให้ผู้ดูแลระบบเติมช่อง "พักร้อน (วัน/ปี)" ในชีต Staff'); if (byY[y] > v.left) err('พักร้อนปี ' + (+y + 543) + ' เหลือ ' + v.left + ' วัน (ขอ ' + byY[y] + ' วัน)'); });
     var reason = txt(p.reason, 200);
     var st = find('Staff', 'code', u.code) || {}, mgrSelf = staffRoles(u.code).indexOf('manager') >= 0, out = [];
     ds.forEach(function (d) { var cl = offClash(u.code, d);
@@ -697,15 +721,16 @@ function makeCore(store) {
   A.offInfo = function (p, u) {
     offAutoMaybe();
     var t = today(), w = offWin(), day = +t.slice(8, 10), nm = monNext(t), mine = rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && String(x.date) >= t.slice(0, 7) + '-01'; }).map(offOut).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
-    var used = {}; mine.forEach(function (x) { if (OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน') { var m = x.date.slice(0, 7); used[m] = (used[m] || 0) + 1; } });
+    var used = {}, ubr = offBr(u.code) || u.branch; mine.forEach(function (x) { if (OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน' && !holClosed(ubr, x.date)) { var m = x.date.slice(0, 7); used[m] = (used[m] || 0) + 1; } });
     var br = offBr(u.code) || u.branch, taken = {};
     rows('DayOffs').forEach(function (x) { if (String(x.branch) === br && String(x.staff) !== u.code && OFF_LIVE.indexOf(x.status) >= 0 && String(x.date) >= t.slice(0, 7) + '-01') (taken[x.date] = taken[x.date] || []).push(String(x.name)); });
     try { vacEnsure(); } catch (e) {}
-    return { today: t, window: w, open: day >= w.a && day <= w.b, nextMonth: nm, quota: offQuota(), used: used, mine: mine, taken: taken, vac: vacInfo(u.code, t.slice(0, 4)), vacNext: +t.slice(5, 7) >= 11 ? vacInfo(u.code, +t.slice(0, 4) + 1) : null };
+    var cm = t.slice(0, 7), mons = [cm, nm, monNext(nm + '-01')], qBy = {}; mons.forEach(function (mo) { qBy[mo] = offQuotaFor(u.code, mo); });
+    return { today: t, window: w, open: day >= w.a && day <= w.b, nextMonth: nm, quota: offQuotaFor(u.code, nm), quotaBy: qBy, base: offQuota(), hol: holMap(br, mons), used: used, mine: mine, taken: taken, vac: vacInfo(u.code, t.slice(0, 4)), vacNext: +t.slice(5, 7) >= 11 ? vacInfo(u.code, +t.slice(0, 4) + 1) : null };
   };
   A.offBook = function (p, u) {
     var ds = (p.dates || [p.date]).map(String).filter(isDate).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort(); if (!ds.length) err('เลือกวันหยุด');
-    var t = today(); ds.forEach(function (d) { if (d <= t) err('ลงวันหยุดย้อนหลัง/วันนี้ไม่ได้ — แจ้งผู้จัดการ'); if (rows('DayOffs').some(function (x) { return String(x.staff) === u.code && x.date === d && OFF_LIVE.indexOf(x.status) >= 0; })) err(thD(d) + ' ลงไว้แล้ว'); });
+    var t = today(); ds.forEach(function (d) { if (d <= t) err('ลงวันหยุดย้อนหลัง/วันนี้ไม่ได้ — แจ้งผู้จัดการ'); if (rows('DayOffs').some(function (x) { return String(x.staff) === u.code && x.date === d && OFF_LIVE.indexOf(x.status) >= 0; })) err(thD(d) + ' ลงไว้แล้ว'); var hc = holClosed(offBr(u.code) || u.branch, d); if (hc) err(thD(d) + ' คลินิกปิด (' + (hc.name || 'วันหยุดนักขัตฯ') + ') หยุดอยู่แล้ว ไม่ต้องลง'); });
     var cnt = {}, plan = ds.map(function (d) { var m = d.slice(0, 7), why = offWhy(u.code, d, cnt[m] || 0); cnt[m] = (cnt[m] || 0) + 1; return { date: d, why: why }; });
     var need = plan.filter(function (x) { return x.why.length; });
     if (need.length && !p.request) return { saved: [], need: need };
@@ -749,13 +774,15 @@ function makeCore(store) {
     var br = all && p.branch ? String(p.branch) : all && p.branch === '' ? '' : u.branch;
     var list = rows('DayOffs').filter(function (x) { return String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && (!br || String(x.branch) === br); })
       .map(function (x) { return { date: String(x.date), name: String(x.name), branch: String(x.branch), status: x.status, vac: x.kind === 'พักร้อน', me: String(x.staff) === u.code }; });
-    return { month: mon, branch: br, canAll: all, branches: all ? rows('Branches').filter(function (b) { return on(b.active); }).map(function (b) { return { code: String(b.code), name: String(b.name) }; }) : [], list: list };
+    return { month: mon, branch: br, hol: holMap(br, [mon]), canAll: all, branches: all ? rows('Branches').filter(function (b) { return on(b.active); }).map(function (b) { return { code: String(b.code), name: String(b.name) }; }) : [], list: list };
   };
   function weekStart(d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(); return addD(d, -((w + 6) % 7)); }
   function addD(d, n) { var x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
   A.myTasks = function (p, u) {
     offAutoMaybe();
-    var tw = offWin(), tday = +today().slice(8, 10), tnm = monNext(today()), autoMine = rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.kind === 'ระบบลงให้' && x.status === 'OK' && String(x.date) > today() && String(x.created).slice(0, 10) >= addD(today(), -7); }).map(function (x) { return String(x.date); }).sort(), out = { autoOff: autoMine, offWindow: tday >= tw.a && tday <= tw.b ? { month: tnm, used: offsOf(u.code, tnm).length, quota: offQuota(), until: tw.b } : null, otPending: A.otPending(p, u).length, offPending: A.offPending(p, u).length, myPending: rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.status === 'PENDING'; }).length, count: null };
+    var tw = offWin(), tday = +today().slice(8, 10), tnm = monNext(today()), autoMine = rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.kind === 'ระบบลงให้' && x.status === 'OK' && String(x.date) > today() && String(x.created).slice(0, 10) >= addD(today(), -7); }).map(function (x) { return String(x.date); }).sort(), out = { autoOff: autoMine, offWindow: tday >= tw.a && tday <= tw.b ? { month: tnm, used: offsOf(u.code, tnm).length, quota: offQuotaFor(u.code, tnm), hol: holExtra(offBr(u.code) || u.branch, tnm), until: tw.b } : null, otPending: A.otPending(p, u).length, offPending: A.offPending(p, u).length, myPending: rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.status === 'PENDING'; }).length, count: null, vac: null, closed: [] };
+    try { var hb = offBr(u.code) || u.branch, h14 = addD(today(), 14); out.closed = holList(hb).filter(function (h) { return /ปิด/.test(String(h.mode)) && String(h.date) >= today() && String(h.date) <= h14; }).map(function (h) { return { date: String(h.date), name: String(h.name || ''), deduct: /หัก/.test(String(h.mode)) }; }); } catch (e) {}
+    try { var vi = vacInfo(u.code, today().slice(0, 4)); if (vi.left > 0) out.vac = { left: vi.left, days: vi.days, daysToEnd: Math.round((new Date(vi.until + 'T00:00:00Z') - new Date(today() + 'T00:00:00Z')) / 864e5) }; } catch (e) {}
     if (roleIn(u, ['manager'])) {
       var ws = weekStart(today()), last = rows('Counts').filter(function (c) { return c.branch === u.branch; }).slice(-1)[0], done = rows('Counts').some(function (c) { return c.branch === u.branch && String(c.time).slice(0, 10) >= ws; });
       out.count = { done: done, weekStart: ws, last: last ? String(last.time) : '', dueDay: setting('countDay', 'จันทร์'), branch: u.branchName };
@@ -1051,7 +1078,7 @@ function makeCore(store) {
     var perf = perfOf(it), dur = num(it.minutes) || 30, numb = num(it.numb), cm = Math.max(5, num(setting('consultMinutes', 10)) || 10);
     var consult = (perf === 'doctor' || perf === 'both' || !hn || !everSawDoctor(hn)) ? cm : 0;
     if (perf === 'staff' && hn && everSawDoctor(hn)) consult = 0;
-    var ncCat = String(setting('noConsultCategories', 'Laser ขน')).split(/\s*,\s*/).indexOf(String(it.category)) >= 0, itNc = perf !== 'doctor' && (on(it.noConsult) || ncCat);
+    var ncCat = String(setting('noConsultCategories', 'กำจัดขน,Laser ขน')).split(/\s*,\s*/).indexOf(String(it.category)) >= 0, itNc = perf !== 'doctor' && (on(it.noConsult) || ncCat);
     if (o.noConsult || itNc) consult = 0;
     var type = String(it.roomType || '').trim(); if (!type || type === '-') type = perf === 'doctor' ? 'ห้องหัตถการแพทย์' : 'เตียงทรีทเม้นท์';
     return { dur: dur + numb, type: type, consult: consult, skip: consult === 0 && !!(o.noConsult || itNc), auto: itNc, ipd: type === 'ห้องผ่าตัด' ? num(setting('ipdMinutes', 90)) : 0 };
@@ -1059,7 +1086,8 @@ function makeCore(store) {
   function findSlots(b, date, it, hn, exceptId, o) {
     var br = find('Branches', 'code', b);
     var open = toMin((br && br.open) || setting('open', '10:00')), close = toMin((br && br.close) || setting('close', '20:00'));
-    var need = needFor(it, hn, o), m = busy(b, date, exceptId), out = [];
+    var need = needFor(it, hn, o), m = busy(b, date, exceptId), out = [], hc = holClosed(b, date);
+    if (hc) return { need: need, slots: [], closed: String(hc.name || 'วันหยุดนักขัตฯ') };
     var rs = roomsOf(b, need.type); if (!rs.length) rs = roomsOf(b, '').filter(function (r) { return r.type !== 'ห้องตรวจ' && r.type !== 'ห้อง IPD'; });
     var crs = roomsOf(b, 'ห้องตรวจ'), ipds = roomsOf(b, 'ห้อง IPD');
     var alt = roomsOf(b, '').filter(function (r) { return r.type !== 'ห้องตรวจ' && r.type !== 'ห้อง IPD' && rs.indexOf(r) < 0; }); // ห้องอื่นที่เลือกเองได้
@@ -2121,7 +2149,7 @@ function makeCore(store) {
 
   /* ---------- เข้า-ออกงานพนักงาน (ผู้จัดการเห็นสาขาตัวเอง · บัญชี/เจ้าของเห็นทุกสาขา · แก้ได้เฉพาะบัญชี) ---------- */
   var TH_DAY = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
-  function isDayOff(st, d) { if (rows('DayOffs').some(function (x) { return String(x.staff) === String(st.code) && x.date === d && (x.status === 'OK' || x.status === 'APPROVED'); })) return true; var w = TH_DAY[new Date(d + 'T00:00:00Z').getUTCDay()], off = String(st.dayOff || ''); return !!off && (off.indexOf(w) >= 0 || (w === 'พฤหัส' && off.indexOf('พฤหัสบดี') >= 0)); }
+  function isDayOff(st, d) { if (holClosed(String(st.branch), d)) return true; if (rows('DayOffs').some(function (x) { return String(x.staff) === String(st.code) && x.date === d && (x.status === 'OK' || x.status === 'APPROVED'); })) return true; var w = TH_DAY[new Date(d + 'T00:00:00Z').getUTCDay()], off = String(st.dayOff || ''); return !!off && (off.indexOf(w) >= 0 || (w === 'พฤหัส' && off.indexOf('พฤหัสบดี') >= 0)); }
   A.attReport = function (p, u) {
     var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today(), inB = has(u, ['account', 'owner', 'admin']) ? scopeFn(p.scope || 'ALL', u) : function (b) { return b === u.branch; };
     var staff = rows('Staff').filter(function (x) { return on(x.active) && inB(String(x.branch)); }), byCode = {};
@@ -3071,7 +3099,7 @@ function makeSeed() {
   T.ReqLines = [{ req: 'RQ00001', stock: 'ST01', name: 'Nabota 100U', qty: 200, approved: '', received: '' }, { req: 'RQ00001', stock: 'ST12', name: 'ยาชา EMLA', qty: 6, approved: '', received: '' }];
   T.OpenVials = [{ id: 'VL00001', branch: 'DTCM', stock: 'ST01', name: 'Nabota 100U', unit: 'U', size: 100, left: 40, lot: 'L2600', openedAt: day(-3) + ' 14:20', expireAt: day(25) + ' 14:20', openedBy: 'พยาบาลภา (N01)', status: 'OPEN', closedBy: '' },
     { id: 'VL00002', branch: 'DTCM', stock: 'ST10', name: 'Mounjaro 15mg', unit: 'mg', size: 15, left: 5, lot: 'L2609', openedAt: day(-30) + ' 11:00', expireAt: day(-2) + ' 11:00', openedBy: 'หมอแทน (D01)', status: 'OPEN', closedBy: '' }];
-  T.Counts = []; T.CountLines = []; T.DayOffs = []; T.Vacation = []; T.OTs = []; T.Installments = []; T.Photos = []; T.Log = [];
+  T.Counts = []; T.CountLines = []; T.DayOffs = []; T.Vacation = []; T.Holidays = [{ date: '2026-12-05', name: 'วันพ่อแห่งชาติ', mode: 'เลือกลงเอง', branches: '', note: '' }, { date: '2026-12-10', name: 'วันรัฐธรรมนูญ', mode: 'เลือกลงเอง', branches: '', note: '' }, { date: '2026-12-14', name: 'ปิดรวม (ตัวอย่าง: ไม่มีลูกค้า)', mode: 'ปิด หักวันหยุด', branches: 'DTCM', note: '' }, { date: '2026-12-31', name: 'วันสิ้นปี', mode: 'ปิดคลินิก', branches: '', note: '' }, { date: '2027-01-01', name: 'วันขึ้นปีใหม่', mode: 'ปิดคลินิก', branches: '', note: '' }]; T.Staff.forEach(function (s) { if (!/doctor|แพทย์/.test(String(s.role))) s.vacDays = 6; }); T.OTs = []; T.Installments = []; T.Photos = []; T.Log = [];
   T.Wallet = [{ time: day(-20) + ' 15:10', hn: 'DT10002', name: T.Patients[1].name, amount: 2500, type: 'แปลงคอร์ส', ref: 'CS-OLD Pico เหลือ 1 ครั้ง', by: 'มิ้นท์', balance: 2500, branch: 'DTCM' }];
   return { v: 'demo6-' + TODAY, tables: T, seq: { seq_CS: 10, seq_AP: 10, seq_OR: seq.OR + 1, seq_L: 9100, seq_RQ: 5, seq_VL: 3, seq_AT: T.Attendance.length + 1 } };
 }
@@ -3529,8 +3557,10 @@ function taskList(t) {   // งานค้างจาก myTasks → ราย
   if (t.offPending) o.push({ i: '📅', t: 'อนุมัติวันหยุด ' + t.offPending + ' รายการ', s: 'พนักงานขอวันหยุด รอคุณกดอนุมัติ' });
   if (t.otPending) o.push({ i: '⏱️', t: 'อนุมัติ OT ' + t.otPending + ' รายการ', s: 'ดูรูปแนบแล้วกดอนุมัติ' });
   if (t.count && !t.count.done) o.push({ i: '📦', t: 'นับสต้อกประจำสัปดาห์', s: 'สัปดาห์นี้ยังไม่ได้นับ · นับในมือถือได้เลย' });
-  if (t.offWindow && t.offWindow.used < t.offWindow.quota) o.push({ i: '🗓️', t: 'ลงวันหยุดเดือน' + monTh(t.offWindow.month) + ' ได้แล้ว', s: (t.offWindow.used ? 'ลงไปแล้ว ' + t.offWindow.used + '/' + t.offWindow.quota + ' วัน · ' : 'คนละ ' + t.offWindow.quota + ' วัน · ') + 'ลงได้ถึงวันที่ ' + t.offWindow.until + ' · ใครลงก่อนได้ก่อน', mine: 1, go: 'off' });
+  if (t.offWindow && t.offWindow.used < t.offWindow.quota) o.push({ i: '🗓️', t: 'ลงวันหยุดเดือน' + monTh(t.offWindow.month) + ' ได้แล้ว', s: (t.offWindow.used ? 'ลงไปแล้ว ' + t.offWindow.used + '/' + t.offWindow.quota + ' วัน · ' : 'คนละ ' + t.offWindow.quota + ' วัน' + (t.offWindow.hol ? ' (รวมนักขัตฯ +' + t.offWindow.hol + ')' : '') + ' · ') + 'ลงได้ถึงวันที่ ' + t.offWindow.until + ' · ใครลงก่อนได้ก่อน', mine: 1, go: 'off' });
   if (t.autoOff && t.autoOff.length) o.push({ i: '🤖', t: 'ระบบลงวันหยุดให้คุณ ' + t.autoOff.length + ' วัน', s: 'เพราะไม่ได้ลงเองภายในวันที่ 25: ' + t.autoOff.map(function (d) { return thDate(d, 1); }).join(', ') + ' · อยากเปลี่ยน ส่งคำขอได้', mine: 1, go: 'off' });
+  if (t.vac && t.vac.left > 0) o.push({ i: '🏖️', t: 'พักร้อนเหลือ ' + t.vac.left + ' วัน', s: 'ใช้ได้ถึง 31 ธ.ค. ' + (new Date().getFullYear() + 543) + (t.vac.daysToEnd <= 90 ? ' (อีก ' + t.vac.daysToEnd + ' วัน)' : '') + ' · ไม่สะสม ไม่จ่ายเป็นเงิน — รีบใช้ให้หมดนะ', mine: 1, go: 'off' });
+  (t.closed || []).forEach(function (h) { o.push({ i: '🎌', t: thDate(h.date, 1) + ' คลินิกปิด' + (h.name ? ' · ' + h.name : ''), s: 'ทุกคนหยุด ไม่ต้องมาทำงาน' + (h.deduct ? ' · นับเป็น 1 วันหยุดของเดือนนั้น' : ''), mine: 1 }); });
   if (t.myPending) o.push({ i: '⏳', t: 'คำขอวันหยุดของคุณรออนุมัติ ' + t.myPending + ' รายการ', s: '', mine: 1 });
   return o;
 }
@@ -3629,12 +3659,13 @@ function offTab() {
     var head = '<div class="chips"><button data-o="me" class="' + (v === 'me' ? 'on' : '') + '">วันหยุดของฉัน</button><button data-o="team" class="' + (v === 'team' ? 'on' : '') + '">📅 ปฏิทินใครหยุดวันไหน</button></div>';
     if (v === 'team') return teamCal().then(function (h) { return head + h; });
     var mon = L.offMon, md = monDays(mon), mine = {}; o.mine.forEach(function (x) { if (x.status !== 'CANCEL') mine[x.date] = x; });
-    var used = o.used[mon] || 0, nSel = Object.keys(L.offSel).length;
+    var used = o.used[mon] || 0, nSel = Object.keys(L.offSel).length, qm = (o.quotaBy && o.quotaBy[mon]) || o.quota, hol = o.hol || {}, hm = Object.keys(hol).filter(function (d) { return d.slice(0, 7) === mon; }).sort();
     var grid = '<div class="lx-cal">' + TH_DS.map(function (d, i) { return '<b class="' + (i === 0 || i === 6 ? 'we' : '') + '">' + d + '</b>'; }).join('') + new Array(md.first + 1).join('<span></span>') +
-      md.days.map(function (d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(), x = mine[d], tk = !x && o.taken && o.taken[d], past = d <= o.today, cls = (w === 0 || w === 6 ? 'we ' : '') + (past ? 'past ' : '') + (L.offSel[d] ? 'sel ' : '') + (x ? 'st-' + x.status + ' ' : '') + (tk ? 'tk ' : '');
-        return '<button data-od="' + d + '" class="' + cls + '"' + (past || (x && x.status !== 'REJECTED') ? ' disabled' : '') + '>' + +d.slice(8) + (x ? '<i>' + (x.status === 'PENDING' ? 'รออนุมัติ' : x.status === 'REJECTED' ? 'ไม่ผ่าน' : 'หยุด') + '</i>' : tk ? '<i>' + esc(tk[0]) + (tk.length > 1 ? '+' + (tk.length - 1) : '') + '</i>' : '') + '</button>'; }).join('') + '</div>';
+      md.days.map(function (d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(), x = mine[d], tk = !x && o.taken && o.taken[d], past = d <= o.today, hd = hol[d], cls = (w === 0 || w === 6 || (hd && hd.closed) ? 'we ' : '') + (past ? 'past ' : '') + (L.offSel[d] ? 'sel ' : '') + (x ? 'st-' + x.status + ' ' : '') + (tk ? 'tk ' : '');
+        return '<button data-od="' + d + '" class="' + cls + '"' + (past || (x && x.status !== 'REJECTED') || (hd && hd.closed) ? ' disabled' : '') + '>' + +d.slice(8) + (hd && hd.closed ? '<i>ปิด🎌</i>' : hd && !x ? '<i>🎌</i>' : '') + (x ? '<i>' + (x.status === 'PENDING' ? 'รออนุมัติ' : x.status === 'REJECTED' ? 'ไม่ผ่าน' : 'หยุด') + '</i>' : tk ? '<i>' + esc(tk[0]) + (tk.length > 1 ? '+' + (tk.length - 1) : '') + '</i>' : '') + '</button>'; }).join('') + '</div>';
     var vm = L.offMode === 'vac', vac = o.vac || {}, vy = vac.year ? (+vac.year + 543) : '';
     var vacCard = '<div class="card stack" style="gap:.5rem"><div class="row"><b class="sp">🏖️ พักร้อนปี ' + vy + '</b>' + (vac.days === null ? '<span class="pill">ยังไม่มีสิทธิ์</span>' : '<span class="pill ' + (vac.left > 0 ? 'g' : '') + '">เหลือ ' + vac.left + ' / ' + vac.days + ' วัน</span>') + '</div>' +
+      (vac.left > 0 ? '<div class="xs muted">ใช้ได้ถึง 31 ธ.ค. ' + vy + ' · ไม่สะสมไปปีหน้า ไม่จ่ายเป็นเงิน</div>' : '') +
       (o.vacNext && o.vacNext.days !== null ? '<div class="xs muted">ปี ' + (+o.vacNext.year + 543) + ': เหลือ ' + o.vacNext.left + ' / ' + o.vacNext.days + ' วัน</div>' : '') +
       '<div class="chips"><button data-om2="off" class="' + (vm ? '' : 'on') + '">เลือกเป็นวันหยุดปกติ</button><button data-om2="vac" class="' + (vm ? 'on' : '') + '">เลือกเป็นพักร้อน</button></div>' +
       (vm ? '<div class="xs muted">พักร้อนต้องรอ <b>ผู้จัดการ + ผู้ดูแลระบบ</b> อนุมัติทุกครั้ง · ไม่นับใน ' + o.quota + ' วันหยุด/เดือน</div>' : '') + '</div>';
@@ -3642,7 +3673,9 @@ function offTab() {
       '<div class="note small' + (o.open ? '' : ' w') + '"' + (vm ? ' hidden' : '') + '>' + (o.open ? '✅ เปิดให้ลงวันหยุดเดือน <b>' + monTh(o.nextMonth) + '</b> ได้ถึงวันที่ ' + o.window.b + ' · คนละ ' +  o.quota + ' วัน · ห้ามเสาร์–อาทิตย์ · ห้ามหยุดตรงกับคนอื่นในสาขา (ใครลงก่อนได้ก่อน)' :
         'ลงวันหยุดเองได้วันที่ <b>' + o.window.a + '–' + o.window.b + '</b> ของทุกเดือน (ลงของเดือนหน้า) · คนละ ' + o.quota + ' วัน · ห้ามเสาร์–อาทิตย์ · ห้ามหยุดตรงกับคนอื่น — ตอนนี้ต้อง <b>ส่งคำขอ</b> ให้ผู้จัดการและผู้ดูแลระบบอนุมัติ') + '</div>' +
       '<div class="card stack"><div class="row"><button class="btn sm" data-om="-1">‹</button><b class="sp" style="text-align:center">' + monTh(mon) + '</b><button class="btn sm" data-om="1">›</button></div>' +
-      '<div class="row small"><span class="sp muted">ใช้ไปแล้ว</span><b>' + used + ' / ' + o.quota + ' วัน</b></div>' + grid +
+      '<div class="row small"><span class="sp muted">ใช้ไปแล้ว</span><b>' + used + ' / ' + qm + ' วัน</b></div>' +
+      (used > qm ? '<div class="note w small">ลงไว้เกิน <b>' + (used - qm) + ' วัน</b> เพราะมีวันปิดคลินิกรวมที่นับเป็นวันหยุด — กด "ยกเลิก" วันที่ไม่ต้องการในรายการด้านล่าง</div>' : '') +
+      (hm.length ? '<div class="note small">' + hm.map(function (d) { return '🎌 ' + (+d.slice(8)) + ' ' + esc(hol[d].name) + ' — ' + (hol[d].deduct ? '<b>คลินิกปิด</b> ทุกคนหยุดพร้อมกัน (นับเป็น 1 วันหยุดของเดือนนี้)' : hol[d].closed ? '<b>คลินิกปิด</b> ทุกคนหยุด (ไม่นับในวันหยุด)' : 'ทำงานตามปกติ ได้<b>วันหยุดเพิ่ม 1 วัน</b> ไปเลือกลงเอง'); }).join('<br>') + (function () { var pl = hm.filter(function (d) { return !hol[d].closed; }).length, mi = hm.filter(function (d) { return hol[d].deduct; }).length; return pl || mi ? '<br>เดือนนี้ลงเองได้ <b>' + qm + ' วัน</b> (ปกติ ' + o.base + (pl ? ' + นักขัตฯ ' + pl : '') + (mi ? ' − ปิดรวม ' + mi : '') + ')' : ''; })() + '</div>' : '') + grid +
       '<div class="row xs muted"><span class="pill g">ลงแล้ว/อนุมัติ</span><span class="pill w">รออนุมัติ</span><span class="pill d">มีคนหยุดแล้ว (ต้องขอ)</span><span>แตะวันที่เพื่อเลือก</span></div>' +
       '<button class="btn p lg blk" data-ob="1"' + (nSel ? '' : ' disabled') + '>' + (vm ? 'ขอพักร้อน' : 'ลงวันหยุด') + (nSel ? ' ' + nSel + ' วัน' : '') + '</button></div>' +
       '<div class="card stack"><div class="sec"><h2>รายการของฉัน</h2></div>' + (o.mine.length ? '<div class="list">' + o.mine.map(function (x) {
@@ -3656,7 +3689,7 @@ function teamCal() {
     L.calMon = c.month; var by = {}; c.list.forEach(function (x) { (by[x.date] = by[x.date] || []).push(x); });
     var md = monDays(c.month), days = Object.keys(by).sort();
     var grid = '<div class="lx-cal team">' + TH_DS.map(function (d, i) { return '<b class="' + (i === 0 || i === 6 ? 'we' : '') + '">' + d + '</b>'; }).join('') + new Array(md.first + 1).join('<span></span>') +
-      md.days.map(function (d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(), n = (by[d] || []).length; return '<a href="#od' + d + '" class="' + (w === 0 || w === 6 ? 'we ' : '') + (n ? 'has' : '') + '">' + +d.slice(8) + (n ? '<i>' + n + ' คน</i>' : '') + '</a>'; }).join('') + '</div>';
+      md.days.map(function (d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(), n = (by[d] || []).length, hd = c.hol && c.hol[d]; return '<a href="#od' + d + '" class="' + (w === 0 || w === 6 || (hd && hd.closed) ? 'we ' : '') + (n ? 'has' : '') + '">' + +d.slice(8) + (hd && hd.closed ? '<i>ปิด🎌</i>' : n ? '<i>' + n + ' คน</i>' : hd ? '<i>🎌</i>' : '') + '</a>'; }).join('') + '</div>';
     return '<div class="card stack"><div class="row"><button class="btn sm" data-cm="-1">‹</button><b class="sp" style="text-align:center">' + monTh(c.month) + '</b><button class="btn sm" data-cm="1">›</button></div>' +
       (c.canAll ? '<select id="cbr"><option value=""' + (c.branch ? '' : ' selected') + '>ทุกสาขา</option>' + c.branches.map(function (b) { return '<option value="' + esc(b.code) + '"' + (b.code === c.branch ? ' selected' : '') + '>' + esc(b.name) + '</option>'; }).join('') + '</select>' : '<div class="small muted">สาขาของคุณ</div>') + grid + '</div>' +
       '<div class="card stack"><h2>ใครหยุดวันไหน</h2>' + (days.length ? '<div class="list">' + days.map(function (d) { return '<div class="li" id="od' + d + '"><div class="qn" style="font-size:.95rem">' + +d.slice(8) + '</div><div class="main"><div class="t">' + esc(thDate(d, 1)) + '</div><div class="s">' + by[d].map(function (x) { return esc(x.name) + (x.vac ? ' 🏖️' : '') + (c.branch ? '' : ' (' + esc(x.branch) + ')') + (x.status === 'PENDING' ? ' <span class="pill w">รออนุมัติ</span>' : ''); }).join(' · ') + '</div></div></div>'; }).join('') + '</div>' : '<div class="empty">ยังไม่มีใครลงวันหยุดเดือนนี้</div>') + '</div>';
