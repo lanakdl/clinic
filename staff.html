@@ -645,6 +645,8 @@ function makeCore(store) {
    * ลงเองได้: ช่วงวันที่ 21–25 ของเดือน · ลงวันหยุดของเดือนหน้า · เดือนละ 4 วัน · ห้ามเสาร์–อาทิตย์
    * นอกเหนือจากนี้ = ส่งคำขอ → ผู้จัดการสาขา + ผู้ดูแลระบบ อนุมัติทั้งคู่ (ผู้จัดการขอเอง = ผู้ดูแลระบบอนุมัติคนเดียว) */
   var OFF_LIVE = ['OK', 'PENDING', 'APPROVED'], OFF_TH = { OK: 'ลงแล้ว', PENDING: 'รออนุมัติ', APPROVED: 'อนุมัติแล้ว', REJECTED: 'ไม่อนุมัติ', CANCEL: 'ยกเลิก' };
+  // เปิดให้ลงวันหยุดใหม่ (นอกช่วง 21–25) เช่น ระบบลงให้ไปแล้วแต่อยากให้เลือกเอง · Settings offReopen = "2026-11 ถึง 2026-11-02"
+  function offReopen() { var m = String(setting('offReopen', '')).match(/(\d{4}-\d{2})\D+(\d{4}-\d{2}-\d{2})/); if (!m) return null; return { month: m[1], until: m[2], active: today() <= m[2] }; }
   function offWin() { var w = String(setting('dayOffWindow', '21-25')).split(/[^\d]+/).filter(String).map(num); return { a: w[0] || 21, b: w[1] || 25 }; }
   function offQuota() { return num(setting('dayOffPerMonth', 4)) || 4; }
   /* วันหยุดนักขัตฯ (แท็บ Holidays · เติมเองทุกปี)
@@ -674,8 +676,9 @@ function makeCore(store) {
   function roleIn(u, r) { return u.roles.some(function (x) { return r.indexOf(x) >= 0; }); }
   function staffRoles(code) { var s = find('Staff', 'code', code); return s ? rolesOf(s) : []; }
   function offWhy(code, d, extra) {   // เหตุผลที่ลงเองไม่ได้ (ว่าง = ลงเองได้)
-    var t = today(), w = offWin(), day = +t.slice(8, 10), why = [];
-    if (day < w.a || day > w.b) why.push('ลงเองได้เฉพาะวันที่ ' + w.a + '–' + w.b + ' ของเดือน');
+    var t = today(), w = offWin(), day = +t.slice(8, 10), why = [], ro = offReopen();
+    if (ro && ro.active && d.slice(0, 7) === ro.month && d > t) { /* ช่วงเปิดลงใหม่ */ }
+    else if (day < w.a || day > w.b) why.push('ลงเองได้เฉพาะวันที่ ' + w.a + '–' + w.b + ' ของเดือน');
     else if (d.slice(0, 7) !== monNext(t)) why.push('ช่วงนี้ลงเองได้เฉพาะวันหยุดของเดือนหน้า');
     if (wkEnd(d)) why.push('ห้ามหยุดเสาร์–อาทิตย์');
     var qm = offQuotaFor(code, d.slice(0, 7)); if (offsOf(code, d.slice(0, 7)).length + (extra || 0) >= qm) why.push('เกิน ' + qm + ' วันต่อเดือน');
@@ -691,8 +694,8 @@ function makeCore(store) {
 
   /* ลงวันหยุดให้อัตโนมัติ: เลยวันที่ 25 แล้วใครยังลงไม่ครบ 4 วันของเดือนหน้า ระบบเลือกวันให้ (จ–ศ · ไม่ชนคนอื่นในสาขา · กระจายห่างกัน)
    * ทำครั้งเดียวต่อเดือน (จำไว้ใน Settings: offAutoDone) · ไม่รวม แพทย์ Part-time / Owner / ผู้ดูแลระบบ / รหัสใน dayOffSkip */
-  function offAutoFill(force) {
-    var t = today(), w = offWin(), mon = monNext(t);
+  function offAutoFill(force, monArg) {
+    var t = today(), w = offWin(), mon = monArg || monNext(t);
     if (!force && +t.slice(8, 10) <= w.b) return { month: mon, added: [] };
     var flag = find('Settings', 'key', 'offAutoDone'); if (!force && flag && String(flag.value) === mon) return { month: mon, added: [] };
     var y = +mon.slice(0, 4), m = +mon.slice(5, 7), n = new Date(Date.UTC(y, m, 0)).getUTCDate(), days = [];
@@ -717,7 +720,8 @@ function makeCore(store) {
     if (added.length) log({ code: 'SYSTEM', name: 'ระบบ' }, 'offAutoFill', mon + ' ' + added.length + ' วัน');
     return { month: mon, added: added };
   }
-  function offAutoMaybe() { try { store.lock(function () { holTrim(); }); } catch (e) {} var t = today(), w = offWin(); if (+t.slice(8, 10) <= w.b) return; var f = find('Settings', 'key', 'offAutoDone'); if (f && String(f.value) === monNext(t)) return; try { store.lock(function () { offAutoFill(false); }); } catch (e) {} }
+  function offAutoMaybe() { try { store.lock(function () { holTrim(); }); } catch (e) {} var t = today(), w = offWin();
+    var ro = offReopen(); if (ro && !ro.active && ro.month >= t.slice(0, 7)) { var rf = find('Settings', 'key', 'offReopenDone'); if (!rf || String(rf.value) !== ro.month) { try { store.lock(function () { offAutoFill(true, ro.month); var r2 = find('Settings', 'key', 'offReopenDone'); if (r2) upd('Settings', r2, { value: ro.month }); else add('Settings', { key: 'offReopenDone', value: ro.month }); }); } catch (e) {} } } if (+t.slice(8, 10) <= w.b) return; var f = find('Settings', 'key', 'offAutoDone'); if (f && String(f.value) === monNext(t)) return; try { store.lock(function () { offAutoFill(false); }); } catch (e) {} }
 
   /* ---------- พักร้อน: สิทธิ์ต่อปีในแท็บ Vacation (เติมเอง) · ขอใน LINE → ผู้จัดการ + ผู้ดูแลระบบ อนุมัติ · ไม่นับใน 4 วันหยุด/เดือน ---------- */
   function vacUsed(code, year) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && x.kind === 'พักร้อน' && String(x.date).slice(0, 4) === String(year) && OFF_LIVE.indexOf(x.status) >= 0; }).length; }
@@ -753,7 +757,8 @@ function makeCore(store) {
     rows('DayOffs').forEach(function (x) { if (String(x.branch) === br && String(x.staff) !== u.code && OFF_LIVE.indexOf(x.status) >= 0 && String(x.date) >= t.slice(0, 7) + '-01') (taken[x.date] = taken[x.date] || []).push(String(x.name)); });
     try { vacEnsure(); } catch (e) {}
     var cm = t.slice(0, 7), mons = [cm, nm, monNext(nm + '-01')], qBy = {}; mons.forEach(function (mo) { qBy[mo] = offQuotaFor(u.code, mo); });
-    return { today: t, window: w, open: day >= w.a && day <= w.b, nextMonth: nm, quota: offQuotaFor(u.code, nm), quotaBy: qBy, base: offQuota(), hol: holMap(br, mons), used: used, mine: mine, taken: taken, vac: vacInfo(u.code, t.slice(0, 4)), vacNext: +t.slice(5, 7) >= 11 ? vacInfo(u.code, +t.slice(0, 4) + 1) : null };
+    var ro = offReopen(); if (ro && ro.active) { nm = ro.month; if (mons.indexOf(nm) < 0) mons.push(nm); qBy[nm] = offQuotaFor(u.code, nm); }
+    return { today: t, window: w, reopen: ro && ro.active ? ro : null, open: (day >= w.a && day <= w.b) || !!(ro && ro.active), nextMonth: nm, quota: offQuotaFor(u.code, nm), quotaBy: qBy, base: offQuota(), hol: holMap(br, mons), used: used, mine: mine, taken: taken, vac: vacInfo(u.code, t.slice(0, 4)), vacNext: +t.slice(5, 7) >= 11 ? vacInfo(u.code, +t.slice(0, 4) + 1) : null };
   };
   A.offBook = function (p, u) {
     var ds = (p.dates || [p.date]).map(String).filter(isDate).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort(); if (!ds.length) err('เลือกวันหยุด');
@@ -795,6 +800,17 @@ function makeCore(store) {
     if (mgrOk && admOk) pt.status = 'APPROVED';
     upd('DayOffs', x, pt); if (x.kind === 'พักร้อน') vacSync(x.staff, String(x.date).slice(0, 4)); log(u, 'offDecide', x.id + ' ' + step); return offOut(x);
   };
+  // ผู้ดูแลระบบ/Owner/ผู้จัดการ: เปิดให้ลงวันหยุดเดือนนี้/เดือนหน้าใหม่ ถึงวันที่กำหนด · ล้างวันที่ "ระบบลงให้" (ที่ยังไม่ถึง) ให้เลือกเองใหม่ · เลยกำหนดแล้วระบบลงให้คนที่ยังไม่ครบอีกรอบ
+  A.offReopenSet = function (p, u) {
+    var mon = /^\d{4}-\d{2}$/.test(String(p.month || '')) ? String(p.month) : '', until = isDate(p.until) ? String(p.until) : '', t = today();
+    if (!mon || mon < t.slice(0, 7)) err('เลือกเดือน'); if (!until || until < t) err('เลือกวันสุดท้ายที่ให้ลง');
+    var all = has(u, ['owner', 'admin']), n = 0;
+    if (p.clearAuto) rows('DayOffs').filter(function (x) { return x.kind === 'ระบบลงให้' && x.status === 'OK' && String(x.date).slice(0, 7) === mon && String(x.date) > t && (all || String(x.branch) === u.branch); }).forEach(function (x) { upd('DayOffs', x, { status: 'CANCEL', note: 'ล้างเพื่อเปิดให้เลือกเองใหม่ (ถึง ' + until + ')' }); n++; });
+    var sv = mon + ' ถึง ' + until, f = find('Settings', 'key', 'offReopen'); if (f) upd('Settings', f, { value: sv }); else add('Settings', { key: 'offReopen', value: sv });
+    var d0 = find('Settings', 'key', 'offReopenDone'); if (d0 && String(d0.value) === mon) upd('Settings', d0, { value: '' });
+    log(u, 'offReopen', sv + ' ล้าง ' + n); return { cleared: n, month: mon, until: until };
+  };
+  PERM.offReopenSet = ['owner', 'admin', 'manager']; WRITES.offReopenSet = 1;
   A.offCalendar = function (p, u) {
     offAutoMaybe();
     var mon = /^\d{4}-\d{2}$/.test(String(p.month || '')) ? String(p.month) : today().slice(0, 7), all = roleIn(u, ['admin', 'owner']);
@@ -807,7 +823,7 @@ function makeCore(store) {
   function addD(d, n) { var x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
   A.myTasks = function (p, u) {
     offAutoMaybe();
-    var tw = offWin(), tday = +today().slice(8, 10), tnm = monNext(today()), autoMine = rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.kind === 'ระบบลงให้' && x.status === 'OK' && String(x.date) > today() && String(x.created).slice(0, 10) >= addD(today(), -7); }).map(function (x) { return String(x.date); }).sort(), out = { autoOff: autoMine, offWindow: tday >= tw.a && tday <= tw.b ? { month: tnm, used: offsOf(u.code, tnm).length, quota: offQuotaFor(u.code, tnm), hol: holExtra(offBr(u.code) || u.branch, tnm), until: tw.b } : null, otPending: A.otPending(p, u).length, offPending: A.offPending(p, u).length, myPending: rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.status === 'PENDING'; }).length, count: null, vac: null, closed: [] };
+    var tw = offWin(), tday = +today().slice(8, 10), tnm = monNext(today()), autoMine = rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.kind === 'ระบบลงให้' && x.status === 'OK' && String(x.date) > today() && String(x.created).slice(0, 10) >= addD(today(), -7); }).map(function (x) { return String(x.date); }).sort(), out = { autoOff: autoMine, offWindow: (function () { var ro = offReopen(); return ro && ro.active ? { month: ro.month, used: offsOf(u.code, ro.month).length, quota: offQuotaFor(u.code, ro.month), hol: 0, until: +ro.until.slice(8, 10), reopen: ro.until } : null; })() || (tday >= tw.a && tday <= tw.b ? { month: tnm, used: offsOf(u.code, tnm).length, quota: offQuotaFor(u.code, tnm), hol: holExtra(offBr(u.code) || u.branch, tnm), until: tw.b } : null), otPending: A.otPending(p, u).length, offPending: A.offPending(p, u).length, myPending: rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.status === 'PENDING'; }).length, count: null, vac: null, closed: [] };
     try { var hb = offBr(u.code) || u.branch, h14 = addD(today(), 14); out.closed = holList(hb).filter(function (h) { return /ปิด/.test(String(h.mode)) && String(h.date) >= today() && String(h.date) <= h14; }).map(function (h) { return { date: String(h.date), name: String(h.name || ''), deduct: /หัก/.test(String(h.mode)) }; }); } catch (e) {}
     try { var vi = vacInfo(u.code, today().slice(0, 4)); if (vi.left > 0) out.vac = { left: vi.left, days: vi.days, daysToEnd: Math.round((new Date(vi.until + 'T00:00:00Z') - new Date(today() + 'T00:00:00Z')) / 864e5) }; } catch (e) {}
     if (roleIn(u, ['manager'])) {
@@ -3778,7 +3794,7 @@ function taskList(t) {   // งานค้างจาก myTasks → ราย
   if (t.offPending) o.push({ i: '📅', t: 'อนุมัติวันหยุด ' + t.offPending + ' รายการ', s: 'พนักงานขอวันหยุด รอคุณกดอนุมัติ' });
   if (t.otPending) o.push({ i: '⏱️', t: 'อนุมัติ OT ' + t.otPending + ' รายการ', s: 'ดูรูปแนบแล้วกดอนุมัติ' });
   if (t.count && !t.count.done) o.push({ i: '📦', t: 'นับสต้อกประจำสัปดาห์', s: 'สัปดาห์นี้ยังไม่ได้นับ · นับในมือถือได้เลย' });
-  if (t.offWindow && t.offWindow.used < t.offWindow.quota) o.push({ i: '🗓️', t: 'ลงวันหยุดเดือน' + monTh(t.offWindow.month) + ' ได้แล้ว', s: (t.offWindow.used ? 'ลงไปแล้ว ' + t.offWindow.used + '/' + t.offWindow.quota + ' วัน · ' : 'คนละ ' + t.offWindow.quota + ' วัน' + (t.offWindow.hol ? ' (รวมนักขัตฯ +' + t.offWindow.hol + ')' : '') + ' · ') + 'ลงได้ถึงวันที่ ' + t.offWindow.until + ' · ใครลงก่อนได้ก่อน', mine: 1, go: 'off' });
+  if (t.offWindow && t.offWindow.used < t.offWindow.quota) o.push({ i: '🗓️', t: 'ลงวันหยุดเดือน' + monTh(t.offWindow.month) + (t.offWindow.reopen ? ' ใหม่ได้ถึง ' + thDate(t.offWindow.reopen, 1) : ' ได้แล้ว'), s: (t.offWindow.used ? 'ลงไปแล้ว ' + t.offWindow.used + '/' + t.offWindow.quota + ' วัน · ' : 'คนละ ' + t.offWindow.quota + ' วัน' + (t.offWindow.hol ? ' (รวมนักขัตฯ +' + t.offWindow.hol + ')' : '') + ' · ') + 'ลงได้ถึงวันที่ ' + t.offWindow.until + ' · ใครลงก่อนได้ก่อน', mine: 1, go: 'off' });
   if (t.autoOff && t.autoOff.length) o.push({ i: '🤖', t: 'ระบบลงวันหยุดให้คุณ ' + t.autoOff.length + ' วัน', s: 'เพราะไม่ได้ลงเองภายในวันที่ 25: ' + t.autoOff.map(function (d) { return thDate(d, 1); }).join(', ') + ' · อยากเปลี่ยน ส่งคำขอได้', mine: 1, go: 'off' });
   if (t.vac && t.vac.left > 0) o.push({ i: '🏖️', t: 'พักร้อนเหลือ ' + t.vac.left + ' วัน', s: 'ใช้ได้ถึง 31 ธ.ค. ' + (new Date().getFullYear() + 543) + (t.vac.daysToEnd <= 90 ? ' (อีก ' + t.vac.daysToEnd + ' วัน)' : '') + ' · ไม่สะสม ไม่จ่ายเป็นเงิน — รีบใช้ให้หมดนะ', mine: 1, go: 'off' });
   (t.closed || []).forEach(function (h) { o.push({ i: '🎌', t: thDate(h.date, 1) + ' คลินิกปิด' + (h.name ? ' · ' + h.name : ''), s: 'ทุกคนหยุด ไม่ต้องมาทำงาน' + (h.deduct ? ' · นับเป็น 1 วันหยุดของเดือนนั้น' : ''), mine: 1 }); });
@@ -3897,7 +3913,7 @@ var OFF_PILL = { OK: 'g', APPROVED: 'g', PENDING: 'w', REJECTED: 'd', CANCEL: ''
 function offTab() {
   return Promise.all([call('offInfo'), null]).then(function (r) {
     var o = L.off = r[0], v = L.offView || 'me';
-    if (!L.offMon) L.offMon = +o.today.slice(8, 10) >= o.window.a ? o.nextMonth : o.today.slice(0, 7);
+    if (!L.offMon) L.offMon = o.reopen ? o.reopen.month : +o.today.slice(8, 10) >= o.window.a ? o.nextMonth : o.today.slice(0, 7);
     if (!L.offSel) L.offSel = {};
     var head = '<div class="chips"><button data-o="me" class="' + (v === 'me' ? 'on' : '') + '">วันหยุดของฉัน</button><button data-o="team" class="' + (v === 'team' ? 'on' : '') + '">📅 ปฏิทินใครหยุดวันไหน</button></div>';
     if (v === 'team') return teamCal().then(function (h) { return head + h; });
@@ -3913,7 +3929,7 @@ function offTab() {
       '<div class="chips"><button data-om2="off" class="' + (vm ? '' : 'on') + '">เลือกเป็นวันหยุดปกติ</button><button data-om2="vac" class="' + (vm ? 'on' : '') + '">เลือกเป็นพักร้อน</button></div>' +
       (vm ? '<div class="xs muted">พักร้อนต้องรอ <b>ผู้จัดการ + ผู้ดูแลระบบ</b> อนุมัติทุกครั้ง · ไม่นับใน ' + o.quota + ' วันหยุด/เดือน</div>' : '') + '</div>';
     return head + vacCard +
-      '<div class="note small' + (o.open ? '' : ' w') + '"' + (vm ? ' hidden' : '') + '>' + (o.open ? '✅ เปิดให้ลงวันหยุดเดือน <b>' + monTh(o.nextMonth) + '</b> ได้ถึงวันที่ ' + o.window.b + ' · คนละ ' +  o.quota + ' วัน · ห้ามเสาร์–อาทิตย์ · ห้ามหยุดตรงกับคนอื่นในสาขา (ใครลงก่อนได้ก่อน)' :
+      '<div class="note small' + (o.open ? '' : ' w') + '"' + (vm ? ' hidden' : '') + '>' + (o.open ? '✅ เปิดให้ลงวันหยุดเดือน <b>' + monTh(o.nextMonth) + '</b>' + (o.reopen ? ' ใหม่' : '') + ' ได้ถึง' + (o.reopen ? ' <b>' + thDate(o.reopen.until, 1) + '</b>' : 'วันที่ ' + o.window.b) + (o.reopen ? ' · เลยกำหนด ใครยังไม่ครบ ระบบลงให้' : '') + ' · คนละ ' +  o.quota + ' วัน · ห้ามเสาร์–อาทิตย์ · ห้ามหยุดตรงกับคนอื่นในสาขา (ใครลงก่อนได้ก่อน)' :
         'ลงวันหยุดเองได้วันที่ <b>' + o.window.a + '–' + o.window.b + '</b> ของทุกเดือน (ลงของเดือนหน้า) · คนละ ' + o.quota + ' วัน · ห้ามเสาร์–อาทิตย์ · ห้ามหยุดตรงกับคนอื่น — ตอนนี้ต้อง <b>ส่งคำขอ</b> ให้ผู้จัดการและผู้ดูแลระบบอนุมัติ') + '</div>' +
       '<div class="card stack"><div class="row"><button class="btn sm" data-om="-1">‹</button><b class="sp" style="text-align:center">' + monTh(mon) + '</b><button class="btn sm" data-om="1">›</button></div>' +
       '<div class="row small"><span class="sp muted">ใช้ไปแล้ว</span><b>' + used + ' / ' + qm + ' วัน</b></div>' +
