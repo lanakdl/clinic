@@ -271,6 +271,36 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none}
 .split>*,.cart,.cart .li .main{min-width:0}select{max-width:100%;min-width:0}.cart .li .t{overflow-wrap:anywhere}
 
+.oc-wrap{overflow-x:auto;padding:.5rem}
+.oc{display:grid;grid-template-columns:repeat(7,minmax(96px,1fr));gap:4px;min-width:700px}
+.oc-h{text-align:center;font-size:.8rem;font-weight:600;color:var(--ink2);padding:.3rem 0}
+.oc-d{min-height:96px;border:1px solid var(--line);border-radius:10px;padding:.35rem;display:flex;flex-direction:column;gap:.2rem;background:var(--surface);min-width:0}
+.oc-d b{font-size:.85rem;color:var(--ink2)}
+.oc-x{border:0;background:none}
+.oc-we{background:var(--surface2)}.oc-h.oc-we{background:none;color:var(--bad)}
+.oc-today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.oc-p{display:block;font-size:.76rem;line-height:1.25;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:.12rem .35rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.oc-p.oc-w{background:var(--warn-soft);color:var(--warn)}
+.row .oc-p{display:inline-block}
+
+/* กล้องถ่ายบัตร */
+.idc{position:relative;width:100%;aspect-ratio:4/3;max-height:62vh;background:#000;border-radius:14px;overflow:hidden}
+.idc video,.idc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.idc img{object-fit:contain;background:#000;z-index:3}
+.idc-mask{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:1}
+.idc-fr{position:relative;width:min(84%,calc(62vh * 0.84 * 1.585 * .75));aspect-ratio:85.6/54;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.55);border:2px dashed rgba(255,255,255,.7)}
+.idc-fr.ok{border:3px solid #4ade80}
+.idc-fr i{position:absolute;width:28px;height:28px;border:4px solid #fff}
+.idc-fr.ok i{border-color:#4ade80}
+.idc-fr i:nth-child(1){left:-4px;top:-4px;border-right:0;border-bottom:0;border-top-left-radius:14px}
+.idc-fr i:nth-child(2){right:-4px;top:-4px;border-left:0;border-bottom:0;border-top-right-radius:14px}
+.idc-fr i:nth-child(3){left:-4px;bottom:-4px;border-right:0;border-top:0;border-bottom-left-radius:14px}
+.idc-fr i:nth-child(4){right:-4px;bottom:-4px;border-left:0;border-top:0;border-bottom-right-radius:14px}
+.idc-fr span{position:absolute;left:0;right:0;bottom:-2.1rem;text-align:center;color:#fff;font-size:.85rem;text-shadow:0 1px 3px #000}
+.idc-st{position:absolute;left:50%;top:.7rem;transform:translateX(-50%);z-index:2;padding:.35rem .9rem;border-radius:99px;font-size:.9rem;font-weight:600;background:rgba(0,0,0,.6);color:#fff;white-space:nowrap}
+.idc-st.ok{background:#15803d}.idc-st.bad{background:#b45309}
+.oc-p.oc-v{background:var(--info-soft);color:var(--info)}
+
 /* ===== แอพพนักงานใน LINE ===== */
 .lx{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px calc(96px + env(safe-area-inset-bottom,0px))}
 .lx-splash{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding-inline:16px}
@@ -295,6 +325,24 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:
 .lx-gps.bad{border-color:var(--bad);background:var(--bad-soft)}.lx-gps.bad .lx-pin{background:var(--bad);color:var(--surface);animation:none}
 @keyframes lxp{50%{transform:scale(.9);opacity:.7}}
 @media (prefers-reduced-motion:reduce){.lx-gps .lx-pin{animation:none}}
+.lx-nav button{position:relative;font-size:.7rem}
+.lx-bd{position:absolute;top:.3rem;left:calc(50% + 6px);background:var(--bad);color:#fff;font-style:normal;font-size:.68rem;font-weight:700;min-width:18px;height:18px;border-radius:99px;display:grid;place-items:center;padding:0 .3rem}
+.lx-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.3rem;text-align:center}
+.lx-cal>b{font-size:.75rem;color:var(--ink2);font-weight:600}.lx-cal>b.we{color:var(--bad)}
+.lx-cal button,.lx-cal a{min-height:48px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.95rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:.15rem;cursor:pointer;text-decoration:none;min-width:0}
+.lx-cal i{font-style:normal;font-size:.58rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.lx-cal .we{background:var(--surface2);color:var(--ink3)}
+.lx-cal .past{opacity:.4}
+.lx-cal .sel{border-color:var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:700}
+.lx-cal .st-OK,.lx-cal .st-APPROVED{border-color:var(--good);background:var(--good-soft);color:var(--good);opacity:1}
+.lx-cal .st-PENDING{border-color:var(--warn);background:var(--warn-soft);color:var(--warn);opacity:1}
+.lx-cal button[disabled]{cursor:default}
+.lx-cal.team a.has{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.lx-cal .tk{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.lx-cal .tk.sel{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.lx-scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:.2rem}.lx-scroll::-webkit-scrollbar{display:none}.lx-scroll button{flex:none;min-height:38px;padding:.35rem .8rem}
+.lx-task{border:2px solid var(--warn);background:var(--warn-soft)}.lx-task .li{padding:.5rem .1rem}.lx-task .list .li{border-color:color-mix(in srgb,var(--warn) 25%,transparent)}
+.lx-ti{font-size:1.4rem;width:2rem;text-align:center;flex:none}
 
 </style>
 </head>
@@ -370,6 +418,10 @@ var SCHEMA = {
   UsageFlags: [['time','เวลา','t'],['branch','สาขา'],['vn','VN'],['order','รายการ'],['item','ขายเป็น'],['stock','รหัสของ'],['name','ของ'],['std','ตามที่ขาย','n'],['used','เบิกจริง','n'],['over','เกิน','n'],['value','มูลค่าที่เกิน','n'],['reason','เหตุผล'],['by','ผู้เบิก'],['status','สถานะ'],['checkedBy','ตรวจโดย'],['note','หมายเหตุ']],
   PayEdits:   [['time','แก้เมื่อ','t'],['receipt','เลขใบเสร็จ'],['branch','สาขา'],['what','แก้อะไร'],['before','ก่อนแก้'],['after','หลังแก้'],['reason','เหตุผล'],['by','ผู้แก้']],
   PayMethods: [['name','ช่องทางชำระ'],['needRef','ต้องใส่เลขอ้างอิง','b'],['feePct','บวกค่าธรรมเนียม %','n'],['branches','ใช้ที่สาขา (ว่าง=ทุกสาขา)'],['active','ใช้งาน','b']],
+  Installments: [['id','เลข'],['hn','HN'],['name','ชื่อ'],['branch','สาขา'],['receipt','ใบเสร็จ'],['no','งวดที่','n'],['of','จากทั้งหมด','n'],['due','ครบกำหนด'],['amount','ยอดงวด','n'],['paid','จ่ายแล้ว','n'],['status','สถานะ'],['paidAt','จ่ายครบเมื่อ','t'],['created','สร้างเมื่อ','t'],['by','อนุมัติโดย']],
+  OTs:        [['id','เลข'],['staff','รหัสพนักงาน'],['name','ชื่อ'],['branch','สาขา'],['date','วันที่'],['start','เริ่ม OT'],['end','ถึง'],['hours','ชั่วโมง','n'],['reason','ทำอะไร'],['photo','รูปแนบ (Drive)'],['status','สถานะ'],['rate','เรท/ชม.','n'],['amount','เงิน OT','n'],['created','ขอเมื่อ','t'],['by','อนุมัติโดย'],['at','อนุมัติเมื่อ','t'],['note','หมายเหตุ']],
+  Vacation:   [['code','รหัสพนักงาน'],['name','ชื่อ'],['year','ปี (ค.ศ.)'],['days','สิทธิ์พักร้อน (วัน) — เติมเอง','n'],['used','ใช้/ขอไปแล้ว (ระบบคำนวณ)','n'],['left','คงเหลือ (ระบบคำนวณ)','n'],['note','หมายเหตุ']],
+  DayOffs:    [['id','เลข'],['staff','รหัสพนักงาน'],['name','ชื่อ'],['branch','สาขา'],['date','วันหยุด'],['kind','แบบ'],['status','สถานะ'],['reason','เหตุผล'],['created','ลงเมื่อ','t'],['mgrBy','ผจก.อนุมัติ'],['mgrAt','ผจก.อนุมัติเมื่อ','t'],['admBy','ผู้ดูแลระบบอนุมัติ'],['admAt','ผู้ดูแลระบบอนุมัติเมื่อ','t'],['note','หมายเหตุ']],
   Attendance: [['id','เลข'],['staff','รหัสพนักงาน'],['name','ชื่อ'],['branch','สาขา'],['date','วันที่'],['in','เข้า'],['out','ออก'],['late','สาย (นาที)','n'],['inPhoto','เซลฟี่เข้า'],['outPhoto','เซลฟี่ออก'],['note','หมายเหตุ'],
                ['inGps','พิกัดตอนเข้า (แผนที่)'],['inDist','ห่างสาขาตอนเข้า (ม.)','n'],['inAcc','ความแม่นยำ GPS เข้า (ม.)','n'],['outGps','พิกัดตอนออก (แผนที่)'],['outDist','ห่างสาขาตอนออก (ม.)','n'],['outAcc','ความแม่นยำ GPS ออก (ม.)','n']],
   OpenVials:  [['id','เลขขวดเปิด'],['branch','สาขา'],['stock','รหัสของ'],['name','ชื่อ'],['unit','หน่วย'],['size','ขนาด','n'],['left','คงเหลือ','n'],['lot','Lot'],['openedAt','เปิดเมื่อ','t'],['expireAt','หมดอายุหลังเปิด'],['openedBy','ผู้เปิด'],['status','สถานะ'],['closedBy','ผู้ปิด/ทิ้ง']],
@@ -499,7 +551,7 @@ function makeCore(store) {
     leadCreate: 1, clock: 1, reqCreate: 1, reqApprove: 1, reqReceive: 1, centralReceive: 1, countSubmit: 1 };
 
   /* ---------- LINE OA (พนักงานเช็คอิน/ดูค่ามือของตัวเอง ผ่าน LIFF) ---------- */
-  var LINE_ACTIONS = ['lineMe', 'clock', 'myDay', 'myEarnings', 'lineUnbind'], LINE_ONLY = ['clock', 'myEarnings'];
+  var LINE_ACTIONS = ['lineMe', 'clock', 'myDay', 'myEarnings', 'lineUnbind', 'offInfo', 'offBook', 'vacBook', 'offCancel', 'offPending', 'offDecide', 'offCalendar', 'myTasks', 'otInfo', 'otRequest', 'otCancel', 'otPending', 'otDecide', 'otPhoto', 'countSheet', 'countPreview', 'countSubmit'], LINE_ONLY = ['clock', 'myEarnings'];
   function lineUser(st, prof) {
     var br = find('Branches', 'code', String(st.branch)) || rows('Branches')[0] || {}, roles = rolesOf(st);
     return { code: String(st.code), name: String(st.nick || st.name), fullName: String(st.name), roles: roles, branch: String(br.code || ''), branchName: String(br.name || ''), brand: String(br.brand || ''),
@@ -530,10 +582,245 @@ function makeCore(store) {
   A.lineMe = function (p, u) {
     var st = find('Staff', 'code', u.code) || {};
     var bs = rows('Branches').filter(function (b) { return on(b.active) && canBranch(st, b.code); }).map(function (b) { return { code: b.code, name: b.name, brand: b.brand, gps: !!(num(b.lat) && num(b.lng)), radius: num(b.radius) || 150 }; });
-    return { user: u, branches: bs, shift: { in: st.shiftIn || '', out: st.shiftOut || '' }, today: today(), now: hm() };
+    return { user: u, branches: bs, shift: shiftOf(st, today()), today: today(), now: hm() };
   };
   A.lineUnbind = function (p, u) { var st = find('Staff', 'code', u.code); if (st) upd('Staff', st, { lineId: '', lineName: '' }); log(u, 'lineUnbind', ''); return true; };
   WRITES.lineUnbind = 1; PERM.lineMe = ALL; PERM.lineUnbind = ALL;
+
+
+
+  /* ---------- เวลากะ (ตามกฎกลาง แทนช่องเวลาในชีต Staff) ----------
+   * Settings: shift_<สาขา> เช่น shift_DTCM = "จ-ศ 10:30-19:30, ส-อา 10:00-19:00" · shiftDefault = "10:00-19:00" (สาขาอื่น)
+   * shiftOffice = "09:00-18:00" ใช้กับ shiftOfficeRoles (การตลาด/บัญชี/แอดมินเพจ/คลังกลาง)
+   * ใช้เวลาในชีต Staff แทน: แพทย์ Part-time · Owner/ผู้ดูแลระบบ · รหัสที่ใส่ใน shiftExceptions */
+  var SH_DAY = { 'อา': 0, 'จ': 1, 'อ': 2, 'พ': 3, 'พฤ': 4, 'ศ': 5, 'ส': 6 };
+  function shParse(spec, wd) {
+    var out = null; String(spec || '').split(/[,;\n]/).forEach(function (part) {
+      var m = part.trim().match(/^(?:(อา|จ|อ|พฤ|พ|ศ|ส)\s*(?:-\s*(อา|จ|อ|พฤ|พ|ศ|ส))?\s+)?(\d{1,2})[:.](\d{2})\s*-\s*(\d{1,2})[:.](\d{2})$/); if (!m || out) return;
+      if (m[1]) { var a = SH_DAY[m[1]], b = m[2] ? SH_DAY[m[2]] : a, ok = a <= b ? wd >= a && wd <= b : wd >= a || wd <= b; if (!ok) return; }
+      out = { in: ('0' + m[3]).slice(-2) + ':' + m[4], out: ('0' + m[5]).slice(-2) + ':' + m[6] };
+    });
+    return out;
+  }
+  function shiftOf(st, d) {
+    st = st || {}; d = isDate(d) ? d : today();
+    var own = { in: String(st.shiftIn || ''), out: String(st.shiftOut || '') }, rs = rolesOf(st), ex = String(setting('shiftExceptions', '')).split(/[\s,]+/);
+    if (on(st.partTime) || ex.indexOf(String(st.code)) >= 0 || rs.indexOf('owner') >= 0 || rs.indexOf('admin') >= 0) return own;
+    var wd = new Date(d + 'T00:00:00Z').getUTCDay(), offR = String(setting('shiftOfficeRoles', 'marketing account adminpage central')).split(/[\s,]+/);
+    if (rs.some(function (r) { return offR.indexOf(r) >= 0; })) return shParse(setting('shiftOffice', '09:00-18:00'), wd) || own;
+    return shParse(setting('shift_' + String(st.branch), String(st.branch) === 'DTCM' ? 'จ-ศ 10:30-19:30, ส-อา 10:00-19:00' : ''), wd) || shParse(setting('shiftDefault', '10:00-19:00'), wd) || own;
+  }
+  /* ---------- วันหยุดพนักงาน (ลงใน LINE) ----------
+   * ลงเองได้: ช่วงวันที่ 21–25 ของเดือน · ลงวันหยุดของเดือนหน้า · เดือนละ 4 วัน · ห้ามเสาร์–อาทิตย์
+   * นอกเหนือจากนี้ = ส่งคำขอ → ผู้จัดการสาขา + ผู้ดูแลระบบ อนุมัติทั้งคู่ (ผู้จัดการขอเอง = ผู้ดูแลระบบอนุมัติคนเดียว) */
+  var OFF_LIVE = ['OK', 'PENDING', 'APPROVED'], OFF_TH = { OK: 'ลงแล้ว', PENDING: 'รออนุมัติ', APPROVED: 'อนุมัติแล้ว', REJECTED: 'ไม่อนุมัติ', CANCEL: 'ยกเลิก' };
+  function offWin() { var w = String(setting('dayOffWindow', '21-25')).split(/[^\d]+/).filter(String).map(num); return { a: w[0] || 21, b: w[1] || 25 }; }
+  function offQuota() { return num(setting('dayOffPerMonth', 4)) || 4; }
+  function monNext(d) { var y = +d.slice(0, 4), m = +d.slice(5, 7) + 1; if (m > 12) { m = 1; y++; } return y + '-' + ('0' + m).slice(-2); }
+  function wkEnd(d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(); return w === 0 || w === 6; }
+  function offsOf(code, mon) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน'; }); }
+  function roleIn(u, r) { return u.roles.some(function (x) { return r.indexOf(x) >= 0; }); }
+  function staffRoles(code) { var s = find('Staff', 'code', code); return s ? rolesOf(s) : []; }
+  function offWhy(code, d, extra) {   // เหตุผลที่ลงเองไม่ได้ (ว่าง = ลงเองได้)
+    var t = today(), w = offWin(), day = +t.slice(8, 10), why = [];
+    if (day < w.a || day > w.b) why.push('ลงเองได้เฉพาะวันที่ ' + w.a + '–' + w.b + ' ของเดือน');
+    else if (d.slice(0, 7) !== monNext(t)) why.push('ช่วงนี้ลงเองได้เฉพาะวันหยุดของเดือนหน้า');
+    if (wkEnd(d)) why.push('ห้ามหยุดเสาร์–อาทิตย์');
+    if (offsOf(code, d.slice(0, 7)).length + (extra || 0) >= offQuota()) why.push('เกิน ' + offQuota() + ' วันต่อเดือน');
+    var cl = offClash(code, d); if (cl.length) why.push('ตรงกับ ' + cl.join(', ') + ' ที่ลงหยุดไว้ก่อน');
+    return why;
+  }
+  function offBr(code) { var s = find('Staff', 'code', code); return s ? String(s.branch) : ''; }
+  function offClash(code, d, br) {   // คนอื่นในสาขาเดียวกันที่ลงวันนี้ไว้ก่อน (ลงแล้ว/อนุมัติ/รออนุมัติ) — คนกดก่อนได้ก่อน
+    br = br || offBr(code);
+    return rows('DayOffs').filter(function (x) { return x.date === d && String(x.staff) !== String(code) && String(x.branch) === br && OFF_LIVE.indexOf(x.status) >= 0; }).map(function (x) { return String(x.name); });
+  }
+  function offOut(x) { var o = clean(x); o.statusTh = OFF_TH[x.status] || x.status; o.weekend = wkEnd(String(x.date)); return o; }
+
+  /* ลงวันหยุดให้อัตโนมัติ: เลยวันที่ 25 แล้วใครยังลงไม่ครบ 4 วันของเดือนหน้า ระบบเลือกวันให้ (จ–ศ · ไม่ชนคนอื่นในสาขา · กระจายห่างกัน)
+   * ทำครั้งเดียวต่อเดือน (จำไว้ใน Settings: offAutoDone) · ไม่รวม แพทย์ Part-time / Owner / ผู้ดูแลระบบ / รหัสใน dayOffSkip */
+  function offAutoFill(force) {
+    var t = today(), w = offWin(), mon = monNext(t);
+    if (!force && +t.slice(8, 10) <= w.b) return { month: mon, added: [] };
+    var flag = find('Settings', 'key', 'offAutoDone'); if (!force && flag && String(flag.value) === mon) return { month: mon, added: [] };
+    var y = +mon.slice(0, 4), m = +mon.slice(5, 7), n = new Date(Date.UTC(y, m, 0)).getUTCDate(), days = [];
+    for (var d = 1; d <= n; d++) { var ds = mon + '-' + ('0' + d).slice(-2); if (!wkEnd(ds)) days.push(ds); }
+    var skip = String(setting('dayOffSkip', '')).split(/[\s,]+/), q = offQuota(), added = [];
+    var staff = rows('Staff').filter(function (s) { var rs = rolesOf(s); return on(s.active) && !on(s.partTime) && rs.length && rs.indexOf('owner') < 0 && rs.indexOf('admin') < 0 && skip.indexOf(String(s.code)) < 0; });
+    function mine(code) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน'; }).map(function (x) { return String(x.date); }); }
+    function offOn(br, ds) { return rows('DayOffs').filter(function (x) { return x.date === ds && String(x.branch) === br && OFF_LIVE.indexOf(x.status) >= 0; }).length; }
+    // แจกทีละ 1 วันต่อคนวนไปเรื่อยๆ (คนที่มีน้อยได้ก่อน) จะได้ไม่มีใครเหมาวันดีๆ ไปหมด
+    for (var round = 0; round < q; round++) {
+      staff.map(function (s) { return { s: s, have: mine(s.code) }; }).filter(function (o) { return o.have.length < q; }).sort(function (a, b) { return a.have.length - b.have.length; }).forEach(function (o) {
+        var s = o.s, br = String(s.branch), have = mine(s.code); if (have.length >= q) return;
+        var best = null; days.forEach(function (ds) { if (have.indexOf(ds) >= 0 || ds <= t) return;
+          var clash = offOn(br, ds), gap = have.length ? Math.min.apply(null, have.map(function (h) { return Math.abs(Date.parse(h) - Date.parse(ds)) / 864e5; })) : 99;
+          var sc = clash * 1000 - Math.min(gap, 14) * 10 + (Date.parse(ds) / 864e5 % 7) * 0.01; if (!best || sc < best.sc) best = { ds: ds, sc: sc, clash: clash }; });
+        if (!best) return;
+        var x = add('DayOffs', { id: nextId('OF', 'seq_OF', 6), staff: String(s.code), name: String(s.nick || s.name), branch: br, date: best.ds, kind: 'ระบบลงให้', status: 'OK', reason: '', created: stamp(), mgrBy: '', mgrAt: '', admBy: '', admAt: '', note: 'ไม่ได้ลงเองภายในวันที่ ' + w.b + (best.clash ? ' · วันว่างไม่พอ ต้องชนกับคนอื่น' : '') });
+        added.push({ staff: String(s.code), name: x.name, date: best.ds, clash: best.clash });
+      });
+    }
+    if (flag) upd('Settings', flag, { value: mon }); else add('Settings', { key: 'offAutoDone', value: mon });
+    if (added.length) log({ code: 'SYSTEM', name: 'ระบบ' }, 'offAutoFill', mon + ' ' + added.length + ' วัน');
+    return { month: mon, added: added };
+  }
+  function offAutoMaybe() { var t = today(), w = offWin(); if (+t.slice(8, 10) <= w.b) return; var f = find('Settings', 'key', 'offAutoDone'); if (f && String(f.value) === monNext(t)) return; try { store.lock(function () { offAutoFill(false); }); } catch (e) {} }
+
+  /* ---------- พักร้อน: สิทธิ์ต่อปีในแท็บ Vacation (เติมเอง) · ขอใน LINE → ผู้จัดการ + ผู้ดูแลระบบ อนุมัติ · ไม่นับใน 4 วันหยุด/เดือน ---------- */
+  function vacUsed(code, year) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && x.kind === 'พักร้อน' && String(x.date).slice(0, 4) === String(year) && OFF_LIVE.indexOf(x.status) >= 0; }).length; }
+  function vacRow(code, year) { return rows('Vacation').filter(function (r) { return String(r.code) === String(code) && String(r.year) === String(year); })[0]; }
+  function vacSync(code, year) { var r = vacRow(code, year); if (!r) return; var used = vacUsed(code, year); upd('Vacation', r, { used: used, left: blank(r.days) ? '' : r2(num(r.days) - used) }); }
+  function vacEnsure() {   // ต้นปี/ครั้งแรก: ใส่ชื่อพนักงานทุกคนไว้ให้ (ช่องสิทธิ์ว่างไว้ให้เติม)
+    var y = today().slice(0, 4), have = {}; rows('Vacation').forEach(function (r) { if (String(r.year) === y) have[String(r.code)] = 1; });
+    rows('Staff').filter(function (s) { return on(s.active) && rolesOf(s).length && !have[String(s.code)]; }).forEach(function (s) { add('Vacation', { code: String(s.code), name: String(s.nick || s.name), year: y, days: '', used: vacUsed(s.code, y), left: '', note: '' }); });
+  }
+  function vacInfo(code, year) { var r = vacRow(code, year), used = vacUsed(code, year); return { year: String(year), days: r && !blank(r.days) ? num(r.days) : null, used: used, left: r && !blank(r.days) ? r2(num(r.days) - used) : null }; }
+  A.vacBook = function (p, u) {
+    try { vacEnsure(); } catch (e) {}
+    var ds = (p.dates || []).map(String).filter(isDate).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort(); if (!ds.length) err('เลือกวันพักร้อน');
+    var t = today(); ds.forEach(function (d) { if (d <= t) err('ขอพักร้อนย้อนหลัง/วันนี้ไม่ได้ — แจ้งผู้จัดการ'); if (rows('DayOffs').some(function (x) { return String(x.staff) === u.code && x.date === d && OFF_LIVE.indexOf(x.status) >= 0; })) err(thD(d) + ' ลงหยุดไว้แล้ว'); });
+    var byY = {}; ds.forEach(function (d) { byY[d.slice(0, 4)] = (byY[d.slice(0, 4)] || 0) + 1; });
+    Object.keys(byY).forEach(function (y) { var v = vacInfo(u.code, y); if (v.days === null) err('ยังไม่มีสิทธิ์พักร้อนปี ' + (+y + 543) + ' — ให้ผู้ดูแลระบบเติมในแท็บ Vacation'); if (byY[y] > v.left) err('พักร้อนปี ' + (+y + 543) + ' เหลือ ' + v.left + ' วัน (ขอ ' + byY[y] + ' วัน)'); });
+    var reason = txt(p.reason, 200);
+    var st = find('Staff', 'code', u.code) || {}, mgrSelf = staffRoles(u.code).indexOf('manager') >= 0, out = [];
+    ds.forEach(function (d) { var cl = offClash(u.code, d);
+      out.push(offOut(add('DayOffs', { id: nextId('OF', 'seq_OF', 6), staff: u.code, name: String(st.nick || st.name || u.name), branch: String(st.branch || u.branch), date: d, kind: 'พักร้อน', status: 'PENDING',
+        reason: (reason || 'ขอใช้พักร้อน') + (cl.length ? ' · (ตรงกับ ' + cl.join(', ') + ')' : ''), created: stamp(), mgrBy: mgrSelf ? '— (ผู้จัดการขอเอง)' : '', mgrAt: '', admBy: '', admAt: '', note: '' }))); });
+    Object.keys(byY).forEach(function (y) { vacSync(u.code, y); });
+    log(u, 'vacBook', ds.join(' ')); return { saved: out, vac: vacInfo(u.code, t.slice(0, 4)) };
+  };
+  PERM.vacBook = ALL; WRITES.vacBook = 1;
+  A.offInfo = function (p, u) {
+    offAutoMaybe();
+    var t = today(), w = offWin(), day = +t.slice(8, 10), nm = monNext(t), mine = rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && String(x.date) >= t.slice(0, 7) + '-01'; }).map(offOut).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    var used = {}; mine.forEach(function (x) { if (OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน') { var m = x.date.slice(0, 7); used[m] = (used[m] || 0) + 1; } });
+    var br = offBr(u.code) || u.branch, taken = {};
+    rows('DayOffs').forEach(function (x) { if (String(x.branch) === br && String(x.staff) !== u.code && OFF_LIVE.indexOf(x.status) >= 0 && String(x.date) >= t.slice(0, 7) + '-01') (taken[x.date] = taken[x.date] || []).push(String(x.name)); });
+    try { vacEnsure(); } catch (e) {}
+    return { today: t, window: w, open: day >= w.a && day <= w.b, nextMonth: nm, quota: offQuota(), used: used, mine: mine, taken: taken, vac: vacInfo(u.code, t.slice(0, 4)), vacNext: +t.slice(5, 7) >= 11 ? vacInfo(u.code, +t.slice(0, 4) + 1) : null };
+  };
+  A.offBook = function (p, u) {
+    var ds = (p.dates || [p.date]).map(String).filter(isDate).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort(); if (!ds.length) err('เลือกวันหยุด');
+    var t = today(); ds.forEach(function (d) { if (d <= t) err('ลงวันหยุดย้อนหลัง/วันนี้ไม่ได้ — แจ้งผู้จัดการ'); if (rows('DayOffs').some(function (x) { return String(x.staff) === u.code && x.date === d && OFF_LIVE.indexOf(x.status) >= 0; })) err(thD(d) + ' ลงไว้แล้ว'); });
+    var cnt = {}, plan = ds.map(function (d) { var m = d.slice(0, 7), why = offWhy(u.code, d, cnt[m] || 0); cnt[m] = (cnt[m] || 0) + 1; return { date: d, why: why }; });
+    var need = plan.filter(function (x) { return x.why.length; });
+    if (need.length && !p.request) return { saved: [], need: need };
+    var reason = txt(p.reason, 200); if (need.length && !reason) err('ใส่เหตุผลที่ขอหยุด');
+    var st = find('Staff', 'code', u.code) || {}, mgrSelf = staffRoles(u.code).indexOf('manager') >= 0, out = [];
+    plan.forEach(function (x) {
+      var req = x.why.length > 0;
+      out.push(offOut(add('DayOffs', { id: nextId('OF', 'seq_OF', 6), staff: u.code, name: String(st.nick || st.name || u.name), branch: String(st.branch || u.branch), date: x.date, kind: req ? 'คำขอ' : 'ลงเอง', status: req ? 'PENDING' : 'OK',
+        reason: req ? reason + ' · (' + x.why.join(', ') + ')' : '', created: stamp(), mgrBy: req && mgrSelf ? '— (ผู้จัดการขอเอง)' : '', mgrAt: '', admBy: '', admAt: '', note: '' })));
+    });
+    log(u, 'offBook', ds.join(' ') + (need.length ? ' (ขอ ' + need.length + ')' : '')); return { saved: out, need: [] };
+  };
+  function thD(d) { return +d.slice(8, 10) + '/' + +d.slice(5, 7); }
+  A.offCancel = function (p, u) {
+    var x = find('DayOffs', 'id', txt(p.id)); if (!x || String(x.staff) !== u.code) err('ไม่พบวันหยุดของคุณ');
+    if (OFF_LIVE.indexOf(x.status) < 0) err('รายการนี้ปิดไปแล้ว'); if (x.date <= today()) err('วันนี้/ผ่านไปแล้ว ยกเลิกเองไม่ได้ — แจ้งผู้จัดการ');
+    upd('DayOffs', x, { status: 'CANCEL', note: [x.note, 'ยกเลิกเอง ' + stamp()].filter(String).join(' · ') }); if (x.kind === 'พักร้อน') vacSync(x.staff, String(x.date).slice(0, 4)); log(u, 'offCancel', x.id + ' ' + x.date); return true;
+  };
+  function offCanStep(u, x) {   // ขั้นที่คนนี้อนุมัติได้: 'mgr' | 'adm' | ''
+    if (x.status !== 'PENDING' || String(x.staff) === u.code) return '';
+    var mgrDone = !!String(x.mgrBy || ''), admDone = !!String(x.admBy || ''), st = find('Staff', 'code', u.code) || {};
+    if (!mgrDone && roleIn(u, ['manager']) && (String(x.branch) === u.branch || canBranch(st, String(x.branch))) && String(x.admBy) !== u.name) return 'mgr';
+    if (!admDone && roleIn(u, ['admin', 'owner']) && String(x.mgrBy) !== u.name) return 'adm';
+    return '';
+  }
+  A.offPending = function (p, u) {
+    return rows('DayOffs').filter(function (x) { return offCanStep(u, x); }).map(function (x) { var o = offOut(x); o.step = offCanStep(u, x); o.monthUsed = offsOf(x.staff, String(x.date).slice(0, 7)).length; if (x.kind === 'พักร้อน') o.vacInfo = vacInfo(x.staff, String(x.date).slice(0, 4)); o.clash = rows('DayOffs').filter(function (y) { return y.date === x.date && y !== x && String(y.branch) === String(x.branch) && (y.status === 'OK' || y.status === 'APPROVED'); }).map(function (y) { return String(y.name); }); return o; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+  };
+  A.offDecide = function (p, u) {
+    var x = find('DayOffs', 'id', txt(p.id)); if (!x) err('ไม่พบคำขอ'); var step = offCanStep(u, x); if (!step) err('คุณอนุมัติคำขอนี้ไม่ได้ หรืออนุมัติไปแล้ว');
+    if (p.approve === false) { var why = txt(p.note, 200); if (!why) err('ใส่เหตุผลที่ไม่อนุมัติ');
+      upd('DayOffs', x, { status: 'REJECTED', note: [x.note, 'ไม่อนุมัติโดย ' + u.name + ': ' + why].filter(String).join(' · ') }); if (x.kind === 'พักร้อน') vacSync(x.staff, String(x.date).slice(0, 4)); log(u, 'offDecide', x.id + ' reject'); return offOut(x); }
+    var pt = step === 'mgr' ? { mgrBy: u.name, mgrAt: stamp() } : { admBy: u.name, admAt: stamp() };
+    var mgrOk = step === 'mgr' || !!String(x.mgrBy || ''), admOk = step === 'adm' || !!String(x.admBy || '');
+    if (mgrOk && admOk) pt.status = 'APPROVED';
+    upd('DayOffs', x, pt); if (x.kind === 'พักร้อน') vacSync(x.staff, String(x.date).slice(0, 4)); log(u, 'offDecide', x.id + ' ' + step); return offOut(x);
+  };
+  A.offCalendar = function (p, u) {
+    offAutoMaybe();
+    var mon = /^\d{4}-\d{2}$/.test(String(p.month || '')) ? String(p.month) : today().slice(0, 7), all = roleIn(u, ['admin', 'owner']);
+    var br = all && p.branch ? String(p.branch) : all && p.branch === '' ? '' : u.branch;
+    var list = rows('DayOffs').filter(function (x) { return String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && (!br || String(x.branch) === br); })
+      .map(function (x) { return { date: String(x.date), name: String(x.name), branch: String(x.branch), status: x.status, vac: x.kind === 'พักร้อน', me: String(x.staff) === u.code }; });
+    return { month: mon, branch: br, canAll: all, branches: all ? rows('Branches').filter(function (b) { return on(b.active); }).map(function (b) { return { code: String(b.code), name: String(b.name) }; }) : [], list: list };
+  };
+  function weekStart(d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(); return addD(d, -((w + 6) % 7)); }
+  function addD(d, n) { var x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
+  A.myTasks = function (p, u) {
+    offAutoMaybe();
+    var tw = offWin(), tday = +today().slice(8, 10), tnm = monNext(today()), autoMine = rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.kind === 'ระบบลงให้' && x.status === 'OK' && String(x.date) > today() && String(x.created).slice(0, 10) >= addD(today(), -7); }).map(function (x) { return String(x.date); }).sort(), out = { autoOff: autoMine, offWindow: tday >= tw.a && tday <= tw.b ? { month: tnm, used: offsOf(u.code, tnm).length, quota: offQuota(), until: tw.b } : null, otPending: A.otPending(p, u).length, offPending: A.offPending(p, u).length, myPending: rows('DayOffs').filter(function (x) { return String(x.staff) === u.code && x.status === 'PENDING'; }).length, count: null };
+    if (roleIn(u, ['manager'])) {
+      var ws = weekStart(today()), last = rows('Counts').filter(function (c) { return c.branch === u.branch; }).slice(-1)[0], done = rows('Counts').some(function (c) { return c.branch === u.branch && String(c.time).slice(0, 10) >= ws; });
+      out.count = { done: done, weekStart: ws, last: last ? String(last.time) : '', dueDay: setting('countDay', 'จันทร์'), branch: u.branchName };
+    }
+    return out;
+  };
+  PERM.offInfo = ALL; PERM.offBook = ALL; PERM.offCancel = ALL; PERM.offPending = ALL; PERM.offDecide = ALL; PERM.offCalendar = ALL; PERM.myTasks = ALL;
+  WRITES.offBook = 1; WRITES.offCancel = 1; WRITES.offDecide = 1;
+
+
+  /* ---------- ขอ OT (ลงใน LINE + แนบรูป) → ส่วนกลาง (ผู้ดูแลระบบ/บัญชี/Owner) อนุมัติ → บวกในเงินเดือนเดือนนั้น
+   * เรทตั้งต้น = เงินเดือน ÷ 30 ÷ 8 × 1.5 (Settings: otMultiplier, otDayDiv, otHourDiv) · ไม่มีเงินเดือน = otRatePerHour · คนอนุมัติแก้ยอดได้ */
+  var OT_TH = { PENDING: 'รออนุมัติ', APPROVED: 'อนุมัติแล้ว', REJECTED: 'ไม่อนุมัติ', CANCEL: 'ยกเลิก' }, OT_APPROVERS = ['admin', 'owner', 'account'];
+  function otRate(code) { var s = find('Staff', 'code', code) || {}, sal = num(s.salary);
+    return r2(sal > 0 ? sal / (num(setting('otDayDiv', 30)) || 30) / (num(setting('otHourDiv', 8)) || 8) * (num(setting('otMultiplier', 1.5)) || 1.5) : num(setting('otRatePerHour', 0))); }
+  function otOut(x) { var o = clean(x); o.statusTh = OT_TH[x.status] || x.status; o.hasPhoto = !!String(x.photo || ''); delete o.photo; return o; }
+  function hmOk(t) { return /^\d{1,2}:\d{2}$/.test(String(t || '')); }
+  A.otInfo = function (p, u) {
+    var st = find('Staff', 'code', u.code) || {}, d = isDate(p.date) ? p.date : today();
+    var at = rows('Attendance').filter(function (a) { return String(a.staff) === u.code && a.date === d; }).slice(-1)[0];
+    var mine = rows('OTs').filter(function (x) { return String(x.staff) === u.code && String(x.date) >= addD(today(), -62); }).map(otOut).reverse();
+    return { date: d, shiftOut: shiftOf(st, d).out, out: at ? String(at.out || '') : '', in: at ? String(at.in || '') : '', rate: otRate(u.code), mine: mine };
+  };
+  A.otRequest = function (p, u) {
+    if (!isDate(p.date) || p.date > today()) err('เลือกวันที่ทำ OT (ขอล่วงหน้าไม่ได้)'); if (p.date < addD(today(), -31)) err('ขอ OT ย้อนหลังได้ไม่เกิน 31 วัน');
+    if (!hmOk(p.start) || !hmOk(p.end)) err('ใส่เวลาเริ่ม–ถึง เช่น 19:00–21:30');
+    var mins = toMin(p.end) - toMin(p.start); if (mins <= 0) mins += 1440; if (mins > 12 * 60) err('ช่วงเวลา OT ยาวเกินไป ตรวจเวลาอีกครั้ง'); if (mins < 15) err('OT ต้องอย่างน้อย 15 นาที');
+    var why = txt(p.reason, 300); if (!why) err('ใส่ว่าทำอะไร / ทำไมต้องอยู่เกินเวลา'); if (!p.photo) err('แนบรูปประกอบ');
+    if (rows('OTs').some(function (x) { return String(x.staff) === u.code && x.date === p.date && (x.status === 'PENDING' || x.status === 'APPROVED') && !(toMin(p.end) <= toMin(x.start) || toMin(p.start) >= toMin(x.end)); })) err('ช่วงเวลานี้ขอ OT ไปแล้ว');
+    var st = find('Staff', 'code', u.code) || {}, hrs = r2(mins / 60), rate = otRate(u.code), id = nextId('OT', 'seq_OT', 6);
+    var x = add('OTs', { id: id, staff: u.code, name: String(st.nick || st.name || u.name), branch: String(st.branch || u.branch), date: p.date, start: txt(p.start, 5), end: txt(p.end, 5), hours: hrs, reason: why,
+      photo: store.savePhoto('OT_' + id + '_' + u.code, p.photo), status: 'PENDING', rate: rate, amount: r2(hrs * rate), created: stamp(), by: '', at: '', note: '' });
+    log(u, 'otRequest', id + ' ' + p.date + ' ' + hrs + 'h'); return otOut(x);
+  };
+  A.otCancel = function (p, u) { var x = find('OTs', 'id', txt(p.id)); if (!x || String(x.staff) !== u.code || x.status !== 'PENDING') err('ยกเลิกได้เฉพาะคำขอที่ยังรออนุมัติ'); upd('OTs', x, { status: 'CANCEL' }); log(u, 'otCancel', x.id); return true; };
+  A.otPending = function (p, u) { if (!roleIn(u, OT_APPROVERS)) return [];
+    return rows('OTs').filter(function (x) { return x.status === 'PENDING' && String(x.staff) !== u.code; }).map(function (x) { var o = otOut(x), at = rows('Attendance').filter(function (a) { return String(a.staff) === String(x.staff) && a.date === x.date; }).slice(-1)[0], s = find('Staff', 'code', x.staff) || {};
+      o.att = at ? (at.in || '-') + '–' + (at.out || 'ยังไม่ออก') : 'ไม่มีบันทึกลงเวลา'; var sx = shiftOf(s, x.date); o.shift = sx.in ? sx.in + '–' + sx.out : ''; return o; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; }); };
+  A.otPhoto = function (p, u) { var x = find('OTs', 'id', txt(p.id)); if (!x || !(String(x.staff) === u.code || roleIn(u, OT_APPROVERS))) err('ไม่มีสิทธิ์'); return store.getPhoto(String(x.photo || '')); };
+  A.otDecide = function (p, u) {
+    if (!roleIn(u, OT_APPROVERS)) err('อนุมัติ OT ได้เฉพาะส่วนกลาง (ผู้ดูแลระบบ/บัญชี/Owner)');
+    var x = find('OTs', 'id', txt(p.id)); if (!x || x.status !== 'PENDING') err('ไม่พบคำขอที่รออนุมัติ'); if (String(x.staff) === u.code) err('อนุมัติ OT ของตัวเองไม่ได้');
+    if (p.approve === false) { var why = txt(p.note, 200); if (!why) err('ใส่เหตุผลที่ไม่อนุมัติ'); upd('OTs', x, { status: 'REJECTED', by: u.name, at: stamp(), note: why }); log(u, 'otDecide', x.id + ' reject'); return otOut(x); }
+    var hrs = p.hours !== undefined && p.hours !== '' ? r2(num(p.hours)) : num(x.hours), amt = p.amount !== undefined && p.amount !== '' ? r2(num(p.amount)) : r2(hrs * num(x.rate));
+    if (!(hrs > 0) || amt < 0) err('ชั่วโมง/ยอดเงินไม่ถูกต้อง');
+    upd('OTs', x, { status: 'APPROVED', hours: hrs, amount: amt, by: u.name, at: stamp(), note: txt(p.note, 200) }); log(u, 'otDecide', x.id + ' ' + amt); return otOut(x);
+  };
+  PERM.otInfo = ALL; PERM.otRequest = ALL; PERM.otCancel = ALL; PERM.otPending = ALL; PERM.otDecide = ALL; PERM.otPhoto = ALL;
+  WRITES.otRequest = 1; WRITES.otCancel = 1; WRITES.otDecide = 1;
+
+
+  // แจ้งเตือนผู้จัดการทาง LINE ให้นับสต้อกประจำสัปดาห์ (เรียกจาก trigger ทุกเช้า) · ตั้งแต่วันนับ (Settings: countDay) จนกว่าจะนับ เตือนวันละครั้ง
+  function countRemind(force) {
+    var t = today(), ws = weekStart(t), wd = (new Date(t + 'T00:00:00Z').getUTCDay() + 6) % 7, names = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
+    var cd = String(setting('countDay', 'จันทร์')), cdi = names.filter(function (n) { return cd.indexOf(n) >= 0; }).map(function (n) { return names.indexOf(n); })[0]; if (cdi == null) cdi = 0;
+    var out = [], link = String(setting('staffLiffUrl', 'https://liff.line.me/2000282297-7vT5Kavo')) + '?p=work';
+    if (wd < cdi && !force) return out;
+    rows('Branches').filter(function (b) { return on(b.active) && b.code !== 'CENTRAL'; }).forEach(function (b) {
+      var last = rows('Counts').filter(function (x) { return x.branch === b.code; }).slice(-1)[0];
+      if (rows('Counts').some(function (x) { return x.branch === b.code && String(x.time).slice(0, 10) >= ws; })) return;
+      var late = wd - cdi;
+      rows('Staff').filter(function (s) { return on(s.active) && String(s.branch) === String(b.code) && rolesOf(s).indexOf('manager') >= 0 && String(s.lineId || '') && !isDayOff(s, t); }).forEach(function (s) {
+        out.push({ to: String(s.lineId), name: String(s.nick || s.name), branch: String(b.code), text: '📦 นับสต้อกประจำสัปดาห์ · ' + b.name + '\n' + (late > 0 ? 'เลยวันนับมา ' + late + ' วันแล้ว — ' : '') + 'สัปดาห์นี้ยังไม่ได้นับ' +
+          (last ? '\nนับครั้งล่าสุด ' + last.time : '') + '\n\nกดเพื่อเริ่มนับ (เมนู งานของฉัน):\n' + link });
+      });
+    });
+    return out;
+  }
 
   function api(token, action, p, rid) {
     var u = auth(token);
@@ -1359,6 +1646,7 @@ function makeCore(store) {
     if (ar > 0) {
       var mg = mgrOk(p.approvePin); if (!mg) err('ค้างชำระต้องให้ผู้จัดการใส่รหัสอนุมัติ');
       if (ar > net) err('ยอดค้างชำระเกินยอดบิล');
+      var arPlan = instPlan(p.arPlan, ar);
       if (os.some(function (o) { return o.type === 'wallet'; })) err('เติมวงเงิน/มัดจำ ต้องจ่ายเงินจริง');
     }
     if (wal > 0) {
@@ -1396,6 +1684,7 @@ function makeCore(store) {
         upd('Leads', deal, { credited: r2(num(deal.credited) + give), hn: v.hn }); } }
     if (wal > 0) walletMove(pt0, -wal, 'ใช้จ่าย', rc, u);
     if (ar > 0) walletMove(pt0, -ar, 'ค้างชำระ (ผ่อน) อนุมัติ ' + mg.code, rc, u, true);
+    if (ar > 0) arPlan.forEach(function (x, i) { add('Installments', { id: nextId('IN', 'seq_IN', 6), hn: v.hn, name: pt0 ? pt0.name : v.name, branch: u.branch, receipt: rc, no: i + 1, of: arPlan.length, due: x.due, amount: x.amount, paid: 0, status: 'OPEN', paidAt: '', created: stamp(), by: mg.name || mg.code }); });
     os.forEach(function (o) { if (o.type === 'wallet') { var cr = num(o.choice) || num(o.paidNet); walletMove(pt0, cr, /^มัดจำ/.test(o.name) ? o.name : 'เติมวงเงิน', rc, u, true); opened.push((/^มัดจำ/.test(o.name) ? o.name + ' ' : 'เติมวงเงิน ') + cr + ' บาท'); } });
     os.forEach(function (o) { if (o.type === 'course' || o.type === 'promo' || o.type === 'buffet') opened = opened.concat(openCourses(o, v, u, rc)); });
     var detail = lines.map(function (l) { return l.method + ' ' + l.amount + (l.fee ? ' +ค่าธรรมเนียม ' + l.fee : '') + (l.ref ? ' (' + l.ref + ')' : ''); }).join(' + ') || 'ส่วนลด 100%';
@@ -1424,12 +1713,35 @@ function makeCore(store) {
 
   /* ---------- วงเงินสมาชิก ---------- */
   function walletMove(pt, amt, type, ref, u, allowNeg) {
-    var bal = r2(num(pt.wallet) + amt); if (bal < -0.001 && !allowNeg && amt < 0) err('วงเงินไม่พอ');
+    var old = num(pt.wallet), bal = r2(old + amt); if (bal < -0.001 && !allowNeg && amt < 0) err('วงเงินไม่พอ');
+    if (amt > 0 && old < 0) instApply(pt.hn, Math.min(amt, -old));
     upd('Patients', pt, { wallet: bal });
     add('Wallet', { time: stamp(), hn: pt.hn, name: pt.name, amount: amt, type: type, ref: ref, by: u.name, balance: bal, branch: u.branch });
     return bal;
   }
   function mgrOk(pin) { var h = store.hash('pin:' + String(pin || '')); return rows('Staff').filter(function (s) { return on(s.active) && (String(s.pin) === h || String(s.pin) === String(pin)) && rolesOf(s).some(function (r) { return ['manager', 'admin', 'owner'].indexOf(r) >= 0; }); })[0]; }
+
+  /* ---------- ผ่อนกับคลินิก: ตารางงวด (วันที่ + ยอด) · เงินที่ลูกค้าจ่ายคืนตัดงวดที่ครบกำหนดก่อน ---------- */
+  function instApply(hn, amt) {
+    rows('Installments').filter(function (x) { return x.hn === hn && x.status !== 'PAID'; }).sort(function (a, b) { return a.due < b.due ? -1 : a.due > b.due ? 1 : num(a.no) - num(b.no); }).forEach(function (x) {
+      if (amt <= 0.001) return; var left = r2(num(x.amount) - num(x.paid)), g = Math.min(left, amt); amt = r2(amt - g);
+      var np = r2(num(x.paid) + g); upd('Installments', x, np >= num(x.amount) - 0.001 ? { paid: np, status: 'PAID', paidAt: stamp() } : { paid: np });
+    });
+  }
+  function instPlan(plan, ar) {
+    var t = today(), pl = (plan || []).map(function (x) { return { due: String(x.due || ''), amount: r2(num(x.amount)) }; }).filter(function (x) { return x.amount > 0; });
+    if (!pl.length) pl = [{ due: addD(t, 30), amount: ar }];
+    pl.forEach(function (x) { if (!isDate(x.due)) err('ใส่วันที่ครบกำหนดของทุกงวด'); if (x.due < t) err('วันครบกำหนดงวดต้องไม่ย้อนหลัง'); });
+    if (Math.abs(sum(pl, function (x) { return x.amount; }) - ar) > 0.01) err('ยอดรวมทุกงวดต้องเท่ากับยอดค้าง ' + ar.toLocaleString() + ' บาท');
+    return pl.sort(function (a, b) { return a.due < b.due ? -1 : 1; });
+  }
+  function instOut(x) { var o = clean(x), t = today(); o.left = r2(num(x.amount) - num(x.paid)); o.days = Math.round((Date.parse(x.due) - Date.parse(t)) / 864e5); o.state = x.status === 'PAID' ? 'PAID' : o.days < 0 ? 'LATE' : o.days === 0 ? 'TODAY' : o.days <= 3 ? 'SOON' : 'LATER'; return o; }
+  A.instList = function (p, u) {
+    if (p.hn) return rows('Installments').filter(function (x) { return x.hn === String(p.hn); }).map(instOut).sort(function (a, b) { return a.due < b.due ? -1 : 1; });
+    var all = has(u, ['account', 'owner', 'admin']) && p.all, ahead = num(p.ahead) || 3;
+    return rows('Installments').filter(function (x) { return x.status !== 'PAID' && (all || x.branch === u.branch); }).map(instOut).filter(function (o) { return o.days <= ahead; }).sort(function (a, b) { return a.due < b.due ? -1 : 1; });
+  };
+  PERM.instList = FRONTISH.concat(['account']);
   A.courseToCredit = function (p, u) {
     var c = find('Courses', 'id', p.id); if (!c) err('ไม่พบคอร์ส');
     if (c.status !== 'ACTIVE') err('คอร์สนี้ไม่ได้ใช้งานอยู่'); if (on(c.buffet)) err('บุฟเฟต์แปลงเป็นวงเงินไม่ได้');
@@ -1522,6 +1834,17 @@ function makeCore(store) {
     if (p.save) { var pt = find('Patients', 'hn', r.hn); if (pt && !pt.email) upd('Patients', pt, { email: res.to }); }
     return res;
   };
+  A.receiptSearch = function (p, u) {
+    var from = isDate(p.from) ? p.from : addD(today(), -30), to = isDate(p.to) ? p.to : today(), q = String(p.q || '').trim().toLowerCase(), qd = q.replace(/[^\d]/g, ''), ph = {};
+    if (q) rows('Patients').forEach(function (x) { ph[x.hn] = String(x.phone || ''); });
+    var out = rows('Payments').filter(function (x) { var d = String(x.time).slice(0, 10); if (!rcOk(u, String(x.branch))) return false; if (p.branch && String(x.branch) !== String(p.branch)) return false;
+      if (!q) return d >= from && d <= to;
+      return String(x.receipt).toLowerCase().indexOf(q) >= 0 || String(x.hn).toLowerCase().indexOf(q) >= 0 || String(x.name).toLowerCase().indexOf(q) >= 0 || (qd.length >= 4 && String(ph[x.hn] || '').indexOf(qd) >= 0); })
+      .map(function (x) { return { receipt: String(x.receipt), time: String(x.time), hn: String(x.hn), name: String(x.name), net: num(x.net), method: String(x.method || ''), branch: String(x.branch), printed: num(x.printed), void: String(x.void || '') }; });
+    out.sort(function (a, b) { return a.time < b.time ? 1 : -1; });
+    return { from: from, to: to, total: out.length, list: out.slice(0, 300) };
+  };
+  PERM.receiptSearch = SELLERS.concat(['account', 'owner', 'admin']);
   PERM.receiptGet = SELLERS.concat(['account', 'owner', 'admin']); PERM.receiptEmail = FRONTISH.concat(['sales', 'account', 'owner', 'admin']); WRITES.receiptEmail = 1;
   /* ---------- Beam (แบบเดียวกับ Lana: เปิดหน้าจ่ายของ Beam → ลูกค้าเลือก บัตร / พร้อมเพย์ / โมบายแบงก์กิ้ง / วอลเล็ต / ผ่อน) ----------
      ตั้งค่า: Apps Script → Project Settings → Script properties: BEAM_MERCHANT_ID, BEAM_API_KEY, BEAM_ENV (production = ค่าเริ่มต้น | playground = ทดลอง)
@@ -1630,10 +1953,10 @@ function makeCore(store) {
     if (ap) { apIt = itemByCode(ap.item); if (!apIt) err('เลือกรายการที่จะนัด'); if (!isDate(ap.date) || ap.date < today()) err('วันที่นัดต้องไม่ย้อนหลัง');
       if (!findSlots(ub.branch, ap.date, apIt, pt ? pt.hn : '').slots.some(function (x) { return x.time === ap.time; })) err('เวลา ' + ap.time + ' ไม่ว่างแล้ว เลือกเวลาใหม่'); }
     var dp = p.deposit && num(p.deposit.amount) > 0 ? p.deposit : null;
-    if (dp) { if (!txt(p.admin)) err('มัดจำต้องระบุคนที่ปิดการขาย'); var dm = find('PayMethods', 'name', txt(dp.method)); if (!dm) err('เลือกช่องทางที่ลูกค้าโอนมัดจำ'); if (isBeam(dm.name)) err('มัดจำผ่าน Beam ให้รับที่หน้าเก็บเงิน'); if (on(dm.needRef) && !txt(dp.ref)) err('ใส่เลขอ้างอิงการโอนมัดจำ'); }
+    if (dp) { if (!txt(p.admin)) err('มัดจำต้องระบุคนที่ปิดการขาย'); var dm = find('PayMethods', 'name', txt(dp.method)); if (!dm) err('เลือกช่องทางที่ลูกค้าโอนมัดจำ'); if (isBeam(dm.name)) err('มัดจำผ่าน Beam ให้รับที่หน้าเก็บเงิน'); }
     var l = add('Leads', { id: nextId('L', 'seq_L', 5), date: today(), branch: p.branch, fbName: txt(p.fbName, 80), gender: txt(p.gender, 10), phone: phone, channel: txt(p.channel, 30),
-      ad: txt(p.ad, 120), interest: txt(p.interest, 120), value: num(p.value), prefer: txt(p.prefer, 120), admin: txt(p.admin, 60) || u.name, status: 'NEW', hn: pt ? pt.hn : '', vn: '', actual: 0, created: stamp(), apptId: '',
-      closed: Math.max(0, r2(num(p.closed))), closedNote: txt(p.closedNote, 120), credited: 0, page: ['CNX', 'PTY', 'JB'].indexOf(p.page) >= 0 ? p.page : pageOf(p.branch) });
+      ad: txt(p.ad, 120), interest: txt(p.interest, 120), value: Math.max(0, r2(num(p.value))), prefer: txt(p.prefer, 120), admin: txt(p.admin, 60) || u.name, status: 'NEW', hn: pt ? pt.hn : '', vn: '', actual: 0, created: stamp(), apptId: '',
+      closed: Math.max(0, r2(num(p.closed !== undefined ? p.closed : p.value))), closedNote: txt(p.closedNote || p.interest, 120), credited: 0, page: ['CNX', 'PTY', 'JB'].indexOf(p.page) >= 0 ? p.page : pageOf(p.branch) });
     log(u, 'leadCreate', l.id + ' ' + l.fbName);
     var appt = null, depo = null;
     if ((ap || dp) && !pt) { var np0 = A.registerPatient({ name: txt(p.fbName, 80), phone: phone, gender: p.gender, noEmail: true, pre: true, note: 'ลงทะเบียนจากลีด #' + l.id }, ub); pt = find('Patients', 'hn', np0.hn); upd('Patients', pt, { channel: txt(p.channel, 30), ad: txt(p.ad, 120) }); upd('Leads', l, { hn: pt.hn }); }
@@ -1649,8 +1972,8 @@ function makeCore(store) {
       appt = A.apptCreate({ hn: pt.hn, item: apIt.code, date: ap.date, time: ap.time, note: txt(ap.note), leadId: l.id }, ub);
     }
     var br = find('Branches', 'code', p.branch);
-    var msg = '🟢 ลีดใหม่ · ' + (br ? br.name : p.branch) + '\nคุณ ' + l.fbName + (l.gender ? ' (' + l.gender + ')' : '') + ' ' + phone + '\nสนใจ: ' + (l.interest || '-') + (l.value ? ' ' + l.value.toLocaleString() : '') +
-      '\nจากแอด: ' + (l.ad || '-') + ' · ' + (l.channel || '-') + (l.closed ? '\n✅ ปิดแล้ว: ' + (l.closedNote || l.interest || '') + ' ' + l.closed.toLocaleString() + ' บาท' : '') + '\nสะดวก: ' + (l.prefer || '-') + '\nแอดมิน: ' + l.admin + ' · ลงโดย ' + u.name + ' · ลีด #' + l.id + (appt ? '\n📅 นัดแล้ว ' + appt.date + ' ' + (appt.cStart || appt.start) + ' · ' + appt.itemName + ' (' + appt.room + ')' : '') + (pt && !appt ? '\n(คนไข้เก่า ' + pt.hn + ')' : '');
+    var msg = '🟢 ลีดใหม่ · ' + (br ? br.name : p.branch) + '\nคุณ ' + l.fbName + (l.gender ? ' (' + l.gender + ')' : '') + ' ' + phone + '\nรายการ: ' + (l.interest || '-') + (l.value ? ' ' + l.value.toLocaleString() + ' บาท' : '') +
+      '\nจากแอด: ' + (l.ad || '-') + ' · ' + (l.channel || '-') + '\nแอดมิน: ' + l.admin + ' · ลงโดย ' + u.name + ' · ลีด #' + l.id + (appt ? '\n📅 นัดแล้ว ' + appt.date + ' ' + (appt.cStart || appt.start) + ' · ' + appt.itemName + ' (' + appt.room + ')' : '') + (pt && !appt ? '\n(คนไข้เก่า ' + pt.hn + ')' : '');
     return { lead: clean(l), line: msg + (depo ? '\n💰 มัดจำ ' + depo.amount.toLocaleString() + ' บาท · ใบเสร็จ ' + depo.receipt : ''), appt: appt, deposit: depo };
   };
   A.leadClose = function (p, u) {
@@ -1745,7 +2068,7 @@ function makeCore(store) {
     var row = rows('Attendance').filter(function (a) { return a.staff === u.code && a.date === d; }).slice(-1)[0];
     if (p.type === 'in') {
       if (row && row.in && !row.out) err('เช็คอินไปแล้วเมื่อ ' + row.in);
-      var late = st && st.shiftIn ? Math.max(0, toMin(t) - toMin(st.shiftIn)) : 0;
+      var shT = shiftOf(st, today()), late = st && shT.in ? Math.max(0, toMin(t) - toMin(shT.in)) : 0;
       if (late <= num(setting('lateGraceMin', 5))) late = 0;
       add('Attendance', { id: nextId('AT', 'seq_AT', 7), staff: u.code, name: u.fullName, branch: u.branch, date: d, in: t, out: '', late: late, inPhoto: '', outPhoto: '', note: u.line ? 'LINE' : '',
         inGps: gps, inDist: m, inAcc: lat ? acc : '', outGps: '', outDist: '', outAcc: '' });
@@ -1753,34 +2076,34 @@ function makeCore(store) {
     }
     if (!row || row.out) err('ยังไม่ได้เช็คอินวันนี้');
     upd('Attendance', row, { out: t, outGps: gps, outDist: m, outAcc: lat ? acc : '' });
-    log(u, 'clockOut', t + (m !== '' ? ' ' + m + 'm' : '')); return { type: 'out', time: t, hours: r2((toMin(t) - toMin(row.in)) / 60), dist: m, branch: u.branchName };
+    log(u, 'clockOut', t + (m !== '' ? ' ' + m + 'm' : '')); return { type: 'out', time: t, hours: (toMin(t) - toMin(row.in)) / 60, dist: m, branch: u.branchName };
   };
   A.myDay = function (p, u) {
     var row = rows('Attendance').filter(function (a) { return a.staff === u.code && a.date === today(); }).slice(-1)[0];
-    return { today: today(), now: hm(), attendance: clean(row), shift: (function () { var s = find('Staff', 'code', u.code); return s ? { in: s.shiftIn, out: s.shiftOut } : {}; })() };
+    return { today: today(), now: hm(), attendance: clean(row), shift: (function () { var s = find('Staff', 'code', u.code); return s ? shiftOf(s, today()) : {}; })() };
   };
 
   /* ---------- เข้า-ออกงานพนักงาน (ผู้จัดการเห็นสาขาตัวเอง · บัญชี/เจ้าของเห็นทุกสาขา · แก้ได้เฉพาะบัญชี) ---------- */
   var TH_DAY = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
-  function isDayOff(st, d) { var w = TH_DAY[new Date(d + 'T00:00:00Z').getUTCDay()], off = String(st.dayOff || ''); return !!off && (off.indexOf(w) >= 0 || (w === 'พฤหัส' && off.indexOf('พฤหัสบดี') >= 0)); }
+  function isDayOff(st, d) { if (rows('DayOffs').some(function (x) { return String(x.staff) === String(st.code) && x.date === d && (x.status === 'OK' || x.status === 'APPROVED'); })) return true; var w = TH_DAY[new Date(d + 'T00:00:00Z').getUTCDay()], off = String(st.dayOff || ''); return !!off && (off.indexOf(w) >= 0 || (w === 'พฤหัส' && off.indexOf('พฤหัสบดี') >= 0)); }
   A.attReport = function (p, u) {
     var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today(), inB = has(u, ['account', 'owner', 'admin']) ? scopeFn(p.scope || 'ALL', u) : function (b) { return b === u.branch; };
     var staff = rows('Staff').filter(function (x) { return on(x.active) && inB(String(x.branch)); }), byCode = {};
     staff.forEach(function (x) { byCode[String(x.code)] = x; });
     var list = rows('Attendance').filter(function (a) { return a.date >= from && a.date <= to && (inB(String(a.branch)) || byCode[String(a.staff)]); }).map(function (a) {
       var o = clean(a), st = byCode[String(a.staff)]; o.nick = st ? String(st.nick || st.name) : String(a.name || a.staff);
-      o.hours = a.out ? r2((toMin(a.out) - toMin(a.in)) / 60) : 0; o.early = st && st.shiftOut && a.out && toMin(a.out) < toMin(st.shiftOut) ? toMin(st.shiftOut) - toMin(a.out) : 0; return o; });
+      o.hours = a.out ? (toMin(a.out) - toMin(a.in)) / 60 : 0; var so = st ? shiftOf(st, a.date).out : ''; o.early = so && a.out && toMin(a.out) < toMin(so) ? toMin(so) - toMin(a.out) : 0; return o; });
     var sum1 = {};
     list.forEach(function (a) { var k = String(a.staff), x = sum1[k] = sum1[k] || { code: k, nick: a.nick, branch: a.branch, days: 0, late: 0, lateMin: 0, hours: 0, noOut: 0, early: 0 };
-      x.days++; if (num(a.late) > 0) { x.late++; x.lateMin += num(a.late); } x.hours = r2(x.hours + a.hours); if (!a.out && a.date < today()) x.noOut++; if (a.early) x.early++; });
-    staff.forEach(function (st) { var k = String(st.code); if (!sum1[k]) sum1[k] = { code: k, nick: String(st.nick || st.name), branch: String(st.branch), days: 0, late: 0, lateMin: 0, hours: 0, noOut: 0, early: 0 }; sum1[k].role = rolesOf(st).join(' '); sum1[k].shift = st.shiftIn ? st.shiftIn + '–' + (st.shiftOut || '') : ''; sum1[k].partTime = on(st.partTime); });
+      x.days++; if (num(a.late) > 0) { x.late++; x.lateMin += num(a.late); } x.hours = x.hours + a.hours; if (!a.out && a.date < today()) x.noOut++; if (a.early) x.early++; });
+    staff.forEach(function (st) { var k = String(st.code); if (!sum1[k]) sum1[k] = { code: k, nick: String(st.nick || st.name), branch: String(st.branch), days: 0, late: 0, lateMin: 0, hours: 0, noOut: 0, early: 0 }; sum1[k].role = rolesOf(st).join(' '); var sht = shiftOf(st, to); sum1[k].shift = sht.in ? sht.in + '–' + sht.out : ''; sum1[k].partTime = on(st.partTime); });
     var board = null, d = today();
     if (from <= d && d <= to) {
       var tr = {}; list.filter(function (a) { return a.date === d; }).forEach(function (a) { tr[String(a.staff)] = a; });
       board = staff.filter(function (st) { return !on(st.partTime) || tr[String(st.code)]; }).map(function (st) {
-        var a = tr[String(st.code)], off = isDayOff(st, d), due = st.shiftIn && toMin(hm()) > toMin(st.shiftIn) + num(setting('lateGraceMin', 5));
-        return { code: String(st.code), nick: String(st.nick || st.name), branch: String(st.branch), shift: st.shiftIn ? st.shiftIn + '–' + (st.shiftOut || '') : '',
-          state: a ? (a.out ? 'OUT' : 'IN') : off ? 'OFF' : !st.shiftIn ? 'NOSHIFT' : st.shiftOut && toMin(hm()) > toMin(st.shiftOut) ? 'ABSENT' : due ? 'MISSING' : 'NOTYET', in: a ? a.in : '', out: a ? a.out : '', late: a ? num(a.late) : 0, dist: a ? a.inDist : '', gps: a ? a.inGps : '' };
+        var a = tr[String(st.code)], off = isDayOff(st, d), sh = shiftOf(st, d), due = sh.in && toMin(hm()) > toMin(sh.in) + num(setting('lateGraceMin', 5));
+        return { code: String(st.code), nick: String(st.nick || st.name), branch: String(st.branch), shift: sh.in ? sh.in + '–' + sh.out : '',
+          state: a ? (a.out ? 'OUT' : 'IN') : off ? 'OFF' : !sh.in ? 'NOSHIFT' : sh.out && toMin(hm()) > toMin(sh.out) ? 'ABSENT' : due ? 'MISSING' : 'NOTYET', in: a ? a.in : '', out: a ? a.out : '', late: a ? num(a.late) : 0, dist: a ? a.inDist : '', gps: a ? a.inGps : '' };
       }).sort(function (x, y) { var o = { ABSENT: 0, MISSING: 1, IN: 2, NOTYET: 3, OUT: 4, NOSHIFT: 5, OFF: 6 }; return o[x.state] - o[y.state]; });
     }
     return { from: from, to: to, canFix: has(u, ['account']), board: board, people: Object.keys(sum1).map(function (k) { return sum1[k]; }).sort(function (a, b) { return String(a.branch).localeCompare(String(b.branch)) || b.days - a.days; }),
@@ -1793,13 +2116,13 @@ function makeCore(store) {
     var row = p.id ? find('Attendance', 'id', txt(p.id)) : null, note = 'แก้โดย ' + u.name + ' ' + stamp() + ': ' + why;
     if (row) {
       var st = find('Staff', 'code', row.staff), pt = { note: (row.note ? row.note + ' · ' : '') + note + ' (เดิม ' + (row.in || '-') + '–' + (row.out || '-') + ')' };
-      if (tIn) { pt.in = tIn; pt.late = st && st.shiftIn ? Math.max(0, toMin(tIn) - toMin(st.shiftIn)) : 0; if (pt.late <= num(setting('lateGraceMin', 5))) pt.late = 0; }
+      if (tIn) { pt.in = tIn; var shF = st ? shiftOf(st, row.date) : {}; pt.late = shF.in ? Math.max(0, toMin(tIn) - toMin(shF.in)) : 0; if (pt.late <= num(setting('lateGraceMin', 5))) pt.late = 0; }
       if (p.out !== undefined) pt.out = tOut;
       upd('Attendance', row, pt); log(u, 'attFix', row.id + ' ' + why); return { ok: true };
     }
     var s2 = find('Staff', 'code', txt(p.staff)); if (!s2) err('ไม่พบพนักงาน'); if (!isDate(p.date)) err('ใส่วันที่'); if (!tIn) err('ใส่เวลาเข้า');
     if (rows('Attendance').some(function (a) { return a.staff === String(s2.code) && a.date === p.date; })) err('วันนั้นมีบันทึกอยู่แล้ว — แก้แถวเดิม');
-    var late = s2.shiftIn ? Math.max(0, toMin(tIn) - toMin(s2.shiftIn)) : 0; if (late <= num(setting('lateGraceMin', 5))) late = 0;
+    var shA = shiftOf(s2, p.date), late = shA.in ? Math.max(0, toMin(tIn) - toMin(shA.in)) : 0; if (late <= num(setting('lateGraceMin', 5))) late = 0;
     add('Attendance', { id: nextId('AT', 'seq_AT', 7), staff: String(s2.code), name: s2.name, branch: String(s2.branch), date: p.date, in: tIn, out: tOut, late: late, inPhoto: '', outPhoto: '', note: 'เพิ่มย้อนหลัง · ' + note, inGps: '', inDist: '', inAcc: '', outGps: '', outDist: '', outAcc: '' });
     log(u, 'attFix', s2.code + ' ' + p.date + ' ' + why); return { ok: true };
   };
@@ -1905,6 +2228,10 @@ function makeCore(store) {
       }
       ps.salary = tot; ps.salaryMonth = sal;
     });
+    // OT ที่ส่วนกลางอนุมัติแล้ว → บวกในเงินเดือน (นับตามวันที่ทำ OT)
+    rows('OTs').forEach(function (x) { if (x.status !== 'APPROVED' || x.date < from || x.date > to || !(num(x.amount) > 0)) return; var s = find('Staff', 'code', x.staff) || {}; if (branchFilter && !branchFilter(s.branch || x.branch)) return;
+      var po = P(String(x.staff)); po.salary = r2(po.salary + num(x.amount)); po.ot = r2((po.ot || 0) + num(x.amount));
+      items.push({ who: String(x.staff), kind: 'เงินเดือน', date: x.date, branch: x.branch, hn: '', name: '', item: 'OT ' + x.start + '–' + x.end + ' (' + num(x.hours) + ' ชม.)' + (x.reason ? ' · ' + String(x.reason).slice(0, 40) : ''), base: num(x.rate), pct: 0, amount: num(x.amount) }); });
     if (perBill > 0) adminBillPay(adminBillRows(from.slice(0, 8) + '01', to.slice(0, 8) + '31')).forEach(function (r) {   // นับบิลทั้งเดือนเพื่อหาขั้นเรท แล้วจ่ายเฉพาะบิลในช่วงที่เลือก
       if (!r.bill || r.kind !== 'admin' || !r.code || r.date < from || r.date > to || (branchFilter && !branchFilter(r.branch))) return;
       var pa = P(r.code); pa.comm = r2(pa.comm + r.amt); pa.cases++;
@@ -1967,7 +2294,7 @@ function makeCore(store) {
     var att = rows('Attendance').filter(function (a) { return a.staff === u.code && a.date >= from && a.date <= to; }).map(clean);
     var hours = sum(att, function (a) { return a.out ? (toMin(a.out) - toMin(a.in)) / 60 : 0; });
     var leads = has(u, ['adminpage']) ? rows('Leads').filter(function (l) { return l.admin === u.name && l.date >= from && l.date <= to; }) : [];
-    return { from: from, to: to, sum: me, hours: r2(hours), days: att.length, lates: att.filter(function (a) { return num(a.late) > 0; }).length, attendance: att.reverse(),
+    return { from: from, to: to, sum: me, hours: hours, days: att.length, lates: att.filter(function (a) { return num(a.late) > 0; }).length, attendance: att.reverse(),
       items: e.items.filter(function (i) { return i.who === u.code; }).sort(function (a, b) { return a.date < b.date ? 1 : -1; }),
       leads: leads.length ? { total: leads.length, booked: leads.filter(function (l) { return ['BOOKED', 'ARRIVED', 'BOUGHT', 'NOSHOW'].indexOf(l.status) >= 0; }).length,
         bought: leads.filter(function (l) { return l.status === 'BOUGHT'; }).length, value: sum(leads.filter(function (l) { return l.status === 'BOUGHT'; }), function (l) { return l.actual; }) } : null };
@@ -2354,7 +2681,8 @@ function makeCore(store) {
     ords.forEach(function (o) { if (!o.receipt && num(o.total) > 0) unpaid[o.vn] = 1; });
     rows('Visits').forEach(function (v) { if (v.branch !== u.branch || v.date !== d) return; st[v.stage] = (st[v.stage] || 0) + 1; if (['DONE', 'CANCEL'].indexOf(v.stage) < 0 && unpaid[v.vn]) due++; });
     var lastCount = rows('Counts').filter(function (c) { return c.branch === u.branch; }).slice(-1)[0];
-    return { stages: st, due: due,
+    var instDue = rows('Installments').filter(function (x) { return x.branch === u.branch && x.status !== 'PAID' && x.due <= d; }).length;
+    return { stages: st, due: due + instDue, instDue: instDue,
       booked: rows('Appointments').filter(function (a) { return a.branch === u.branch && a.date === d && a.status === 'BOOKED'; }).length,
       leads: rows('Leads').filter(function (l) { return l.branch === u.branch && l.status === 'NEW'; }).length,
       low: rows('Stock').filter(function (s) { return s.branch === u.branch && num(s.min) > 0 && num(s.qty) <= num(s.min); }).length,
@@ -2376,7 +2704,7 @@ function makeCore(store) {
   };
   PERM.countPreview = ['manager'];
 
-  return { api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook, adsExport: adsExport };
+  return { api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook, adsExport: adsExport, countRemind: countRemind, offAutoFill: offAutoFill };
 }
 
 /* ---------- อ่านบัตรประชาชน (ข้อความจาก OCR) ---------- */
@@ -2685,7 +3013,7 @@ function makeSeed() {
   T.ReqLines = [{ req: 'RQ00001', stock: 'ST01', name: 'Nabota 100U', qty: 200, approved: '', received: '' }, { req: 'RQ00001', stock: 'ST12', name: 'ยาชา EMLA', qty: 6, approved: '', received: '' }];
   T.OpenVials = [{ id: 'VL00001', branch: 'DTCM', stock: 'ST01', name: 'Nabota 100U', unit: 'U', size: 100, left: 40, lot: 'L2600', openedAt: day(-3) + ' 14:20', expireAt: day(25) + ' 14:20', openedBy: 'พยาบาลภา (N01)', status: 'OPEN', closedBy: '' },
     { id: 'VL00002', branch: 'DTCM', stock: 'ST10', name: 'Mounjaro 15mg', unit: 'mg', size: 15, left: 5, lot: 'L2609', openedAt: day(-30) + ' 11:00', expireAt: day(-2) + ' 11:00', openedBy: 'หมอแทน (D01)', status: 'OPEN', closedBy: '' }];
-  T.Counts = []; T.CountLines = []; T.Photos = []; T.Log = [];
+  T.Counts = []; T.CountLines = []; T.DayOffs = []; T.Vacation = []; T.OTs = []; T.Installments = []; T.Photos = []; T.Log = [];
   T.Wallet = [{ time: day(-20) + ' 15:10', hn: 'DT10002', name: T.Patients[1].name, amount: 2500, type: 'แปลงคอร์ส', ref: 'CS-OLD Pico เหลือ 1 ครั้ง', by: 'มิ้นท์', balance: 2500, branch: 'DTCM' }];
   return { v: 'demo6-' + TODAY, tables: T, seq: { seq_CS: 10, seq_AP: 10, seq_OR: seq.OR + 1, seq_L: 9100, seq_RQ: 5, seq_VL: 3, seq_AT: T.Attendance.length + 1 } };
 }
@@ -2711,6 +3039,8 @@ function $(s, r) { return (r || document).querySelector(s); }
 function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 function fm(n, d) { n = Number(n) || 0; return n.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: d == null ? 2 : d }); }
+function hmDur(h) { var m = Math.round((Number(h) || 0) * 60), H = Math.floor(m / 60), M = m % 60; return (H ? H + ' ชม.' : '') + (M ? (H ? ' ' : '') + M + ' นาที' : '') || '0 นาที'; }
+function hmClock(h) { var m = Math.round((Number(h) || 0) * 60); return Math.floor(m / 60) + ':' + ('0' + m % 60).slice(-2); }
 function bt(n) { return '฿' + fm(n); }
 function nz(v) { var n = Number(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; }
 function rid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
@@ -2937,6 +3267,7 @@ var TILES = [
   { k: 'arrivals', t: 'คนไข้นัดไว้แล้ว', s: 'กดรับเข้าคิวเมื่อมาถึง', ic: 'cal', r: FRONT, b: 'booked' },
   { k: 'bookNew', t: 'ลงนัด', s: 'จองห้อง/เตียงอัตโนมัติ', ic: 'plus', r: FRONT },
   { k: 'due', t: 'เก็บเงิน / ค้างจ่าย', s: 'บิลที่ยังไม่ได้ชำระ', ic: 'cash', r: FRONT, b: 'due' },
+  { k: 'rcFind', t: 'ใบเสร็จย้อนหลัง', s: 'ค้นหา · ดู · พิมพ์ซ้ำ', ic: 'search', r: FRONT.concat(['account']) },
   { k: 'queue', t: 'คิววันนี้', s: 'สถานะคนไข้ทุกคน', ic: 'list', r: FRONT.concat(['sales']) },
   { k: 'leads', t: 'ลีดรอลงนัด', s: 'ลีดที่ยังไม่ได้นัด', ic: 'chat', r: FRONT, b: 'leads' },
   { k: 'sched', t: 'ตารางนัด', s: 'ห้อง · เตียง · ทั้งวัน', ic: 'grid', r: FRONT.concat(CLINS) },
@@ -2950,9 +3281,11 @@ var TILES = [
   { k: 'income', t: 'รายรับ', s: 'วัน · เดือน · ปี · แยกช่องทาง · แก้รายการคีผิด', ic: 'cash', r: ['account', 'manager'] },
   { k: 'att', t: 'เข้า-ออกงาน', s: 'ใครมาแล้ว · สาย · ลืมเช็คเอาท์', ic: 'user', r: ['account', 'manager'] },
   { k: 'adm', t: 'บิลแอดมิน', s: 'ปิดได้กี่บิล · มาจริง · แยกสาขา · ยกมาจากเดือนก่อน', ic: 'chat', r: ['account', 'manager'] },
+  { k: 'otApprove', t: 'อนุมัติ OT', s: 'คำขอ OT จากพนักงาน · อนุมัติแล้วบวกเงินเดือน', ic: 'user', r: ['account'] },
   { k: 'fees', t: 'จ่ายพนักงาน', s: 'เงินเดือน · DF · ค่ามือ · ค่าคอม', ic: 'coin', r: ['account', 'manager'] },
   { k: 'promos', t: 'จัดการโปร', s: 'โปรรายเดือน S/M/L · ราคาแต่ละสาขา', ic: 'mega', r: ['marketing', 'manager'] },
   { k: 'gallery', t: 'รูปรีวิว', s: 'เฉพาะคนไข้ที่อนุญาต', ic: 'img', r: ['marketing'] },
+  { k: 'offCal', t: 'ปฏิทินวันหยุดพนักงาน', s: 'ใครหยุดวันไหน · ลงวันหยุดใน LINE', ic: 'cal', r: null },
   { k: 'me', t: 'ของฉัน · ลงเวลา', s: 'เช็คอิน · DF/ค่ามือ/ค่าคอมของฉัน', ic: 'user', r: null }
 ];
 TITLES.home = '';
@@ -3063,13 +3396,13 @@ function lineStart() {
   }).catch(function (e) { paint('<div class="lx-splash"><div class="card stack" style="max-width:420px;text-align:center"><h2>เปิดไม่ได้</h2><p class="muted">' + esc(e.message) + '</p><button class="btn p" onclick="lineStart()">ลองใหม่</button></div></div>'); });
 }
 function qTab() { // ?p=clock|pay|me (ลิงก์จาก Rich menu: https://liff.line.me/LIFF_ID?p=pay)
-  var s = location.search, m = s.match(/[?&]p=(clock|pay|me)\b/) || decodeURIComponent((s.match(/liff\.state=([^&]+)/) || [])[1] || '').match(/p=(clock|pay|me)\b/) || location.hash.match(/^#(clock|pay|me)$/);
+  var s = location.search, m = s.match(/[?&]p=(clock|pay|me|off|work)\b/) || decodeURIComponent((s.match(/liff\.state=([^&]+)/) || [])[1] || '').match(/p=(clock|pay|me|off|work)\b/) || location.hash.match(/^#(clock|pay|me|off|work)$/);
   return m && m[1];
 }
 function gotSession(r) {
   var q = qTab(); if (q) L.tab = q;
   S.token = r.token; S.user = r.user; LS.sset('hl_tok', r.token); applyBrand(r.user.brand);
-  call('lineMe', {}, { spin: true }).then(function (m) { L.me = m; draw(); }).catch(fail);
+  call('lineMe', {}, { spin: true }).then(function (m) { L.me = m; draw(); taskBadge(); }).catch(fail);
 }
 
 /* ---------- ผูกบัญชีครั้งแรก ---------- */
@@ -3096,34 +3429,52 @@ function bindScreen() {
 }
 
 /* ---------- หน้าหลัก (แท็บล่าง) ---------- */
-var LTABS = [['clock', 'ลงเวลา', 'clock'], ['pay', 'รายได้ของฉัน', 'cash'], ['me', 'บัญชี', 'user']];
+var LTABS = [['clock', 'ลงเวลา', 'clock'], ['off', 'วันหยุด', 'cal'], ['work', 'งานของฉัน', 'list'], ['pay', 'รายได้', 'cash'], ['me', 'บัญชี', 'user']];
+var LTITLE = { pay: 'รายได้ของฉัน' };
 function draw() {
   var u = S.user;
   $('#top').hidden = false;
-  $('#top').innerHTML = '<div class="in">' + logo(u.brand) + '<div class="ttl">' + esc(LTABS.filter(function (t) { return t[0] === L.tab; })[0][1]) + '</div><div class="who"><b>' + esc(u.name) + '</b><br>' + esc(u.roles.map(function (r) { return ROLE_TH[r] || r; }).join(' · ')) + '</div>' +
+  $('#top').innerHTML = '<div class="in">' + logo(u.brand) + '<div class="ttl">' + esc(LTITLE[L.tab] || LTABS.filter(function (t) { return t[0] === L.tab; })[0][1]) + '</div><div class="who"><b>' + esc(u.name) + '</b><br>' + esc(u.roles.map(function (r) { return ROLE_TH[r] || r; }).join(' · ')) + '</div>' +
     (u.picture ? '<img src="' + esc(u.picture) + '" alt="" class="lx-av sm">' : '') + '</div>';
   var nav = $('#lnav'); if (!nav) { nav = document.createElement('nav'); nav.id = 'lnav'; nav.className = 'lx-nav'; document.body.appendChild(nav); }
-  nav.innerHTML = LTABS.map(function (t) { return '<button data-tab="' + t[0] + '" class="' + (L.tab === t[0] ? 'on' : '') + '">' + ic(t[2], 22) + '<span>' + t[1] + '</span></button>'; }).join('');
+  nav.innerHTML = LTABS.map(function (t) { return '<button data-tab="' + t[0] + '" class="' + (L.tab === t[0] ? 'on' : '') + '">' + ic(t[2], 22) + '<span>' + t[1] + '</span>' + (t[0] === 'work' && L.badge ? '<i class="lx-bd">' + L.badge + '</i>' : '') + '</button>'; }).join('');
   nav.onclick = function (e) { var b = e.target.closest('[data-tab]'); if (!b) return; L.tab = b.dataset.tab; draw(); window.scrollTo(0, 0); };
   if (L.tick) { clearInterval(L.tick); L.tick = null; }
   paint('<div class="lx"><div class="empty"><div class="spin" style="margin:2rem auto"></div></div></div>');
-  (L.tab === 'clock' ? clockTab() : L.tab === 'pay' ? payTab() : meTab()).then(function (h) { paint('<div class="lx stack">' + demoBar() + h + '</div>'); if (L.tab === 'clock') startTick(); }).catch(function (e) { paint('<div class="lx"><div class="card empty">' + esc(e.message) + '</div></div>'); });
+  (L.tab === 'clock' ? clockTab() : L.tab === 'pay' ? payTab() : L.tab === 'off' ? offTab() : L.tab === 'work' ? workTab() : meTab()).then(function (h) { paint('<div class="lx stack">' + demoBar() + h + '</div>'); if (L.tab === 'clock') startTick(); if (L.after) { var f = L.after; L.after = null; f(); } }).catch(function (e) { paint('<div class="lx"><div class="card empty">' + esc(e.message) + '</div></div>'); });
 }
 function startTick() { var el = $('#lclk'); if (!el) return; function f() { var d = new Date(Date.now() + 7 * 3600e3); el.textContent = d.toISOString().slice(11, 19); } f(); L.tick = setInterval(f, 1000); }
 
 function clockTab() {
   var from = addDays(today(), -13);
-  return Promise.all([call('myDay'), call('myEarnings', { from: from, to: today() })]).then(function (r) {
-    var d = r[0], e = r[1], a = d.attendance, sh = d.shift || {};
+  return Promise.all([call('myDay'), call('myEarnings', { from: from, to: today() }), call('myTasks').catch(function () { return null; })]).then(function (r) {
+    var d = r[0], e = r[1], a = d.attendance, sh = d.shift || {}, tk = taskList(r[2]);
     var st = !a ? ['ยังไม่เช็คอินวันนี้', ''] : a.out ? ['เลิกงานแล้ว', a.in + ' – ' + a.out] : ['กำลังทำงาน', 'เข้างาน ' + a.in + (num0(a.late) ? ' · สาย ' + a.late + ' นาที' : '')];
     var bs = L.me.branches || [], anyGps = bs.some(function (b) { return b.gps; });
-    return '<div class="card stack lx-clock"><div class="small muted">' + thDate(d.today, 1) + (sh.in ? ' · กะ ' + esc(sh.in + '–' + sh.out) : '') + '</div>' +
+    return taskCard(tk) + '<div class="card stack lx-clock"><div class="small muted">' + thDate(d.today, 1) + (sh.in ? ' · กะ ' + esc(sh.in + '–' + sh.out) : '') + '</div>' +
       '<div class="lx-time" id="lclk">--:--:--</div><div class="row" style="justify-content:center"><span class="pill ' + (!a ? 'w' : a.out ? '' : 'g') + '">' + esc(st[0]) + '</span>' + (st[1] ? '<span class="small muted">' + esc(st[1]) + '</span>' : '') + '</div>' +
       (!a || a.out ? '<button class="btn p lg blk lx-big" data-l="clock" data-t="in">' + ic('pin', 24) + ' เช็คอินเข้างาน</button>' : '<button class="btn w lg blk lx-big" data-l="clock" data-t="out">' + ic('pin', 24) + ' เช็คเอาท์ออกงาน</button>') +
       '<div class="xs muted">บันทึกพิกัดทุกครั้ง' + (anyGps ? ' · ต้องอยู่ในรัศมีสาขา' : '') + ' · ใช้เวลาของเซิร์ฟเวอร์ แก้เวลาในเครื่องไม่มีผล</div></div>' +
       '<div class="card stack"><div class="sec"><h2>ลงเวลา 14 วันล่าสุด</h2><span class="pill">' + e.days + ' วัน · สาย ' + e.lates + '</span></div>' +
       (e.attendance.length ? '<div class="list">' + e.attendance.map(function (x) { return '<div class="li"><div class="main"><div class="t">' + esc(thDate(x.date, 1)) + '</div><div class="s">' + esc(x.branch || '') + (x.inDist !== '' && x.inDist != null ? ' · 📍 ห่าง ' + x.inDist + ' ม.' : x.inGps ? ' · 📍 บันทึกพิกัดแล้ว' : '') + '</div></div><div class="r"><b class="mono">' + esc(x.in) + ' – ' + esc(x.out || '…') + '</b>' + (num0(x.late) ? '<div class="xs dn">สาย ' + x.late + ' นาที</div>' : '') + '</div></div>'; }).join('') + '</div>' : '<div class="empty">ยังไม่มีประวัติ</div>') + '</div>';
   });
+}
+
+function taskList(t) {   // งานค้างจาก myTasks → รายการสั้นๆ ไว้โชว์หน้าลงเวลา
+  if (!t) return []; var o = [];
+  if (t.offPending) o.push({ i: '📅', t: 'อนุมัติวันหยุด ' + t.offPending + ' รายการ', s: 'พนักงานขอวันหยุด รอคุณกดอนุมัติ' });
+  if (t.otPending) o.push({ i: '⏱️', t: 'อนุมัติ OT ' + t.otPending + ' รายการ', s: 'ดูรูปแนบแล้วกดอนุมัติ' });
+  if (t.count && !t.count.done) o.push({ i: '📦', t: 'นับสต้อกประจำสัปดาห์', s: 'สัปดาห์นี้ยังไม่ได้นับ · นับในมือถือได้เลย' });
+  if (t.offWindow && t.offWindow.used < t.offWindow.quota) o.push({ i: '🗓️', t: 'ลงวันหยุดเดือน' + monTh(t.offWindow.month) + ' ได้แล้ว', s: (t.offWindow.used ? 'ลงไปแล้ว ' + t.offWindow.used + '/' + t.offWindow.quota + ' วัน · ' : 'คนละ ' + t.offWindow.quota + ' วัน · ') + 'ลงได้ถึงวันที่ ' + t.offWindow.until + ' · ใครลงก่อนได้ก่อน', mine: 1, go: 'off' });
+  if (t.autoOff && t.autoOff.length) o.push({ i: '🤖', t: 'ระบบลงวันหยุดให้คุณ ' + t.autoOff.length + ' วัน', s: 'เพราะไม่ได้ลงเองภายในวันที่ 25: ' + t.autoOff.map(function (d) { return thDate(d, 1); }).join(', ') + ' · อยากเปลี่ยน ส่งคำขอได้', mine: 1, go: 'off' });
+  if (t.myPending) o.push({ i: '⏳', t: 'คำขอวันหยุดของคุณรออนุมัติ ' + t.myPending + ' รายการ', s: '', mine: 1 });
+  return o;
+}
+function taskCard(tk) {
+  if (!tk.length) return '';
+  var todo = tk.filter(function (x) { return !x.mine; }).length;
+  return '<div class="card stack lx-task"><div class="row"><b class="sp">' + (todo ? '🔔 งานที่รอคุณ ' + todo + ' อย่าง' : 'แจ้งเตือน') + '</b></div><div class="list">' + tk.map(function (x) { return '<div class="li"><span class="lx-ti">' + x.i + '</span><div class="main"><div class="t">' + esc(x.t) + '</div>' + (x.s ? '<div class="s">' + esc(x.s) + '</div>' : '') + '</div></div>'; }).join('') + '</div>' +
+    (todo ? '<button class="btn p blk" data-tab-go="work">ไปที่งานของฉัน ›</button>' : '') + (tk.some(function (x) { return x.go === 'off'; }) ? '<button class="btn ' + (todo ? '' : 'p ') + 'blk" data-tab-go="off">ลงวันหยุด ›</button>' : !todo ? '<button class="btn blk" data-tab-go="off">ดูวันหยุดของฉัน ›</button>' : '') + '</div>';
 }
 function num0(v) { return Number(v) || 0; }
 function clockDlg(type) {
@@ -3147,7 +3498,11 @@ function clockDlg(type) {
       return call('clock', { type: type, lat: pos.latitude, lng: pos.longitude, acc: pos.accuracy, branch: pick }, { write: true, msg: type === 'in' ? 'กำลังเช็คอิน…' : 'กำลังเช็คเอาท์…' }).then(function (r) {
         try { navigator.geolocation.clearWatch(watch); } catch (e) {}
         var dd = r.dist !== '' && r.dist != null ? ' · ห่างสาขา ' + r.dist + ' ม.' : '';
-        toast((r.type === 'in' ? 'เช็คอิน ' + r.time + (r.branch ? ' · ' + r.branch : '') + dd + (r.late ? ' · สาย ' + r.late + ' นาที' : '') : 'เช็คเอาท์ ' + r.time + dd + ' · ทำงาน ' + fm(r.hours, 1) + ' ชม.'), r.late ? 1 : 0); draw();
+        toast((r.type === 'in' ? 'เช็คอิน ' + r.time + (r.branch ? ' · ' + r.branch : '') + dd + (r.late ? ' · สาย ' + r.late + ' นาที' : '') : 'เช็คเอาท์ ' + r.time + dd + ' · ทำงาน ' + hmDur(r.hours) + ''), r.late ? 1 : 0); draw();
+        if (r.type === 'in') call('myTasks').then(function (t) { var tk = taskList(t); if (!tk.length) return;
+          var onlyOff = !tk.some(function (x) { return !x.mine; }); if (onlyOff && !tk.some(function (x) { return x.go === 'off'; })) return;
+          dialog({ title: onlyOff ? 'อย่าลืม' : 'งานที่รอคุณ', ok: onlyOff ? 'ลงวันหยุด' : 'ไปที่งานของฉัน', cancel: 'ไว้ทีหลัง', body: '<div class="list">' + tk.map(function (x) { return '<div class="li"><span class="lx-ti">' + x.i + '</span><div class="main"><div class="t">' + esc(x.t) + '</div>' + (x.s ? '<div class="s">' + esc(x.s) + '</div>' : '') + '</div></div>'; }).join('') + '</div>' })
+            .then(function (ok) { if (ok) { L.tab = onlyOff ? 'off' : 'work'; draw(); window.scrollTo(0, 0); } }); }).catch(function () {});
       });
     } }).then(function () { try { navigator.geolocation.clearWatch(watch); } catch (e) {} });
 }
@@ -3164,11 +3519,11 @@ function payTab() {
   var r0 = rngOf(L.rng);
   return call('myEarnings', r0).then(function (e) {
     var sm = e.sum, comm = (sm.comm || 0) - (sm.mgmt || 0), tot = (sm.df || 0) + (sm.fee || 0) + (sm.comm || 0) + (sm.salary || 0);
-    var parts = [['เงินเดือน', sm.salary], ['DF แพทย์', sm.df], ['ค่ามือ', sm.fee], ['ค่าคอม', comm], ['ค่าบริหาร', sm.mgmt]].filter(function (x) { return x[1]; });
+    var parts = [['เงินเดือน', (sm.salary || 0) - (sm.ot || 0)], ['OT', sm.ot], ['DF แพทย์', sm.df], ['ค่ามือ', sm.fee], ['ค่าคอม', comm], ['ค่าบริหาร', sm.mgmt]].filter(function (x) { return x[1]; });
     return '<div class="chips" id="rng">' + RNG.map(function (x) { return '<button data-r="' + x[0] + '" class="' + (L.rng === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' +
       '<div class="card stack lx-total"><div class="small muted">' + esc(thDate(e.from)) + (e.to !== e.from ? ' – ' + esc(thDate(e.to)) : '') + '</div><div class="l">รวมที่ได้</div><div class="lx-amt">' + bt(tot) + '</div>' +
       (parts.length ? '<div class="lx-split">' + parts.map(function (x) { return '<div><span class="xs muted">' + x[0] + '</span><b>' + bt(x[1]) + '</b></div>'; }).join('') + '</div>' : '') +
-      '<div class="row small muted"><span>' + (sm.cases || 0) + ' เคส</span>' + (sm.sales ? '<span>· ยอดขาย ' + bt(sm.sales) + '</span>' : '') + '<span>· ทำงาน ' + e.days + ' วัน ' + fm(e.hours, 1) + ' ชม.</span></div></div>' +
+      '<div class="row small muted"><span>' + (sm.cases || 0) + ' เคส</span>' + (sm.sales ? '<span>· ยอดขาย ' + bt(sm.sales) + '</span>' : '') + '<span>· ทำงาน ' + e.days + ' วัน ' + hmDur(e.hours) + '</span></div></div>' +
       lineComm(sm) +
       (e.leads ? '<div class="card row small"><span class="sp">ลีด ' + e.leads.total + ' · นัดได้ ' + e.leads.booked + ' · ซื้อ ' + e.leads.bought + '</span><b>' + bt(e.leads.value) + '</b></div>' : '') +
       '<div class="card stack"><div class="sec"><h2>รายการ</h2><span class="pill">' + e.items.length + '</span></div>' +
@@ -3195,6 +3550,154 @@ function lineComm(sm) {
 var TH_MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 function monTh(m) { return TH_MON[+m.slice(5, 7) - 1] + ' ' + String(+m.slice(0, 4) + 543).slice(2); }
 
+
+/* ---------- วันหยุด ---------- */
+var TH_DS = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+function monAdd(m, n) { var y = +m.slice(0, 4), mo = +m.slice(5, 7) - 1 + n; y += Math.floor(mo / 12); mo = ((mo % 12) + 12) % 12; return y + '-' + ('0' + (mo + 1)).slice(-2); }
+function monDays(m) { var y = +m.slice(0, 4), mo = +m.slice(5, 7), n = new Date(Date.UTC(y, mo, 0)).getUTCDate(), first = new Date(Date.UTC(y, mo - 1, 1)).getUTCDay(), out = []; for (var i = 1; i <= n; i++) out.push(m + '-' + ('0' + i).slice(-2)); return { days: out, first: first }; }
+var OFF_PILL = { OK: 'g', APPROVED: 'g', PENDING: 'w', REJECTED: 'd', CANCEL: '' };
+function offTab() {
+  return Promise.all([call('offInfo'), null]).then(function (r) {
+    var o = L.off = r[0], v = L.offView || 'me';
+    if (!L.offMon) L.offMon = +o.today.slice(8, 10) >= o.window.a ? o.nextMonth : o.today.slice(0, 7);
+    if (!L.offSel) L.offSel = {};
+    var head = '<div class="chips"><button data-o="me" class="' + (v === 'me' ? 'on' : '') + '">วันหยุดของฉัน</button><button data-o="team" class="' + (v === 'team' ? 'on' : '') + '">📅 ปฏิทินใครหยุดวันไหน</button></div>';
+    if (v === 'team') return teamCal().then(function (h) { return head + h; });
+    var mon = L.offMon, md = monDays(mon), mine = {}; o.mine.forEach(function (x) { if (x.status !== 'CANCEL') mine[x.date] = x; });
+    var used = o.used[mon] || 0, nSel = Object.keys(L.offSel).length;
+    var grid = '<div class="lx-cal">' + TH_DS.map(function (d, i) { return '<b class="' + (i === 0 || i === 6 ? 'we' : '') + '">' + d + '</b>'; }).join('') + new Array(md.first + 1).join('<span></span>') +
+      md.days.map(function (d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(), x = mine[d], tk = !x && o.taken && o.taken[d], past = d <= o.today, cls = (w === 0 || w === 6 ? 'we ' : '') + (past ? 'past ' : '') + (L.offSel[d] ? 'sel ' : '') + (x ? 'st-' + x.status + ' ' : '') + (tk ? 'tk ' : '');
+        return '<button data-od="' + d + '" class="' + cls + '"' + (past || (x && x.status !== 'REJECTED') ? ' disabled' : '') + '>' + +d.slice(8) + (x ? '<i>' + (x.status === 'PENDING' ? 'รออนุมัติ' : x.status === 'REJECTED' ? 'ไม่ผ่าน' : 'หยุด') + '</i>' : tk ? '<i>' + esc(tk[0]) + (tk.length > 1 ? '+' + (tk.length - 1) : '') + '</i>' : '') + '</button>'; }).join('') + '</div>';
+    var vm = L.offMode === 'vac', vac = o.vac || {}, vy = vac.year ? (+vac.year + 543) : '';
+    var vacCard = '<div class="card stack" style="gap:.5rem"><div class="row"><b class="sp">🏖️ พักร้อนปี ' + vy + '</b>' + (vac.days === null ? '<span class="pill">ยังไม่มีสิทธิ์</span>' : '<span class="pill ' + (vac.left > 0 ? 'g' : '') + '">เหลือ ' + vac.left + ' / ' + vac.days + ' วัน</span>') + '</div>' +
+      (o.vacNext && o.vacNext.days !== null ? '<div class="xs muted">ปี ' + (+o.vacNext.year + 543) + ': เหลือ ' + o.vacNext.left + ' / ' + o.vacNext.days + ' วัน</div>' : '') +
+      '<div class="chips"><button data-om2="off" class="' + (vm ? '' : 'on') + '">เลือกเป็นวันหยุดปกติ</button><button data-om2="vac" class="' + (vm ? 'on' : '') + '">เลือกเป็นพักร้อน</button></div>' +
+      (vm ? '<div class="xs muted">พักร้อนต้องรอ <b>ผู้จัดการ + ผู้ดูแลระบบ</b> อนุมัติทุกครั้ง · ไม่นับใน ' + o.quota + ' วันหยุด/เดือน</div>' : '') + '</div>';
+    return head + vacCard +
+      '<div class="note small' + (o.open ? '' : ' w') + '"' + (vm ? ' hidden' : '') + '>' + (o.open ? '✅ เปิดให้ลงวันหยุดเดือน <b>' + monTh(o.nextMonth) + '</b> ได้ถึงวันที่ ' + o.window.b + ' · คนละ ' +  o.quota + ' วัน · ห้ามเสาร์–อาทิตย์ · ห้ามหยุดตรงกับคนอื่นในสาขา (ใครลงก่อนได้ก่อน)' :
+        'ลงวันหยุดเองได้วันที่ <b>' + o.window.a + '–' + o.window.b + '</b> ของทุกเดือน (ลงของเดือนหน้า) · คนละ ' + o.quota + ' วัน · ห้ามเสาร์–อาทิตย์ · ห้ามหยุดตรงกับคนอื่น — ตอนนี้ต้อง <b>ส่งคำขอ</b> ให้ผู้จัดการและผู้ดูแลระบบอนุมัติ') + '</div>' +
+      '<div class="card stack"><div class="row"><button class="btn sm" data-om="-1">‹</button><b class="sp" style="text-align:center">' + monTh(mon) + '</b><button class="btn sm" data-om="1">›</button></div>' +
+      '<div class="row small"><span class="sp muted">ใช้ไปแล้ว</span><b>' + used + ' / ' + o.quota + ' วัน</b></div>' + grid +
+      '<div class="row xs muted"><span class="pill g">ลงแล้ว/อนุมัติ</span><span class="pill w">รออนุมัติ</span><span class="pill d">มีคนหยุดแล้ว (ต้องขอ)</span><span>แตะวันที่เพื่อเลือก</span></div>' +
+      '<button class="btn p lg blk" data-ob="1"' + (nSel ? '' : ' disabled') + '>' + (vm ? 'ขอพักร้อน' : 'ลงวันหยุด') + (nSel ? ' ' + nSel + ' วัน' : '') + '</button></div>' +
+      '<div class="card stack"><div class="sec"><h2>รายการของฉัน</h2></div>' + (o.mine.length ? '<div class="list">' + o.mine.map(function (x) {
+        return '<div class="li"><div class="main"><div class="t">' + esc(thDate(x.date, 1)) + '</div><div class="s">' + esc(x.kind) + (x.reason ? ' · ' + esc(x.reason) : '') + (x.status === 'PENDING' ? ' · ' + (x.mgrBy ? 'ผจก. ✓' : 'รอ ผจก.') + ' · ' + (x.admBy ? 'ผู้ดูแลระบบ ✓' : 'รอผู้ดูแลระบบ') : '') + (x.status === 'REJECTED' && x.note ? ' · ' + esc(x.note) : '') + '</div></div>' +
+          '<span class="pill ' + (OFF_PILL[x.status] || '') + '">' + esc(x.statusTh) + '</span>' + (['OK', 'PENDING', 'APPROVED'].indexOf(x.status) >= 0 && x.date > o.today ? '<button class="btn q sm" data-oc="' + esc(x.id) + '">ยกเลิก</button>' : '') + '</div>'; }).join('') + '</div>' : '<div class="empty">ยังไม่มีวันหยุด</div>') + '</div>';
+  });
+}
+function teamCal() {
+  var mon = L.calMon || L.offMon || today().slice(0, 7);
+  return call('offCalendar', { month: mon, branch: L.calBr }).then(function (c) {
+    L.calMon = c.month; var by = {}; c.list.forEach(function (x) { (by[x.date] = by[x.date] || []).push(x); });
+    var md = monDays(c.month), days = Object.keys(by).sort();
+    var grid = '<div class="lx-cal team">' + TH_DS.map(function (d, i) { return '<b class="' + (i === 0 || i === 6 ? 'we' : '') + '">' + d + '</b>'; }).join('') + new Array(md.first + 1).join('<span></span>') +
+      md.days.map(function (d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(), n = (by[d] || []).length; return '<a href="#od' + d + '" class="' + (w === 0 || w === 6 ? 'we ' : '') + (n ? 'has' : '') + '">' + +d.slice(8) + (n ? '<i>' + n + ' คน</i>' : '') + '</a>'; }).join('') + '</div>';
+    return '<div class="card stack"><div class="row"><button class="btn sm" data-cm="-1">‹</button><b class="sp" style="text-align:center">' + monTh(c.month) + '</b><button class="btn sm" data-cm="1">›</button></div>' +
+      (c.canAll ? '<select id="cbr"><option value=""' + (c.branch ? '' : ' selected') + '>ทุกสาขา</option>' + c.branches.map(function (b) { return '<option value="' + esc(b.code) + '"' + (b.code === c.branch ? ' selected' : '') + '>' + esc(b.name) + '</option>'; }).join('') + '</select>' : '<div class="small muted">สาขาของคุณ</div>') + grid + '</div>' +
+      '<div class="card stack"><h2>ใครหยุดวันไหน</h2>' + (days.length ? '<div class="list">' + days.map(function (d) { return '<div class="li" id="od' + d + '"><div class="qn" style="font-size:.95rem">' + +d.slice(8) + '</div><div class="main"><div class="t">' + esc(thDate(d, 1)) + '</div><div class="s">' + by[d].map(function (x) { return esc(x.name) + (x.vac ? ' 🏖️' : '') + (c.branch ? '' : ' (' + esc(x.branch) + ')') + (x.status === 'PENDING' ? ' <span class="pill w">รออนุมัติ</span>' : ''); }).join(' · ') + '</div></div></div>'; }).join('') + '</div>' : '<div class="empty">ยังไม่มีใครลงวันหยุดเดือนนี้</div>') + '</div>';
+  });
+}
+function offSubmit() {
+  var ds = Object.keys(L.offSel).sort(); if (!ds.length) return;
+  if (L.offMode === 'vac') return dialog({ title: 'ขอพักร้อน ' + ds.length + ' วัน', ok: 'ส่งคำขอ', body: '<div class="small">' + ds.map(function (d) { return esc(thDate(d, 1)); }).join(' · ') + '</div><label>หมายเหตุ (ถ้ามี)<input id="vrz" placeholder="เช่น กลับบ้านต่างจังหวัด"></label><p class="xs muted">รอผู้จัดการ + ผู้ดูแลระบบอนุมัติ · หักจากสิทธิ์พักร้อนทันทีที่ส่ง (คืนให้ถ้าไม่อนุมัติ/ยกเลิก)</p>',
+    onOk: function (b) { return call('vacBook', { dates: ds, reason: b.querySelector('#vrz').value.trim() }, { write: true }).then(function (r) { L.offSel = {}; toast('ส่งคำขอพักร้อนแล้ว · เหลือ ' + (r.vac.left == null ? '-' : r.vac.left) + ' วัน'); draw(); }); } });
+  call('offBook', { dates: ds }, { write: true }).then(function (r) {
+    if (!r.need.length) { L.offSel = {}; toast('ลงวันหยุดแล้ว ' + r.saved.length + ' วัน'); return draw(); }
+    var free = ds.length - r.need.length;
+    dialog({ title: 'ต้องส่งคำขอ', ok: 'ส่งคำขอ', body: '<p class="small">วันต่อไปนี้ลงเองไม่ได้ ต้องให้ <b>ผู้จัดการ</b> และ <b>ผู้ดูแลระบบ</b> อนุมัติทั้งคู่</p><div class="list">' + r.need.map(function (x) { return '<div class="li"><div class="main"><div class="t">' + esc(thDate(x.date, 1)) + '</div><div class="s dn">' + esc(x.why.join(' · ')) + '</div></div></div>'; }).join('') + '</div>' +
+      (free ? '<p class="xs muted">อีก ' + free + ' วันที่เลือกไว้ลงได้ปกติ จะบันทึกพร้อมกัน</p>' : '') + '<label>เหตุผลที่ขอหยุด *<input id="orz" placeholder="เช่น ไปงานแต่งญาติ / ไปหาหมอ"></label>',
+      onOk: function (b) { var rz = b.querySelector('#orz').value.trim(); if (!rz) throw new Error('ใส่เหตุผลที่ขอหยุด');
+        return call('offBook', { dates: ds, request: true, reason: rz }, { write: true }).then(function (r2) { L.offSel = {}; toast('ส่งคำขอแล้ว · รออนุมัติ'); draw(); }); } });
+  }).catch(fail);
+}
+
+/* ---------- งานของฉัน (อนุมัติวันหยุด · นับสต้อกประจำสัปดาห์) ---------- */
+function taskBadge() { call('myTasks').then(function (t) { L.badge = t.offPending + (t.otPending || 0) + (t.count && !t.count.done ? 1 : 0); var n = $('#lnav [data-tab="work"]'); if (n) { var i = n.querySelector('.lx-bd'); if (L.badge) { if (!i) { i = document.createElement('i'); i.className = 'lx-bd'; n.appendChild(i); } i.textContent = L.badge; } else if (i) i.remove(); } }).catch(function () {}); }
+function workTab() {
+  if (L.counting) return countView();
+  if (L.otForm) return otFormView();
+  return Promise.all([call('myTasks'), call('offPending'), call('otPending'), call('otInfo')]).then(function (r) {
+    var t = r[0], pend = r[1], otp = r[2], oti = r[3], h = '';
+    L.badge = t.offPending + (t.otPending || 0) + (t.count && !t.count.done ? 1 : 0);
+    if (otp.length) h += '<div class="card stack"><div class="sec"><h2>อนุมัติ OT</h2><span class="pill w">' + otp.length + '</span></div><div class="list">' + otp.map(function (x) {
+      return '<div class="li" style="flex-wrap:wrap"><div class="main" style="flex:1 1 200px"><div class="t">' + esc(x.name) + ' · ' + esc(thDate(x.date, 1)) + '</div><div class="s">OT ' + esc(x.start + '–' + x.end) + ' · <b>' + hmDur(x.hours) + '</b> · ' + bt(x.amount) + '<br>' + esc(x.reason) + '<br>ลงเวลาจริง ' + esc(x.att) + (x.shift ? ' · กะ ' + esc(x.shift) : '') + ' · สาขา ' + esc(x.branch) + '</div></div>' +
+        '<div class="row" style="margin-left:auto">' + (x.hasPhoto ? '<button class="btn sm" data-otp="' + esc(x.id) + '">ดูรูป</button>' : '') + '<button class="btn sm d" data-otd="' + esc(x.id) + '" data-ok="0">ไม่อนุมัติ</button><button class="btn sm g" data-otd="' + esc(x.id) + '" data-ok="1" data-h="' + x.hours + '" data-a="' + x.amount + '" data-r="' + x.rate + '">อนุมัติ</button></div></div>'; }).join('') + '</div></div>';
+    if (pend.length) h += '<div class="card stack"><div class="sec"><h2>อนุมัติวันหยุด</h2><span class="pill w">' + pend.length + '</span></div><div class="list">' + pend.map(function (x) {
+      return '<div class="li" style="flex-wrap:wrap"><div class="main" style="flex:1 1 200px"><div class="t">' + (x.kind === 'พักร้อน' ? '<span class="pill i">🏖️ พักร้อน</span> ' : '') + esc(x.name) + ' · ' + esc(thDate(x.date, 1)) + '</div><div class="s">' + esc(x.reason || '') + '<br>สาขา ' + esc(x.branch) + (x.vacInfo ? ' · พักร้อนเหลือ ' + x.vacInfo.left + '/' + x.vacInfo.days + ' (นับคำขอนี้แล้ว)' : ' · เดือนนี้ลงไว้ ' + x.monthUsed + ' วัน') + (x.clash && x.clash.length ? ' · <b class="dn">วันนี้ ' + esc(x.clash.join(', ')) + ' หยุดแล้ว</b>' : '') + ' · อนุมัติในฐานะ <b>' + (x.step === 'mgr' ? 'ผู้จัดการ' : 'ผู้ดูแลระบบ') + '</b>' + (x.mgrBy && x.step === 'adm' ? ' (ผจก. ' + esc(x.mgrBy) + ' อนุมัติแล้ว)' : '') + (x.admBy && x.step === 'mgr' ? ' (ผู้ดูแลระบบ ' + esc(x.admBy) + ' อนุมัติแล้ว)' : '') + '</div></div>' +
+        '<div class="row" style="margin-left:auto"><button class="btn sm d" data-wd="' + esc(x.id) + '" data-ok="0">ไม่อนุมัติ</button><button class="btn sm g" data-wd="' + esc(x.id) + '" data-ok="1">อนุมัติ</button></div></div>'; }).join('') + '</div></div>';
+    if (t.count) h += '<div class="card stack"><div class="sec"><h2>นับสต้อกประจำสัปดาห์</h2><span class="pill ' + (t.count.done ? 'g' : 'w') + '">' + (t.count.done ? 'สัปดาห์นี้นับแล้ว' : 'ยังไม่นับ') + '</span></div>' +
+      '<div class="small muted">' + esc(t.count.branch) + ' · นับสัปดาห์ละ 1 ครั้ง (ทุกวัน' + esc(t.count.dueDay) + ')' + (t.count.last ? ' · ครั้งล่าสุด ' + esc(t.count.last) : '') + '</div>' +
+      '<button class="btn ' + (t.count.done ? '' : 'p') + ' lg blk" data-wc="1">' + (t.count.done ? 'นับเพิ่มอีกรอบ' : 'เริ่มนับสต้อก') + '</button></div>';
+    if (t.myPending) h += '<div class="note small">คำขอวันหยุดของคุณรออนุมัติ ' + t.myPending + ' รายการ — ดูที่แท็บวันหยุด</div>';
+    h += '<div class="card stack"><div class="sec"><h2>OT ของฉัน</h2><button class="btn p sm" data-otn="1">+ ขอ OT</button></div><div class="xs muted">ทำงานเกินเวลา → ขอ OT พร้อมแนบรูป ส่งให้ส่วนกลางอนุมัติ · อนุมัติแล้วบวกในเงินเดือน</div>' +
+      (oti.mine.length ? '<div class="list">' + oti.mine.slice(0, 20).map(function (x) { return '<div class="li"><div class="main"><div class="t">' + esc(thDate(x.date, 1)) + ' · ' + esc(x.start + '–' + x.end) + '</div><div class="s">' + hmDur(x.hours) + ' · ' + bt(x.amount) + ' · ' + esc(x.reason) + (x.note ? ' · ' + esc(x.note) : '') + '</div></div><span class="pill ' + ({ APPROVED: 'g', PENDING: 'w', REJECTED: 'd' }[x.status] || '') + '">' + esc(x.statusTh) + '</span>' + (x.status === 'PENDING' ? '<button class="btn q sm" data-otc="' + esc(x.id) + '">ยกเลิก</button>' : '') + '</div>'; }).join('') + '</div>' : '') + '</div>';
+    return h;
+  });
+}
+
+function otFormView() {
+  var d = L.otDate || today();
+  return call('otInfo', { date: d }).then(function (o) {
+    L.otRate = o.rate; var st = L.otStart || o.shiftOut || '', en = L.otEnd || o.out || '';
+    return '<div class="row"><button class="btn sm" data-otx="1">‹ กลับ</button><b class="sp">ขอ OT</b></div>' +
+      '<div class="card stack"><label>วันที่ทำ OT<input type="date" id="otd" value="' + esc(d) + '" max="' + today() + '"></label>' +
+      '<div class="small muted">' + (o.shiftOut ? 'เลิกกะปกติ ' + esc(o.shiftOut) : 'ยังไม่ได้ตั้งเวลากะ') + ' · ' + (o.in ? 'วันนั้นเช็คอิน ' + esc(o.in) + (o.out ? ' เช็คเอาท์ ' + esc(o.out) : ' ยังไม่เช็คเอาท์') : 'วันนั้นไม่มีบันทึกลงเวลา') + '</div>' +
+      '<div class="g2" style="grid-template-columns:1fr 1fr"><label>เริ่ม OT<input type="time" id="ots" value="' + esc(st) + '"></label><label>ถึง<input type="time" id="ote" value="' + esc(en) + '"></label></div>' +
+      '<div class="note small" id="otsum"></div>' +
+      '<label>ทำอะไร / ทำไมต้องอยู่เกินเวลา *<textarea id="otr" placeholder="เช่น เคสผ่าตัดเลิกช้า ต้องดูแลคนไข้หลังผ่าตัด">' + esc(L.otReason || '') + '</textarea></label>' +
+      '<label>แนบรูป * <span class="xs">(เช่น หน้าจอนาฬิกา/งานที่ทำ/ใบงาน)</span><input type="file" id="otf" accept="image/*"></label><img id="otim" alt="" style="max-height:220px;border-radius:12px;object-fit:contain" hidden>' +
+      '<button class="btn p lg blk" data-ots="1">ส่งขอ OT</button><p class="xs muted">ส่งให้ส่วนกลาง (ผู้ดูแลระบบ/บัญชี) อนุมัติ · อนุมัติแล้วบวกในเงินเดือนเดือนนั้น · ส่วนกลางปรับชั่วโมง/ยอดได้</p></div>';
+  });
+}
+function otCalc() { var s = $('#ots'), e = $('#ote'), o = $('#otsum'); if (!s || !o) return; L.otStart = s.value; L.otEnd = e.value;
+  if (!s.value || !e.value) { o.textContent = 'ใส่เวลาเริ่ม–ถึง'; return; } var p = s.value.split(':'), q = e.value.split(':'), m = (+q[0] * 60 + +q[1]) - (+p[0] * 60 + +p[1]); if (m <= 0) m += 1440;
+  o.innerHTML = 'รวม <b>' + hmDur(m / 60) + '</b>' + (L.otRate ? ' · ประมาณ <b>' + bt(Math.round(m / 60 * L.otRate * 100) / 100) + '</b> (' + bt(L.otRate) + '/ชม.)' : ''); }
+function otSend() {
+  var f = $('#otf').files[0], d = $('#otd').value, s = $('#ots').value, e = $('#ote').value, r = $('#otr').value.trim();
+  if (!s || !e) return toast('ใส่เวลาเริ่ม–ถึง', 1); if (!r) return toast('ใส่ว่าทำอะไร', 1); if (!f) return toast('แนบรูปก่อน', 1);
+  readImg(f, 1280, .8).then(function (img) { return call('otRequest', { date: d, start: s, end: e, reason: r, photo: img }, { write: true, msg: 'กำลังส่งขอ OT…' }); })
+    .then(function (x) { L.otForm = false; L.otStart = L.otEnd = L.otReason = ''; L.otDate = ''; toast('ส่งขอ OT แล้ว ' + hmDur(x.hours) + ' · รอส่วนกลางอนุมัติ'); draw(); }).catch(fail);
+}
+function cntKey() { return 'hl_cnt_' + (S.user && S.user.code) + '_' + (S.user && S.user.branch); }
+function cntSave() { try { LS.set(cntKey(), JSON.stringify({ d: today(), v: L.cntVal || {} })); } catch (e) {} }
+function cntLoad() { try { var o = JSON.parse(LS.get(cntKey(), '') || 'null'); return o && o.d && o.d >= addDays(today(), -6) ? o.v || {} : {}; } catch (e) { return {}; } }
+function countView() {
+  return call('countSheet').then(function (c) {
+    L.cnt = c; if (!L.cntVal || !Object.keys(L.cntVal).length) L.cntVal = cntLoad();
+    var done = c.items.filter(function (s) { return L.cntVal[s.code] != null && L.cntVal[s.code] !== ''; }).length, cats = {};
+    c.items.forEach(function (s) { cats[s.category || 'อื่นๆ'] = 1; });
+    return '<div class="row"><button class="btn sm" data-wx="1">‹ กลับ</button><b class="sp">นับสต้อก · ' + esc(S.user.branchName || '') + '</b><span class="pill" id="cntp">' + done + '/' + c.items.length + '</span></div>' +
+      '<div class="note small">นับของที่ยังไม่เปิด (หน่วยเล็กสุด) · ไม่โชว์ยอดในระบบระหว่างนับ เพื่อให้นับจริง · <b>ตัวเลขที่กรอกบันทึกในเครื่องเอง ปิด LINE แล้วกลับมานับต่อได้</b> · ช่องว่าง = ไม่ได้นับ</div>' +
+      '<input id="cnq" type="search" placeholder="ค้นหาชื่อของ…" style="position:sticky;top:calc(58px + env(safe-area-inset-top,0px));z-index:5">' +
+      '<div class="chips lx-scroll" id="cnc"><button class="on" data-cc="">ทั้งหมด</button><button data-cc="__left">ยังไม่นับ</button>' + Object.keys(cats).map(function (k) { return '<button data-cc="' + esc(k) + '">' + esc(k) + '</button>'; }).join('') + '</div>' +
+      '<div class="card"><div class="list" id="cnl">' + c.items.map(function (s, i) { var v = L.cntVal[s.code]; return '<div class="li" data-cn="' + esc((s.name + ' ' + (s.code || '') + ' ' + (s.category || '')).toLowerCase()) + '" data-cg="' + esc(s.category || 'อื่นๆ') + '"><div class="main"><div class="t">' + esc(s.name) + '</div><div class="s">' + esc(s.category || '') + '</div></div><input data-ct="' + i + '" type="number" inputmode="decimal" step="any" enterkeyhint="next" value="' + esc(v != null ? v : '') + '" style="width:96px;min-height:46px;text-align:right;font-size:1.1rem"><span class="xs muted" style="width:36px">' + esc(s.unit || '') + '</span></div>'; }).join('') + '</div></div>' +
+      '<button class="btn p lg blk" data-wk="1">ตรวจยอดกับระบบ</button>';
+  }).then(function (h) { L.after = cntBind; return h; });
+}
+function cntBind() {
+  var list = $('#cnl'); if (!list) return; var cat = '';
+  function filt() { var q = ($('#cnq').value || '').trim().toLowerCase(); $$('#cnl [data-cn]').forEach(function (r) { var inp = r.querySelector('input'), ok = (!q || r.dataset.cn.indexOf(q) >= 0) && (!cat || (cat === '__left' ? inp.value === '' : r.dataset.cg === cat)); r.hidden = !ok; }); }
+  $('#cnq').oninput = filt;
+  $('#cnc').onclick = function (e) { var b = e.target.closest('[data-cc]'); if (!b) return; cat = b.dataset.cc; $$('#cnc button').forEach(function (x) { x.classList.toggle('on', x === b); }); filt(); };
+  list.addEventListener('input', function (e) { var i = e.target.closest('[data-ct]'); if (!i) return; var s = L.cnt.items[+i.dataset.ct]; L.cntVal[s.code] = i.value; cntSave();
+    var n = L.cnt.items.filter(function (x) { return L.cntVal[x.code] != null && L.cntVal[x.code] !== ''; }).length, p = $('#cntp'); if (p) p.textContent = n + '/' + L.cnt.items.length; });
+  list.addEventListener('keydown', function (e) { if (e.key !== 'Enter') return; var ins = $$('#cnl [data-cn]:not([hidden]) input'), k = ins.indexOf(e.target); if (k >= 0 && ins[k + 1]) { e.preventDefault(); ins[k + 1].focus(); } });
+}
+function countCheck() {
+  var c = L.cnt, lines = [];
+  $$('[data-ct]').forEach(function (i) { var s = c.items[+i.dataset.ct]; L.cntVal[s.code] = i.value; }); cntSave();
+  c.items.forEach(function (s) { var v = L.cntVal[s.code]; if (v != null && v !== '') lines.push({ stock: s.code, counted: Number(v) || 0 }); });
+  if (!lines.length) return toast('ยังไม่ได้กรอกยอดนับ', 1);
+  call('countPreview', { lines: lines }, { spin: true }).then(function (pv) {
+    var diff = pv.filter(function (x) { return x.diff !== 0; });
+    dialog({ title: 'ผลนับ · ต่าง ' + diff.length + ' รายการ', ok: 'ยืนยันผลนับ',
+      body: (diff.length ? '<div class="list">' + diff.map(function (x) { return '<div class="li" style="flex-wrap:wrap"><div class="main" style="flex:1 1 180px"><div class="t">' + esc(x.name) + '</div><div class="s">ระบบ ' + fm(x.system) + ' · นับได้ ' + fm(x.counted) + ' · <b class="' + (x.diff < 0 ? 'dn' : 'up') + '">ต่าง ' + fm(x.diff) + '</b> (' + bt(x.value) + ')</div></div><input data-rs="' + esc(x.stock) + '" placeholder="เหตุผล * เช่น ลืมตัด/แตก" style="flex:1 1 160px"></div>'; }).join('') + '</div>' : '<div class="empty">ตรงกับระบบทุกรายการ 👍</div>') +
+        '<p class="xs muted">นับ ' + pv.length + ' รายการ · ส่วนต่างรอบัญชีอนุมัติก่อนปรับสต้อก</p>',
+      onOk: function (b) { var rs = {}; $$('[data-rs]', b).forEach(function (i) { rs[i.dataset.rs] = i.value.trim(); }); lines.forEach(function (l) { l.reason = rs[l.stock] || ''; });
+        return call('countSubmit', { lines: lines }, { write: true }).then(function (r) { L.counting = false; L.cntVal = {}; LS.del(cntKey()); toast(r.pending ? 'บันทึกการนับ ' + r.id + ' · รอบัญชีอนุมัติส่วนต่าง' : 'บันทึกการนับ ' + r.id + ' · ตรงทุกรายการ'); draw(); taskBadge(); }); } });
+  }).catch(fail);
+}
+
 function meTab() {
   var u = S.user, m = L.me;
   return Promise.resolve('<div class="card stack" style="align-items:center;text-align:center">' + (u.picture ? '<img src="' + esc(u.picture) + '" alt="" class="lx-av">' : logo(u.brand, 'full')) +
@@ -3214,7 +3717,37 @@ document.addEventListener('click', function (e) {
     if (a === 'unbind') return ask('ยกเลิกการผูก LINE?', 'ครั้งหน้าต้องใส่รหัสพนักงานเพื่อผูกใหม่', 'ยกเลิกการผูก', true).then(function (ok) { if (!ok) return; call('lineUnbind', {}, { write: true }).then(function () { var n = $('#lnav'); if (n) n.remove(); $('#top').hidden = true; S.token = null; lineStart(); }).catch(fail); });
   }
   var r = e.target.closest('#rng [data-r]'); if (r) { L.rng = r.dataset.r; draw(); }
+  var tg = e.target.closest('[data-tab-go]'); if (tg) { L.tab = tg.dataset.tabGo; draw(); window.scrollTo(0, 0); return; }
+  var o = e.target.closest('[data-o]'); if (o) { L.offView = o.dataset.o; return draw(); }
+  var om2 = e.target.closest('[data-om2]'); if (om2) { L.offMode = om2.dataset.om2; L.offSel = {}; return draw(); }
+  var om = e.target.closest('[data-om]'); if (om) { L.offMon = monAdd(L.offMon, +om.dataset.om); return draw(); }
+  var cm = e.target.closest('[data-cm]'); if (cm) { L.calMon = monAdd(L.calMon, +cm.dataset.cm); return draw(); }
+  var od = e.target.closest('[data-od]'); if (od && !od.disabled) { var d = od.dataset.od; if (L.offSel[d]) delete L.offSel[d]; else L.offSel[d] = 1; od.classList.toggle('sel', !!L.offSel[d]); var n = Object.keys(L.offSel).length, bb = $('[data-ob]'); if (bb) { bb.disabled = !n; bb.textContent = (L.offMode === 'vac' ? 'ขอพักร้อน' : 'ลงวันหยุด') + (n ? ' ' + n + ' วัน' : ''); } return; }
+  if (e.target.closest('[data-ob]')) return offSubmit();
+  var oc = e.target.closest('[data-oc]'); if (oc) return ask('ยกเลิกวันหยุดนี้?', 'ยกเลิกแล้วต้องลงใหม่', 'ยกเลิกวันหยุด', true).then(function (ok) { if (ok) call('offCancel', { id: oc.dataset.oc }, { write: true }).then(function () { toast('ยกเลิกแล้ว'); draw(); }).catch(fail); });
+  var wd = e.target.closest('[data-wd]'); if (wd) { var yes = wd.dataset.ok === '1';
+    return dialog({ title: yes ? 'อนุมัติวันหยุด?' : 'ไม่อนุมัติ', ok: yes ? 'อนุมัติ' : 'ไม่อนุมัติ', danger: !yes, body: yes ? '<p class="small">ต้องได้รับอนุมัติทั้งผู้จัดการและผู้ดูแลระบบ วันหยุดถึงจะใช้ได้</p>' : '<label>เหตุผล *<input id="wdn" placeholder="เช่น วันนั้นคนไม่พอ"></label>',
+      onOk: function (b) { return call('offDecide', { id: wd.dataset.wd, approve: yes, note: yes ? '' : b.querySelector('#wdn').value.trim() }, { write: true }).then(function (x) { toast(x.status === 'APPROVED' ? 'อนุมัติครบแล้ว' : yes ? 'อนุมัติแล้ว · รออีกฝ่าย' : 'ไม่อนุมัติแล้ว'); draw(); taskBadge(); }); } }); }
+  if (e.target.closest('[data-wc]')) { L.counting = true; return draw(); }
+  if (e.target.closest('[data-wx]')) { L.counting = false; return draw(); }
+  if (e.target.closest('[data-wk]')) return countCheck();
+  if (e.target.closest('[data-otn]')) { L.otForm = true; L.after = otCalc; return draw(); }
+  if (e.target.closest('[data-otx]')) { L.otForm = false; return draw(); }
+  if (e.target.closest('[data-ots]')) return otSend();
+  var otc = e.target.closest('[data-otc]'); if (otc) return call('otCancel', { id: otc.dataset.otc }, { write: true }).then(function () { toast('ยกเลิกแล้ว'); draw(); }).catch(fail);
+  var otp = e.target.closest('[data-otp]'); if (otp) return call('otPhoto', { id: otp.dataset.otp }, { spin: true }).then(function (src) { dialog({ title: 'รูปแนบ OT', ok: false, cancel: 'ปิด', body: src ? '<img src="' + src + '" alt="" style="width:100%;border-radius:12px">' : '<div class="empty">ไม่มีรูป</div>' }); }).catch(fail);
+  var otd = e.target.closest('[data-otd]'); if (otd) { var y2 = otd.dataset.ok === '1';
+    return dialog({ title: y2 ? 'อนุมัติ OT' : 'ไม่อนุมัติ OT', ok: y2 ? 'อนุมัติ' : 'ไม่อนุมัติ', danger: !y2,
+      body: y2 ? '<div class="g2" style="grid-template-columns:1fr 1fr"><label>ชั่วโมง<input id="oh" type="number" inputmode="decimal" step="0.25" value="' + otd.dataset.h + '"></label><label>เงิน OT (บาท)<input id="oa" type="number" inputmode="decimal" value="' + otd.dataset.a + '"></label></div><p class="xs ' + (+otd.dataset.r ? 'muted' : 'dn') + '">' + (+otd.dataset.r ? 'เรท ' + bt(otd.dataset.r) + '/ชม. · แก้ชั่วโมงแล้วยอดคำนวณใหม่' : 'คนนี้ยังไม่มีเงินเดือนในชีต Staff — ใส่ยอดเงิน OT เอง') + ' · ยอดนี้บวกในเงินเดือน</p><label>หมายเหตุ<input id="on"></label>' : '<label>เหตุผล *<input id="on" placeholder="เช่น ไม่ได้แจ้งล่วงหน้า"></label>',
+      mount: function (b) { var h = b.querySelector('#oh'), a = b.querySelector('#oa'); if (h) h.oninput = function () { if (!+otd.dataset.r) return; a.value = Math.round((Number(h.value) || 0) * Number(otd.dataset.r) * 100) / 100; }; },
+      onOk: function (b) { var n = b.querySelector('#on').value.trim(); if (!y2 && !n) throw new Error('ใส่เหตุผล');
+        return call('otDecide', { id: otd.dataset.otd, approve: y2, hours: y2 ? b.querySelector('#oh').value : '', amount: y2 ? b.querySelector('#oa').value : '', note: n }, { write: true }).then(function () { toast(y2 ? 'อนุมัติ OT แล้ว · บวกในเงินเดือน' : 'ไม่อนุมัติแล้ว'); draw(); taskBadge(); }); } }); }
 });
+document.addEventListener('change', function (e) { if (e.target.id === 'cbr') { L.calBr = e.target.value; draw(); }
+  if (e.target.id === 'otd') { L.otDate = e.target.value; L.otStart = L.otEnd = ''; L.otReason = ($('#otr') || {}).value || ''; L.after = otCalc; draw(); }
+  if (e.target.id === 'ots' || e.target.id === 'ote') otCalc();
+  if (e.target.id === 'otf') { var f = e.target.files[0], im = $('#otim'); if (f && im) { im.src = URL.createObjectURL(f); im.hidden = false; } } });
+document.addEventListener('input', function (e) { if (e.target.id === 'ots' || e.target.id === 'ote') otCalc(); });
 lineStart();
 
 </script>
