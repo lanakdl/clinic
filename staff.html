@@ -3601,7 +3601,7 @@ function clockDlg(type) {
     } }).then(function () { try { navigator.geolocation.clearWatch(watch); } catch (e) {} });
 }
 
-var RNG = [['today', 'วันนี้'], ['week', '7 วัน'], ['month', 'เดือนนี้'], ['last', 'เดือนก่อน']];
+var RNG = [['today', 'วันนี้'], ['week', '7 วัน'], ['month', 'เดือนนี้'], ['last', 'เดือนก่อน'], ['slip', '🧾 สลิปย้อนหลัง']];
 function rngOf(k) {
   var t = today(), m1 = t.slice(0, 8) + '01';
   if (k === 'today') return { from: t, to: t };
@@ -3609,7 +3609,29 @@ function rngOf(k) {
   if (k === 'last') { var e = addDays(m1, -1); return { from: e.slice(0, 8) + '01', to: e }; }
   return { from: m1, to: t };
 }
+/* ---------- สลิปเงินเดือนย้อนหลัง (ทีละเดือน) ---------- */
+function slipView() {
+  var t = today(), cur = t.slice(0, 7), mon = L.slipMon || monAdd(cur, -1), end = monDays(mon).days.slice(-1)[0], to = end > t ? t : end;
+  var chips = '<div class="chips" id="rng">' + RNG.map(function (x) { return '<button data-r="' + x[0] + '" class="' + (L.rng === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>';
+  return call('myEarnings', { from: mon + '-01', to: to }).then(function (e) {
+    var sm = e.sum, comm = (sm.comm || 0) - (sm.mgmt || 0), sal = (sm.salary || 0) - (sm.ot || 0) - (sm.hourPay || 0);
+    var inc = [['เงินเดือน', sal], ['ค่าชั่วโมง' + (sm.hourPay ? ' (' + hmDur(e.hours) + ')' : ''), sm.hourPay], ['OT', sm.ot], ['DF แพทย์', sm.df], ['ค่ามือ', sm.fee], ['ค่าคอม', comm], ['ค่าบริหาร', sm.mgmt]].filter(function (x) { return x[1]; });
+    var lateMin = e.attendance.reduce(function (a, x) { return a + (Number(x.late) || 0); }, 0), other = Math.round(((sm.deduct || 0) - (sm.sso || 0) - (sm.lateDed || 0)) * 100) / 100;
+    var ded = [['ประกันสังคม', sm.sso], ['มาสาย' + (lateMin ? ' (' + e.lates + ' ครั้ง · ' + lateMin + ' นาที)' : ''), sm.lateDed], ['หักอื่นๆ', other > 0 ? other : 0]].filter(function (x) { return x[1]; });
+    var gross = inc.reduce(function (a, x) { return a + x[1]; }, 0), dsum = ded.reduce(function (a, x) { return a + x[1]; }, 0);
+    var R = function (l, v, cls) { return '<div class="row small"><span class="sp">' + l + '</span><b class="' + (cls || '') + '">' + v + '</b></div>'; };
+    return chips + '<div class="card stack" style="gap:.6rem"><div class="row"><button class="btn sm" data-sm="-1"' + (mon <= monAdd(cur, -24) ? ' disabled' : '') + '>‹</button><b class="sp" style="text-align:center">สลิปเดือน ' + monTh(mon) + '</b><button class="btn sm" data-sm="1"' + (mon >= cur ? ' disabled' : '') + '>›</button></div>' +
+      '<div class="xs muted" style="text-align:center">' + esc((S.user && S.user.name) || '') + ' · ' + esc(thDate(e.from)) + ' – ' + esc(thDate(e.to)) + (mon === cur ? ' · <b class="dn">เดือนนี้ยังไม่จบ ตัวเลขยังเปลี่ยนได้</b>' : '') + '</div>' +
+      '<div class="small b">รายได้</div>' + (inc.length ? inc.map(function (x) { return R(esc(x[0]), bt(x[1])); }).join('') : '<div class="xs muted">— ไม่มีรายได้เดือนนี้ —</div>') + R('<b>รวมรายได้</b>', bt(gross)) +
+      '<hr style="border:0;border-top:1px dashed var(--line);margin:.2rem 0"><div class="small b">รายการหัก</div>' + (ded.length ? ded.map(function (x) { return R(esc(x[0]), '−' + bt(x[1]), 'dn'); }).join('') : '<div class="xs muted">— ไม่มีรายการหัก —</div>') + R('<b>รวมหัก</b>', '−' + bt(dsum), 'dn') +
+      '<div class="lx-total" style="border-top:2px solid var(--line);padding-top:.5rem"><div class="l">รับสุทธิ</div><div class="lx-amt">' + bt(gross - dsum) + '</div></div>' +
+      '<div class="row xs muted"><span>ทำงาน ' + e.days + ' วัน · ' + hmDur(e.hours) + '</span>' + (sm.cases ? '<span>· ' + sm.cases + ' เคส</span>' : '') + (sm.sales ? '<span>· ยอดขาย ' + bt(sm.sales) + '</span>' : '') + '</div></div>' +
+      lineComm(sm) +
+      '<p class="xs muted">สลิปนี้คำนวณจากระบบ (ค่าคอม/ค่ามือ/ลงเวลา) · ยอดที่โอนจริงตามที่บัญชีสรุป ถ้าตัวเลขไม่ตรงแจ้งบัญชีได้เลย · ดูรายการละเอียดได้ที่ปุ่ม "เดือนนี้/เดือนก่อน"</p>';
+  });
+}
 function payTab() {
+  if (L.rng === 'slip') return slipView();
   var r0 = rngOf(L.rng);
   return call('myEarnings', r0).then(function (e) {
     var sm = e.sum, comm = (sm.comm || 0) - (sm.mgmt || 0), gross = (sm.df || 0) + (sm.fee || 0) + (sm.comm || 0) + (sm.salary || 0), tot = gross - (sm.deduct || 0);
@@ -3815,6 +3837,7 @@ document.addEventListener('click', function (e) {
     if (a === 'unbind') return ask('ยกเลิกการผูก LINE?', 'ครั้งหน้าต้องใส่รหัสพนักงานเพื่อผูกใหม่', 'ยกเลิกการผูก', true).then(function (ok) { if (!ok) return; call('lineUnbind', {}, { write: true }).then(function () { var n = $('#lnav'); if (n) n.remove(); $('#top').hidden = true; S.token = null; lineStart(); }).catch(fail); });
   }
   var r = e.target.closest('#rng [data-r]'); if (r) { L.rng = r.dataset.r; draw(); }
+  var smv = e.target.closest('[data-sm]'); if (smv && !smv.disabled) { L.slipMon = monAdd(L.slipMon || monAdd(today().slice(0, 7), -1), +smv.dataset.sm); draw(); }
   var tg = e.target.closest('[data-tab-go]'); if (tg) { L.tab = tg.dataset.tabGo; draw(); window.scrollTo(0, 0); return; }
   var o = e.target.closest('[data-o]'); if (o) { L.offView = o.dataset.o; return draw(); }
   var om2 = e.target.closest('[data-om2]'); if (om2) { L.offMode = om2.dataset.om2; L.offSel = {}; return draw(); }
