@@ -2031,7 +2031,7 @@ function makeCore(store) {
     var d0 = find('Settings', 'key', 'offReopenDone'); if (d0 && String(d0.value) === mon) upd('Settings', d0, { value: '' });
     log(u, 'offReopen', sv + ' ล้าง ' + n); return { cleared: n, month: mon, until: until };
   };
-  PERM.offReopenSet = ['owner', 'admin', 'manager']; WRITES.offReopenSet = 1;
+  PERM.offReopenSet = ['owner', 'admin']; WRITES.offReopenSet = 1;
   A.offCalendar = function (p, u) {
     offAutoMaybe();
     var mon = /^\d{4}-\d{2}$/.test(String(p.month || '')) ? String(p.month) : today().slice(0, 7), all = roleIn(u, ['admin', 'owner']);
@@ -6931,7 +6931,7 @@ SCR.offCal = function () {
       var hd = c.hol && c.hol[ds];
       cells += '<div class="oc-d' + (w === 0 || w === 6 ? ' oc-we' : '') + (ds === today() ? ' oc-today' : '') + (hd && hd.closed ? ' oc-we' : '') + '"><b>' + d + '</b>' + (hd ? '<span class="oc-p oc-v">🎌 ' + esc(hd.name) + (hd.deduct ? ' · ปิดรวม (หักวันหยุด)' : hd.closed ? ' · ปิดคลินิก' : ' · +1 วันหยุด') + '</span>' : '') + ps.map(function (x) { return '<span class="oc-p' + (x.status === 'PENDING' ? ' oc-w' : x.vac ? ' oc-v' : '') + '">' + (x.vac ? '🏖️ ' : '') + esc(x.name) + (c.branch ? '' : ' · ' + esc(x.branch)) + (x.status === 'PENDING' ? ' (รอ)' : '') + '</span>'; }).join('') + '</div>'; }
     var cnt = {}; c.list.forEach(function (x) { if (x.status !== 'PENDING') cnt[x.name] = (cnt[x.name] || 0) + 1; });
-    return '<div class="stack"><div class="row"><button class="btn" data-a="ocNav" data-n="-1">‹</button><h2 style="min-width:12rem;text-align:center">' + TH_MN[m - 1] + ' ' + (y + 543) + '</h2><button class="btn" data-a="ocNav" data-n="1">›</button><span class="sp"></span>' + (has(['manager']) ? '<button class="btn w" data-a="offReopen">🔓 เปิดให้ลงวันหยุดใหม่</button>' : '') +
+    return '<div class="stack"><div class="row"><button class="btn" data-a="ocNav" data-n="-1">‹</button><h2 style="min-width:12rem;text-align:center">' + TH_MN[m - 1] + ' ' + (y + 543) + '</h2><button class="btn" data-a="ocNav" data-n="1">›</button><span class="sp"></span>' + (S.user.roles.some(function (r) { return r === 'owner' || r === 'admin'; }) ? '<button class="btn w" data-a="offReopen">🔓 เปิดให้ลงวันหยุดใหม่</button>' : '') +
       (c.canAll ? '<select id="ocbr" style="width:auto"><option value=""' + (c.branch ? '' : ' selected') + '>ทุกสาขา</option>' + c.branches.map(function (b) { return '<option value="' + esc(b.code) + '"' + (b.code === c.branch ? ' selected' : '') + '>' + esc(b.name) + '</option>'; }).join('') + '</select>' : '<span class="pill">' + esc(S.user.branchName || c.branch) + '</span>') + '</div>' +
       '<div class="card oc-wrap"><div class="oc">' + ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'].map(function (x, i) { return '<div class="oc-h' + (i === 0 || i === 6 ? ' oc-we' : '') + '">' + x + '</div>'; }).join('') + cells + '</div></div>' +
       '<div class="row xs muted"><span class="oc-p">ชื่อ = หยุด (ลงแล้ว/อนุมัติแล้ว)</span><span class="oc-p oc-w">(รอ) = รออนุมัติ</span><span class="oc-p oc-v">🏖️ = พักร้อน</span>' + (Object.keys(cnt).length ? '<span class="sp"></span><span>เดือนนี้: ' + Object.keys(cnt).sort().map(function (k) { return esc(k) + ' ' + cnt[k] + ' วัน'; }).join(' · ') + '</span>' : '') + '</div>' +

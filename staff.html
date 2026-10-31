@@ -810,7 +810,7 @@ function makeCore(store) {
     var d0 = find('Settings', 'key', 'offReopenDone'); if (d0 && String(d0.value) === mon) upd('Settings', d0, { value: '' });
     log(u, 'offReopen', sv + ' ล้าง ' + n); return { cleared: n, month: mon, until: until };
   };
-  PERM.offReopenSet = ['owner', 'admin', 'manager']; WRITES.offReopenSet = 1;
+  PERM.offReopenSet = ['owner', 'admin']; WRITES.offReopenSet = 1;
   A.offCalendar = function (p, u) {
     offAutoMaybe();
     var mon = /^\d{4}-\d{2}$/.test(String(p.month || '')) ? String(p.month) : today().slice(0, 7), all = roleIn(u, ['admin', 'owner']);
