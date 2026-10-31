@@ -1594,12 +1594,12 @@ var SCHEMA = {
   Rooms:      [['branch','สาขา'],['name','ชื่อห้อง/เตียง'],['type','ประเภท'],['machine','เครื่องประจำห้อง'],['active','ใช้งาน','b']],
   Staff:      [['code','รหัสพนักงาน'],['name','ชื่อ-สกุล'],['nick','ชื่อเล่น'],['role','บทบาท'],['role2','บทบาทที่ 2'],['branch','สาขาหลัก'],
                ['branches','สาขาที่เข้าได้ (ว่าง=ทุกสาขา)'],['phone','เบอร์โทร'],['email','อีเมล'],['license','เลขใบประกอบวิชาชีพ'],['pin','รหัสเข้าระบบ'],
-               ['shiftIn','เวลาเข้างาน'],['shiftOut','เวลาออกงาน'],['dayOff','วันหยุดประจำ'],['commPct','ค่าคอม %','n'],['salary','เงินเดือน (บาท/เดือน)','n'],['partTime','แพทย์ Part-time (ไม่ยุ่งสต้อก)','b'],['active','ใช้งาน','b'],['sign','ลายเซ็น (Drive)'],
+               ['shiftIn','เวลาเข้างาน'],['shiftOut','เวลาออกงาน'],['dayOff','วันหยุดประจำ'],['commPct','ค่าคอม %','n'],['salary','เงินเดือน (บาท/เดือน)','n'],['hourly','ค่าชั่วโมง (บาท/ชม. · แพทย์ว่าง=700)','n'],['sso','ประกันสังคม (บาท/เดือน)','n'],['partTime','แพทย์ Part-time (ไม่ยุ่งสต้อก)','b'],['active','ใช้งาน','b'],['sign','ลายเซ็น (Drive)'],
                ['lineId','LINE (ผูกแล้ว — ลบเพื่อผูกใหม่)'],['lineName','ชื่อ LINE'],['lineAt','ผูก LINE เมื่อ','t']],
   Items:      [['code','รหัสรายการ'],['name','ชื่อรายการ'],['category','หมวด'],['type','ประเภท'],['performer','ผู้ทำ'],
                ['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['dfPct','DF แพทย์ %','n'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['prepFee','ค่ามือตอนเตรียมให้หมอ (บาท/ครั้ง)','n'],['scrubFee','ค่ามือ Scrub (บาท/เคส)','n'],['circFee','ค่ามือ Circulating (บาท/เคส)','n'],['sessions','จำนวนครั้ง (คอร์ส)','n'],['validDays','อายุคอร์ส (วัน)','n'],
-               ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว'],['feeNext','ค่ามือหน่วยถัดไป (เช่น Filler cc ที่ 2 ขึ้นไป)','n'],['feeGroup','กลุ่มเคสผ่าตัด (หลัก+ออฟชั่น)'],['tierAt','ขั้นราคาเคส (รวมออฟชั่น)','n'],['scrubHi','Scrub เมื่อเกินขั้น','n'],['circHi','Circ เมื่อเกินขั้น','n'],['dfHiAt','DF ขั้นสูงเมื่อจำนวนถึง','n'],['dfHi','DF ขั้นสูง %','n'],['feeTiers','ค่ามือตามจำนวน (เช่น 1:30,3:60)']],
+               ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['noConsult','ไม่ต้องพบแพทย์ก่อน (ลูกค้าใหม่คุยเซลแล้วทำเลย)'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว'],['feeNext','ค่ามือหน่วยถัดไป (เช่น Filler cc ที่ 2 ขึ้นไป)','n'],['feeGroup','กลุ่มเคสผ่าตัด (หลัก+ออฟชั่น)'],['tierAt','ขั้นราคาเคส (รวมออฟชั่น)','n'],['scrubHi','Scrub เมื่อเกินขั้น','n'],['circHi','Circ เมื่อเกินขั้น','n'],['dfHiAt','DF ขั้นสูงเมื่อจำนวนถึง','n'],['dfHi','DF ขั้นสูง %','n'],['feeTiers','ค่ามือตามจำนวน (เช่น 1:30,3:60)']],
   CourseItems:[['course','รหัสคอร์ส'],['courseName','ชื่อคอร์ส'],['item','รหัสรายการที่ใช้ได้'],['itemName','ชื่อรายการ'],['sessions','จำนวนครั้ง','n']],
   Promos:     [['code','รหัสโปร'],['name','ชื่อโปร'],['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['start','วันเริ่ม'],['end','วันหมด'],['part','รายการในชุด'],['item','รหัสรายการ'],['qty','จำนวน','n'],['fullPrice','ราคาเต็ม','n'],['free','ของแถม'],['choice','ตัวเลือก'],['buffetDF','บุฟเฟต์ DF บาท/ครั้ง','n']],
@@ -1619,7 +1619,7 @@ var SCHEMA = {
                ['closed','ยอดที่แอดมินปิดได้','n'],['closedNote','ปิดโปร/รายการ'],['credited','นับให้แอดมินแล้ว','n'],['page','เพจที่ทักมา (CNX/PTY/JB)'],['depAt','มัดจำเมื่อ','t'],['depAmt','ยอดมัดจำ','n'],['depRc','ใบเสร็จมัดจำ']],
   Ads:        [['name','ชื่อแอด/โปร'],['channel','channel'],['active','ใช้งาน','b']],
   Appointments:[['id','เลขนัด'],['branch','สาขา'],['date','วันที่'],['start','เริ่ม'],['end','จบ'],['room','ห้อง'],['cRoom','ห้องตรวจ (ปรึกษา)'],['cStart','ปรึกษาเริ่ม'],['cEnd','ปรึกษาจบ'],
-               ['hn','HN'],['name','ชื่อ'],['phone','โทร'],['item','รายการ'],['itemName','ชื่อรายการ'],['courseId','ใช้คอร์ส'],['note','หมายเหตุ'],['status','สถานะ'],['vn','VN'],['leadId','ลีด'],['by','ผู้ลงนัด'],['created','เวลาลงนัด','t'],['ipdRoom','ห้องพักฟื้น'],['ipdEnd','พักฟื้นถึง']],
+               ['hn','HN'],['name','ชื่อ'],['phone','โทร'],['item','รายการ'],['itemName','ชื่อรายการ'],['courseId','ใช้คอร์ส'],['note','หมายเหตุ'],['status','สถานะ'],['vn','VN'],['leadId','ลีด'],['by','ผู้ลงนัด'],['created','เวลาลงนัด','t'],['ipdRoom','ห้องพักฟื้น'],['ipdEnd','พักฟื้นถึง'],['noConsult','ไม่ต้องตรวจก่อน']],
   Visits:     [['vn','VN'],['date','วันที่'],['branch','สาขา'],['queue','คิว','n'],['hn','HN'],['name','ชื่อ'],['stage','สถานะ'],['stageAt','เข้าสถานะเมื่อ','t'],['cc','อาการสำคัญ'],['vitals','สัญญาณชีพ'],
                ['doctor','แพทย์'],['room','ห้อง'],['claimedBy','ผู้รับงาน'],['numbAt','ทายาชาเมื่อ','t'],['numbMin','ยาชา (นาที)','n'],['created','เวลาเข้า','t'],['updated','อัปเดต','t'],['apptId','นัด'],['leadId','ลีด'],['buyMore','ซื้อเพิ่ม','b'],
                ['route','ส่งต่อไป (หลังคุย)'],['concern','ความกังวล/สิ่งที่อยากแก้'],['consultBy','ผู้คุยเบื้องต้น'],
@@ -1824,10 +1824,12 @@ function makeCore(store) {
     });
     return out;
   }
+  function hourlyOf(st) { if (!on(st.active)) return 0; if (!blank(st.hourly)) return num(st.hourly); return rolesOf(st).indexOf('doctor') >= 0 && !(num(st.salary) > 0) ? num(setting('doctorHourly', 700)) : 0; }
   function shiftOf(st, d) {
     st = st || {}; d = isDate(d) ? d : today();
     var own = { in: String(st.shiftIn || ''), out: String(st.shiftOut || '') }, rs = rolesOf(st), ex = String(setting('shiftExceptions', '')).split(/[\s,]+/);
-    if (on(st.partTime) || ex.indexOf(String(st.code)) >= 0 || rs.indexOf('owner') >= 0 || rs.indexOf('admin') >= 0) return own;
+    if (ex.indexOf(String(st.code)) >= 0 || rs.indexOf('owner') >= 0 || rs.indexOf('admin') >= 0) return own;
+    if (rs.indexOf('doctor') >= 0 || on(st.partTime)) return { in: '', out: '' };   // แพทย์จ่ายรายชั่วโมง ไม่ต้องเช็คสาย/ออกก่อน
     var wd = new Date(d + 'T00:00:00Z').getUTCDay(), offR = String(setting('shiftOfficeRoles', 'marketing account adminpage central')).split(/[\s,]+/);
     if (rs.some(function (r) { return offR.indexOf(r) >= 0; })) return shParse(setting('shiftOffice', '09:00-18:00'), wd) || own;
     return shParse(setting('shift_' + String(st.branch), String(st.branch) === 'DTCM' ? 'จ-ศ 10:30-19:30, ส-อา 10:00-19:00' : ''), wd) || shParse(setting('shiftDefault', '10:00-19:00'), wd) || own;
@@ -1868,7 +1870,7 @@ function makeCore(store) {
     var y = +mon.slice(0, 4), m = +mon.slice(5, 7), n = new Date(Date.UTC(y, m, 0)).getUTCDate(), days = [];
     for (var d = 1; d <= n; d++) { var ds = mon + '-' + ('0' + d).slice(-2); if (!wkEnd(ds)) days.push(ds); }
     var skip = String(setting('dayOffSkip', '')).split(/[\s,]+/), q = offQuota(), added = [];
-    var staff = rows('Staff').filter(function (s) { var rs = rolesOf(s); return on(s.active) && !on(s.partTime) && rs.length && rs.indexOf('owner') < 0 && rs.indexOf('admin') < 0 && skip.indexOf(String(s.code)) < 0; });
+    var staff = rows('Staff').filter(function (s) { var rs = rolesOf(s); return on(s.active) && !on(s.partTime) && rs.length && rs.indexOf('owner') < 0 && rs.indexOf('admin') < 0 && rs.indexOf('doctor') < 0 && skip.indexOf(String(s.code)) < 0; });
     function mine(code) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน'; }).map(function (x) { return String(x.date); }); }
     function offOn(br, ds) { return rows('DayOffs').filter(function (x) { return x.date === ds && String(x.branch) === br && OFF_LIVE.indexOf(x.status) >= 0; }).length; }
     // แจกทีละ 1 วันต่อคนวนไปเรื่อยๆ (คนที่มีน้อยได้ก่อน) จะได้ไม่มีใครเหมาวันดีๆ ไปหมด
@@ -2070,7 +2072,7 @@ function makeCore(store) {
     var items = rows('Items').filter(function (it) { return on(it.active === '' ? true : it.active) && priceAt(it, b) !== null && it.code && String(it.code).indexOf('ตัวอย่าง') !== 0; }).map(function (it) {
       var ci = rows('CourseItems').filter(function (c) { return String(c.course) === String(it.code); }).map(function (c) { return { item: c.item, name: c.itemName || ((itemByCode(c.item) || {}).name) || c.item, sessions: num(c.sessions) }; });
       return { code: String(it.code), name: String(it.name), category: String(it.category || 'อื่นๆ'), type: typeOf(it), performer: perfOf(it), price: priceAt(it, b),
-        dfPct: num(it.dfPct), staffFee: num(it.staffFee), sessions: num(it.sessions), validDays: num(it.validDays), minutes: num(it.minutes) || 30, numb: num(it.numb), roomType: String(it.roomType || ''), unit: String(it.unit || ''), presets: String(it.presets || '').split(/[\s,]+/).map(num).filter(function (x) { return x > 0; }), parts: ci.length ? ci : undefined };
+        dfPct: num(it.dfPct), staffFee: num(it.staffFee), sessions: num(it.sessions), validDays: num(it.validDays), minutes: num(it.minutes) || 30, numb: num(it.numb), roomType: String(it.roomType || ''), unit: String(it.unit || ''), feeGroup: String(it.feeGroup || '').trim() || undefined, optOf: String(it.feeGroup || '').trim() && !(num(it.tierAt) > 0) && !(num(it.scrubFee) > 0) ? 1 : undefined, presets: String(it.presets || '').split(/[\s,]+/).map(num).filter(function (x) { return x > 0; }), parts: ci.length ? ci : undefined };
     });
     var pm = {};
     rows('Promos').forEach(function (r) {
@@ -2263,19 +2265,25 @@ function makeCore(store) {
     return m;
   }
   function free(m, room, s, e) { return !(m[room] || []).some(function (x) { return s < x[1] && e > x[0]; }); }
-  function needFor(it, hn) {
-    var perf = perfOf(it), dur = num(it.minutes) || 30, numb = num(it.numb);
-    var consult = (perf === 'doctor' || perf === 'both' || !hn || !everSawDoctor(hn)) ? 15 : 0;
+  // ลูกค้าใหม่/รายการที่หมอทำ: จองห้องตรวจ (ปรึกษาแพทย์) ก่อน แล้วต่อห้องหัตถการทันที — จอง 2 ห้องต่อกันในนัดเดียว
+  // ไม่ต้องตรวจก่อน: ติ๊กตอนลงนัด หรือรายการที่ตั้ง "ไม่ต้องพบแพทย์ก่อน" (เช่น เลเซอร์ขน คุยกับเซลแล้วทำเลย)
+  function needFor(it, hn, o) {
+    o = o || {};
+    var perf = perfOf(it), dur = num(it.minutes) || 30, numb = num(it.numb), cm = Math.max(5, num(setting('consultMinutes', 10)) || 10);
+    var consult = (perf === 'doctor' || perf === 'both' || !hn || !everSawDoctor(hn)) ? cm : 0;
     if (perf === 'staff' && hn && everSawDoctor(hn)) consult = 0;
+    var ncCat = String(setting('noConsultCategories', 'Laser ขน')).split(/\s*,\s*/).indexOf(String(it.category)) >= 0, itNc = perf !== 'doctor' && (on(it.noConsult) || ncCat);
+    if (o.noConsult || itNc) consult = 0;
     var type = String(it.roomType || '').trim(); if (!type || type === '-') type = perf === 'doctor' ? 'ห้องหัตถการแพทย์' : 'เตียงทรีทเม้นท์';
-    return { dur: dur + numb, type: type, consult: consult, ipd: type === 'ห้องผ่าตัด' ? num(setting('ipdMinutes', 90)) : 0 };
+    return { dur: dur + numb, type: type, consult: consult, skip: consult === 0 && !!(o.noConsult || itNc), auto: itNc, ipd: type === 'ห้องผ่าตัด' ? num(setting('ipdMinutes', 90)) : 0 };
   }
-  function findSlots(b, date, it, hn, exceptId) {
+  function findSlots(b, date, it, hn, exceptId, o) {
     var br = find('Branches', 'code', b);
     var open = toMin((br && br.open) || setting('open', '10:00')), close = toMin((br && br.close) || setting('close', '20:00'));
-    var need = needFor(it, hn), m = busy(b, date, exceptId), out = [];
+    var need = needFor(it, hn, o), m = busy(b, date, exceptId), out = [];
     var rs = roomsOf(b, need.type); if (!rs.length) rs = roomsOf(b, '').filter(function (r) { return r.type !== 'ห้องตรวจ' && r.type !== 'ห้อง IPD'; });
     var crs = roomsOf(b, 'ห้องตรวจ'), ipds = roomsOf(b, 'ห้อง IPD');
+    var alt = roomsOf(b, '').filter(function (r) { return r.type !== 'ห้องตรวจ' && r.type !== 'ห้อง IPD' && rs.indexOf(r) < 0; }); // ห้องอื่นที่เลือกเองได้
     var nowMin = date === today() ? toMin(hm()) : -1;
     for (var t = open; t + need.consult + need.dur <= close; t += 15) {
       if (t < nowMin) continue;
@@ -2285,17 +2293,20 @@ function makeCore(store) {
       if (!r) continue;
       var ir = null;
       if (need.ipd && ipds.length) { ir = ipds.filter(function (x) { return free(m, x.name, e, e + need.ipd); })[0]; if (!ir) continue; }
-      out.push({ time: fromMin(t), room: r.name, cRoom: cr ? cr.name : '', start: fromMin(s), end: fromMin(e), cStart: cr ? fromMin(t) : '', cEnd: cr ? fromMin(t + need.consult) : '',
+      var fr = rs.concat(alt).filter(function (x) { return free(m, x.name, s, e); }).map(function (x) { return x.name; });
+      out.push({ time: fromMin(t), room: r.name, rooms: fr, cRoom: cr ? cr.name : '', start: fromMin(s), end: fromMin(e), cStart: cr ? fromMin(t) : '', cEnd: cr ? fromMin(t + need.consult) : '',
         ipdRoom: ir ? ir.name : '', ipdEnd: ir ? fromMin(e + need.ipd) : '' });
     }
     return { need: need, slots: out };
   }
 
+  // ห้องที่เลือกเองตอนลงนัด (ต้องว่างช่วงเวลานั้น) · ไม่เลือก = ห้องที่ระบบจัดให้
+  function roomPick(sl, room) { room = txt(room); if (!room || room === sl.room) return sl; if ((sl.rooms || []).indexOf(room) < 0) err(room + ' ไม่ว่างเวลา ' + sl.time + ' — เลือกห้องอื่น'); sl.room = room; return sl; }
   A.slots = function (p, u) {
     var it = itemByCode(p.item); if (!it) err('เลือกรายการก่อน');
     if (!isDate(p.date)) err('เลือกวันที่');
     var b = p.branch && find('Branches', 'code', p.branch) ? String(p.branch) : u.branch;
-    return findSlots(b, p.date, it, p.hn, p.exceptId);
+    return findSlots(b, p.date, it, p.hn, p.exceptId, { noConsult: on(p.noConsult) });
   };
 
   A.dayBook = function (p, u) {
@@ -2313,9 +2324,9 @@ function makeCore(store) {
     var pt = find('Patients', 'hn', p.hn); if (!pt) err('ไม่พบคนไข้');
     var it = itemByCode(p.item); if (!it) err('เลือกรายการ');
     if (!isDate(p.date) || p.date < today()) err('วันที่นัดต้องไม่ย้อนหลัง');
-    var sl = findSlots(u.branch, p.date, it, pt.hn).slots.filter(function (s) { return s.time === p.time; })[0];
-    if (!sl) err('เวลานี้ไม่ว่างแล้ว เลือกเวลาใหม่');
-    var a = add('Appointments', { id: nextId('AP', 'seq_AP'), branch: u.branch, date: p.date, start: sl.start, end: sl.end, room: sl.room, cRoom: sl.cRoom, cStart: sl.cStart, cEnd: sl.cEnd, ipdRoom: sl.ipdRoom, ipdEnd: sl.ipdEnd,
+    var sl = findSlots(u.branch, p.date, it, pt.hn, '', { noConsult: on(p.noConsult) }).slots.filter(function (s) { return s.time === p.time; })[0];
+    if (!sl) err('เวลานี้ไม่ว่างแล้ว เลือกเวลาใหม่'); sl = roomPick(sl, p.room);
+    var a = add('Appointments', { id: nextId('AP', 'seq_AP'), branch: u.branch, date: p.date, start: sl.start, end: sl.end, room: sl.room, cRoom: sl.cRoom, cStart: sl.cStart, cEnd: sl.cEnd, ipdRoom: sl.ipdRoom, ipdEnd: sl.ipdEnd, noConsult: on(p.noConsult) ? 'ใช่' : '',
       hn: pt.hn, name: pt.name, phone: pt.phone, item: it.code, itemName: it.name, courseId: txt(p.courseId), note: txt(p.note), status: 'BOOKED', vn: '', leadId: txt(p.leadId), by: u.name, created: stamp() });
     var ld = p.leadId ? find('Leads', 'id', p.leadId) : leadOf(pt.phone);
     if (ld && ['NEW', 'BOOKED'].indexOf(ld.status) >= 0) upd('Leads', ld, { status: 'BOOKED', hn: pt.hn, apptId: a.id });
@@ -2327,15 +2338,15 @@ function makeCore(store) {
   A.apptNoShow = function (p, u) { var a = apptOf(p.id, u); if (a.status !== 'BOOKED') err('นัดนี้ไม่ได้อยู่ในสถานะรอมา'); upd('Appointments', a, { status: 'NOSHOW' }); var ld = a.leadId && find('Leads', 'id', a.leadId); if (ld && ld.status === 'BOOKED') upd('Leads', ld, { status: 'NOSHOW' }); return true; };
   A.apptMove = function (p, u) {
     var a = apptOf(p.id, u); if (a.status !== 'BOOKED') err('ย้ายได้เฉพาะนัดที่ยังไม่มา');
-    var it = itemByCode(a.item); var sl = findSlots(u.branch, p.date, it, a.hn, a.id).slots.filter(function (s) { return s.time === p.time; })[0];
-    if (!sl) err('เวลานี้ไม่ว่าง');
-    upd('Appointments', a, { date: p.date, start: sl.start, end: sl.end, room: sl.room, cRoom: sl.cRoom, cStart: sl.cStart, cEnd: sl.cEnd, ipdRoom: sl.ipdRoom, ipdEnd: sl.ipdEnd }); log(u, 'apptMove', a.id + ' → ' + p.date + ' ' + p.time); return clean(a);
+    var it = itemByCode(a.item); var nc = p.noConsult == null ? on(a.noConsult) : on(p.noConsult), sl = findSlots(u.branch, p.date, it, a.hn, a.id, { noConsult: nc }).slots.filter(function (s) { return s.time === p.time; })[0];
+    if (!sl) err('เวลานี้ไม่ว่าง'); sl = roomPick(sl, p.room);
+    upd('Appointments', a, { date: p.date, start: sl.start, end: sl.end, room: sl.room, cRoom: sl.cRoom, cStart: sl.cStart, cEnd: sl.cEnd, ipdRoom: sl.ipdRoom, ipdEnd: sl.ipdEnd, noConsult: nc ? 'ใช่' : '' }); log(u, 'apptMove', a.id + ' → ' + p.date + ' ' + p.time); return clean(a);
   };
   A.apptArrive = function (p, u) {
     var a = apptOf(p.id, u); if (a.status !== 'BOOKED') err('นัดนี้ไม่ได้อยู่ในสถานะรอมา');
     if (a.date !== today()) err('นัดนี้ไม่ใช่ของวันนี้');
-    var it = itemByCode(a.item), route = it && needFor(it, a.hn).consult ? 'doctor' : 'treat';
-    var v = createVisit(a.hn, p.cc || a.itemName, p.vitals || '', u, route, a.id, a.leadId, on(setting('preConsult', 'ใช่')) && !p.skipConsult);
+    var it = itemByCode(a.item), route = it && needFor(it, a.hn, { noConsult: on(a.noConsult) }).consult ? 'doctor' : 'treat';
+    var v = createVisit(a.hn, p.cc || a.itemName, p.vitals || '', u, route, a.id, a.leadId, on(setting('preConsult', 'ใช่')) && !p.skipConsult && !on(a.noConsult));
     upd('Appointments', a, { status: 'ARRIVED', vn: v.vn });
     if (a.courseId) { try { redeem(a.courseId, u, v); } catch (e) { /* คอร์สใช้ไม่ได้ ให้ Front จัดการต่อ */ } }
     log(u, 'apptArrive', a.id + ' → ' + v.vn);
@@ -2718,14 +2729,16 @@ function makeCore(store) {
     var name = txt(p.name, 80), price = r2(num(p.price)), cat = txt(p.category, 40) || 'อื่นๆ', type = QTYPE[p.type] ? p.type : 'proc', perf = QPERF[p.performer] ? p.performer : (type === 'product' || type === 'service' ? 'none' : 'doctor');
     if (name.length < 2) err('ใส่ชื่อรายการ'); if (!(price >= 0) || blank(p.price)) err('ใส่ราคา');
     var ses = type === 'course' ? Math.round(num(p.sessions)) : 0; if (type === 'course' && !(ses >= 2)) err('คอร์สต้องมีจำนวนครั้ง 2 ขึ้นไป');
-    var ex = rows('Items').filter(function (x) { return normName(x.name) === normName(name); })[0], col = 'p_' + u.branch;
-    if (ex) { if (!blank(ex[col])) err('มีรายการนี้แล้ว: ' + ex.name + ' (' + ex.code + ') ' + num(ex[col]) + ' บาท — ค้นหาแล้วกดได้เลย');
+    var ex = rows('Items').filter(function (x) { return normName(x.name) === normName(name); })[0], col = 'p_' + u.branch, og = txt(p.optionOf, 30);
+    var OPT = og ? { feeGroup: og, tierAt: '', scrubHi: '', circHi: '', scrubFee: 0, circFee: 0, staffFee: 0 } : null; // ออฟชั่นศัลยกรรม: ค่ามือ 0 · ราคานับรวมเคสหลักในบิลเดียวกัน
+    if (ex) { if (OPT) upd('Items', ex, OPT); if (!blank(ex[col])) err('มีรายการนี้แล้ว: ' + ex.name + ' (' + ex.code + ') ' + num(ex[col]) + ' บาท — ค้นหาแล้วกดได้เลย');
       var pt = {}; pt[col] = price; upd('Items', ex, pt); log(u, 'itemQuickAdd', ex.code + ' ' + u.branch + ' ' + price); return { code: String(ex.code), existed: true, item: catalogFor(u.branch).items.filter(function (x) { return x.code === String(ex.code); })[0] }; }
     var code = 'N' + pad(store.next('item_new'), 3), o = { code: code, name: name, category: cat, type: QTYPE[type], performer: QPERF[perf], dfPct: perf === 'doctor' ? catDefault(cat, 'dfPct') : '', staffFee: perf !== 'none' ? catDefault(cat, 'staffFee') : '',
       sessions: ses || '', validDays: ses ? 365 : '', unit: txt(p.unit, 10), active: true, addedBy: mg ? u.name + ' · อนุมัติ ' + (mg.nick || mg.name) : u.name + ' (' + u.code + ')', addedAt: stamp(), reviewed: '' };
+    if (OPT) { for (var ok in OPT) o[ok] = OPT[ok]; if (perf === 'staff') o.performer = QPERF.doctor; }
     o[col] = price; add('Items', o);
     if (p.stock) { var sr = stockRow(u.branch, p.stock); if (!sr) err('ไม่พบของในสต้อก'); var q = num(p.stockQty); if (!(q > 0)) err('ใส่จำนวนที่ใช้ต่อครั้ง'); add('BOM', { item: code, stock: String(sr.code), qty: q }); }
-    log(u, 'itemQuickAdd', code + ' ' + name + ' ' + price);
+    log(u, 'itemQuickAdd', code + ' ' + name + ' ' + price + (og ? ' ออฟชั่น' + og : ''));
     return { code: code, item: catalogFor(u.branch).items.filter(function (x) { return x.code === code; })[0] };
   };
   A.newItems = function (p, u) {
@@ -2853,11 +2866,26 @@ function makeCore(store) {
     var l = v.leadId ? find('Leads', 'id', v.leadId) : null; if (open(l)) return l;
     return rows('Leads').filter(function (x) { return open(x) && (x.hn === v.hn || (pt && pt.phone && String(x.phone) === String(pt.phone))); }).slice(-1)[0] || null;
   }
+  // ผู้ขาย/แบ่งค่าคอม เลือกที่หน้ารับเงิน → เขียนทับ seller ของทุกรายการที่กำลังจ่าย
+  function sellersCheck(p, u) {
+    if (!(p.sellers && p.sellers.length)) return '';
+    var known = {}; rows('Staff').forEach(function (s) { [s.name, s.nick, s.code].forEach(function (k) { if (k) known[String(k)] = 1; }); }); known['คลินิก'] = 1;
+    p.sellers.forEach(function (x) { if (x && txt(x.name) && !known[txt(x.name)]) err('ไม่รู้จักผู้ขาย ' + txt(x.name)); });
+    return sellerStr(p, u);
+  }
+  function applySellers(os, ss) { if (ss) os.forEach(function (o) { if (String(o.seller || '') !== ss) upd('Orders', o, { seller: ss }); }); }
+  function adminManualOf(p) {
+    var m = p.adminManual; if (!m || !txt(m.admin) || !(num(m.amount) > 0)) return null;
+    var st = rows('Staff').filter(function (s) { return s.name === txt(m.admin) || s.nick === txt(m.admin) || String(s.code) === txt(m.admin); })[0];
+    if (!st) err('ไม่รู้จักแอดมิน ' + txt(m.admin));
+    return { admin: st.name, amount: r2(num(m.amount)) };
+  }
   A.pay = function (p, u) {
     var v = visitOf(p.vn, u);
     if (['DONE', 'CANCEL'].indexOf(v.stage) >= 0) err('บิลนี้ปิดแล้ว');
     var os = ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; });
     if (!os.length) err('ไม่มีรายการค้างชำระ');
+    var ssel = sellersCheck(p, u), dl0 = adminDeal(v), man = dl0 ? null : adminManualOf(p);
     var sub = sum(os, function (o) { return o.total; });
     var disc = Math.min(sub, Math.max(0, r2(num(p.discount)))), net = r2(sub - disc);
     var methods = {}; rows('PayMethods').forEach(function (m) { if (on(m.active === '' ? true : m.active)) methods[m.name] = m; });
@@ -2868,7 +2896,8 @@ function makeCore(store) {
     if (ar > 0) {
       var mg = mgrOk(p.approvePin); if (!mg) err('ค้างชำระต้องให้ผู้จัดการใส่รหัสอนุมัติ');
       if (ar > net) err('ยอดค้างชำระเกินยอดบิล');
-      var arPlan = instPlan(p.arPlan, ar);
+      var arPlan = instPlan(p.arPlan, ar), paidNow = r2(net - ar - wal);
+      if (!(paidNow > 0)) err('ผ่อนกับคลินิกต้องจ่ายงวดแรกวันนี้ก่อน — ใส่เงินสด/QR/บัตร เป็นงวดแรก แล้วที่เหลือค่อยลงค้างชำระ');
       if (os.some(function (o) { return o.type === 'wallet'; })) err('เติมวงเงิน/มัดจำ ต้องจ่ายเงินจริง');
     }
     if (wal > 0) {
@@ -2899,14 +2928,19 @@ function makeCore(store) {
     var acc = 0, opened = [];
     var cashRatio = net > 0 ? (net - wal - ar) / net : 1;
     os.forEach(function (o, i) { var share = i === os.length - 1 ? r2(net - acc) : r2(num(o.total) * net / sub); acc = r2(acc + share); var per = o.perVal || r2(share / Math.max(1, num(o.qty))); upd('Orders', o, { receipt: rc, paidNet: share, cashNet: r2(share * cashRatio), perVal: (o.type === 'course' || o.type === 'promo' || o.type === 'buffet' || o.type === 'wallet') ? 0 : per }); });
-    var deal = adminDeal(v);
+    applySellers(os, ssel);
+    var deal = dl0;
+    if (man) { var mb = sum(os, function (o) { return num(o.cashNet); }), mg2 = Math.min(man.amount, mb), ac3 = 0, cd2 = os.filter(function (o) { return num(o.cashNet) > 0; });
+      if (mg2 > 0) { cd2.forEach(function (o, i) { var g = i === cd2.length - 1 ? r2(mg2 - ac3) : r2(mg2 * num(o.cashNet) / mb); ac3 = r2(ac3 + g); upd('Orders', o, { adminShare: g, adminBy: man.admin }); }); log(u, 'adminShareManual', v.vn + ' ' + man.admin + ' ' + mg2); } }
     if (deal) { var left0 = r2(num(deal.closed) - num(deal.credited)), base0 = sum(os, function (o) { return num(o.cashNet); }), give = Math.min(left0, base0), acc2 = 0;
       if (give > 0) { var cand = os.filter(function (o) { return num(o.cashNet) > 0; });
         cand.forEach(function (o, i) { var g = i === cand.length - 1 ? r2(give - acc2) : r2(give * num(o.cashNet) / base0); acc2 = r2(acc2 + g); upd('Orders', o, { adminShare: g, adminBy: deal.admin }); });
         upd('Leads', deal, { credited: r2(num(deal.credited) + give), hn: v.hn }); } }
     if (wal > 0) walletMove(pt0, -wal, 'ใช้จ่าย', rc, u);
     if (ar > 0) walletMove(pt0, -ar, 'ค้างชำระ (ผ่อน) อนุมัติ ' + mg.code, rc, u, true);
-    if (ar > 0) arPlan.forEach(function (x, i) { add('Installments', { id: nextId('IN', 'seq_IN', 6), hn: v.hn, name: pt0 ? pt0.name : v.name, branch: u.branch, receipt: rc, no: i + 1, of: arPlan.length, due: x.due, amount: x.amount, paid: 0, status: 'OPEN', paidAt: '', created: stamp(), by: mg.name || mg.code }); });
+    if (ar > 0) { var ofN = arPlan.length + 1;
+      add('Installments', { id: nextId('IN', 'seq_IN', 6), hn: v.hn, name: pt0 ? pt0.name : v.name, branch: u.branch, receipt: rc, no: 1, of: ofN, due: today(), amount: paidNow, paid: paidNow, status: 'PAID', paidAt: stamp(), created: stamp(), by: mg.name || mg.code });
+      arPlan.forEach(function (x, i) { add('Installments', { id: nextId('IN', 'seq_IN', 6), hn: v.hn, name: pt0 ? pt0.name : v.name, branch: u.branch, receipt: rc, no: i + 2, of: ofN, due: x.due, amount: x.amount, paid: 0, status: 'OPEN', paidAt: '', created: stamp(), by: mg.name || mg.code }); }); }
     os.forEach(function (o) { if (o.type === 'wallet') { var cr = num(o.choice) || num(o.paidNet); walletMove(pt0, cr, /^มัดจำ/.test(o.name) ? o.name : 'เติมวงเงิน', rc, u, true); opened.push((/^มัดจำ/.test(o.name) ? o.name + ' ' : 'เติมวงเงิน ') + cr + ' บาท'); } });
     os.forEach(function (o) { if (o.type === 'course' || o.type === 'promo' || o.type === 'buffet') opened = opened.concat(openCourses(o, v, u, rc)); });
     var detail = lines.map(function (l) { return l.method + ' ' + l.amount + (l.fee ? ' +ค่าธรรมเนียม ' + l.fee : '') + (l.ref ? ' (' + l.ref + ')' : ''); }).join(' + ') || 'ส่วนลด 100%';
@@ -3112,7 +3146,8 @@ function makeCore(store) {
     var l = beamApi('POST', '/api/v1/payment-links', body), id = l.id || l.paymentLinkId;
     if (!id || !l.url) err('Beam ไม่ส่งลิงก์กลับมา');
     bl[0].ref = id;
-    var draft = { vn: v.vn, discount: r2(num(d.discount)), lines: lines, who: { code: u.code, name: u.name, branch: u.branch, roles: u.roles, brand: u.brand } };
+    applySellers(ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; }), sellersCheck(d, u)); adminManualOf(d);
+    var draft = { vn: v.vn, discount: r2(num(d.discount)), lines: lines, adminManual: d.adminManual || null, who: { code: u.code, name: u.name, branch: u.branch, roles: u.roles, brand: u.brand } };
     add('BeamCharges', { id: id, kind: 'LINK', vn: v.vn, hn: v.hn, branch: u.branch, method: bl[0].method, amount: amt, ref: ref, url: l.url, status: 'PENDING', created: stamp(), by: u.name, paidAt: '', receipt: '', draft: JSON.stringify(draft) });
     log(u, 'beamCreate', v.vn + ' ' + amt + ' ' + id); return { id: id, ref: ref, url: l.url, amount: amt };
   };
@@ -3124,7 +3159,7 @@ function makeCore(store) {
       var d = JSON.parse(r0.draft || '{}'); if (!d.who) return null;
       var v = find('Visits', 'vn', r0.vn), unpaid = ordersOf(r0.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; });
       if (!v || !unpaid.length) { upd('BeamCharges', r0, { status: 'PAID-ต้องตรวจ (บิลปิดไปแล้ว)', paidAt: stamp() }); return null; }
-      try { var out = A.pay({ vn: r0.vn, discount: d.discount, lines: d.lines }, d.who); return out.receipt; }
+      try { var out = A.pay({ vn: r0.vn, discount: d.discount, lines: d.lines, adminManual: d.adminManual }, d.who); return out.receipt; }
       catch (e) { upd('BeamCharges', r0, { status: 'PAID-ต้องตรวจ: ' + String(e.message).slice(0, 80), paidAt: stamp() }); return null; }
     });
   }
@@ -3173,7 +3208,7 @@ function makeCore(store) {
     // นัดเลยตอนลงลีด (ถ้าลูกค้าเลือกเวลาแล้ว) — เช็กเวลาว่างก่อนบันทึกอะไร
     var ap = p.appt && p.appt.item && p.appt.date && p.appt.time ? p.appt : null, ub = Object.assign({}, u, { branch: String(p.branch) }), apIt = null;
     if (ap) { apIt = itemByCode(ap.item); if (!apIt) err('เลือกรายการที่จะนัด'); if (!isDate(ap.date) || ap.date < today()) err('วันที่นัดต้องไม่ย้อนหลัง');
-      if (!findSlots(ub.branch, ap.date, apIt, pt ? pt.hn : '').slots.some(function (x) { return x.time === ap.time; })) err('เวลา ' + ap.time + ' ไม่ว่างแล้ว เลือกเวลาใหม่'); }
+      if (!findSlots(ub.branch, ap.date, apIt, pt ? pt.hn : '', '', { noConsult: on(ap.noConsult) }).slots.some(function (x) { return x.time === ap.time; })) err('เวลา ' + ap.time + ' ไม่ว่างแล้ว เลือกเวลาใหม่'); }
     var dp = p.deposit && num(p.deposit.amount) > 0 ? p.deposit : null;
     if (dp) { if (!txt(p.admin)) err('มัดจำต้องระบุคนที่ปิดการขาย'); var dm = find('PayMethods', 'name', txt(dp.method)); if (!dm) err('เลือกช่องทางที่ลูกค้าโอนมัดจำ'); if (isBeam(dm.name)) err('มัดจำผ่าน Beam ให้รับที่หน้าเก็บเงิน'); }
     var l = add('Leads', { id: nextId('L', 'seq_L', 5), date: today(), branch: p.branch, fbName: txt(p.fbName, 80), gender: txt(p.gender, 10), phone: phone, channel: txt(p.channel, 30),
@@ -3191,7 +3226,7 @@ function makeCore(store) {
     }
     if (ap) {
       if (!pt) { var np = A.registerPatient({ name: txt(p.fbName, 80), phone: phone, gender: p.gender, noEmail: true, pre: true, note: 'ลงทะเบียนจากลีด #' + l.id }, ub); pt = find('Patients', 'hn', np.hn); upd('Patients', pt, { channel: txt(p.channel, 30), ad: txt(p.ad, 120) }); upd('Leads', l, { hn: pt.hn }); }
-      appt = A.apptCreate({ hn: pt.hn, item: apIt.code, date: ap.date, time: ap.time, note: txt(ap.note), leadId: l.id }, ub);
+      appt = A.apptCreate({ hn: pt.hn, item: apIt.code, date: ap.date, time: ap.time, room: txt(ap.room), noConsult: on(ap.noConsult), note: txt(ap.note), leadId: l.id }, ub);
     }
     var br = find('Branches', 'code', p.branch);
     var msg = '🟢 ลีดใหม่ · ' + (br ? br.name : p.branch) + '\nคุณ ' + l.fbName + (l.gender ? ' (' + l.gender + ')' : '') + ' ' + phone + '\nรายการ: ' + (l.interest || '-') + (l.value ? ' ' + l.value.toLocaleString() + ' บาท' : '') +
@@ -3450,6 +3485,28 @@ function makeCore(store) {
       }
       ps.salary = tot; ps.salaryMonth = sal;
     });
+    // หัก: ประกันสังคม (ตามสัดส่วนวันเหมือนเงินเดือน) + มาสาย (เงินเดือน ÷ 30 ÷ 8 ÷ 60 = บาท/นาที × นาทีที่สาย)
+    var lateOn = on(setting('lateDeduct', 'ใช่')), lDay = num(setting('lateDayDiv', 30)) || 30, lHr = num(setting('lateHourDiv', 8)) || 8;
+    rows('Staff').forEach(function (s) {
+      if (!on(s.active) || (branchFilter && !branchFilter(s.branch))) return;
+      var code = String(s.code), sso = num(s.sso), sal = num(s.salary);
+      if (sso > 0) { var m = from.slice(0, 8) + '01';
+        while (m <= to) { var dim = new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7), 0)).getUTCDate(), me = m.slice(0, 8) + ('0' + dim).slice(-2), a1 = from > m ? from : m, b1 = to < me ? to : me, dd = Math.round((Date.parse(b1) - Date.parse(a1)) / 864e5) + 1;
+          if (dd > 0) { var amt = r2(sso * dd / dim), pd = P(code); pd.sso = r2((pd.sso || 0) + amt); pd.deduct = r2((pd.deduct || 0) + amt);
+            items.push({ who: code, kind: 'หัก', date: a1, branch: s.branch, hn: '', name: '', item: 'ประกันสังคม ' + m.slice(0, 7) + (dd < dim ? ' (' + dd + '/' + dim + ' วัน)' : ''), base: sso, pct: 0, amount: -amt }); }
+          m = addDays(me, 1); } }
+      if (lateOn && sal > 0 && !(hourlyOf(s) > 0)) { var perMin = sal / lDay / lHr / 60;
+        rows('Attendance').filter(function (a) { return String(a.staff) === code && a.date >= from && a.date <= to && num(a.late) > 0; }).forEach(function (a) {
+          var amt2 = r2(num(a.late) * perMin), pl = P(code); pl.lateDed = r2((pl.lateDed || 0) + amt2); pl.deduct = r2((pl.deduct || 0) + amt2);
+          items.push({ who: code, kind: 'หัก', date: a.date, branch: a.branch || s.branch, hn: '', name: '', item: 'มาสาย ' + num(a.late) + ' นาที (เข้า ' + a.in + ') × ' + r2(perMin) + ' บาท/นาที', base: r2(perMin), pct: 0, amount: -amt2 }); }); }
+    });
+    // ค่าชั่วโมง (แพทย์): นับจากเวลาเข้า–ออกจริง × เรท (ชีต Staff ช่อง hourly · แพทย์ที่ไม่มีเงินเดือนและช่องว่าง = Settings doctorHourly 700)
+    var hrRound = num(setting('doctorHourRound', 0));
+    rows('Staff').forEach(function (s) { var rate = hourlyOf(s); if (!(rate > 0)) return;
+      rows('Attendance').filter(function (a) { return String(a.staff) === String(s.code) && a.date >= from && a.date <= to && a.in && a.out && (!branchFilter || branchFilter(String(a.branch || s.branch))); }).forEach(function (a) {
+        var m = toMin(a.out) - toMin(a.in); if (m <= 0) return; if (hrRound > 0) m = Math.floor(m / hrRound) * hrRound; var amt = r2(m / 60 * rate), ph = P(String(s.code));
+        ph.salary = r2(ph.salary + amt); ph.hourPay = r2((ph.hourPay || 0) + amt); ph.hours = r2((ph.hours || 0) + m / 60);
+        items.push({ who: String(s.code), kind: 'เงินเดือน', date: a.date, branch: a.branch || s.branch, hn: '', name: '', item: 'ค่าชั่วโมง ' + a.in + '–' + a.out + ' (' + Math.floor(m / 60) + ' ชม.' + (m % 60 ? ' ' + (m % 60) + ' นาที' : '') + ' × ' + rate + ')', base: rate, pct: 0, amount: amt }); }); });
     // OT ที่ส่วนกลางอนุมัติแล้ว → บวกในเงินเดือน (นับตามวันที่ทำ OT)
     rows('OTs').forEach(function (x) { if (x.status !== 'APPROVED' || x.date < from || x.date > to || !(num(x.amount) > 0)) return; var s = find('Staff', 'code', x.staff) || {}; if (branchFilter && !branchFilter(s.branch || x.branch)) return;
       var po = P(String(x.staff)); po.salary = r2(po.salary + num(x.amount)); po.ot = r2((po.ot || 0) + num(x.amount));
@@ -3700,8 +3757,8 @@ function makeCore(store) {
     var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today();
     var e = earnings(from, to, scopeFn(p.scope, u));
     var pay = has(u, ['owner', 'admin', 'account']), ppl = Object.keys(e.people).map(function (k) { return e.people[k]; });
-    if (!pay) { ppl.forEach(function (x) { x.salary = 0; delete x.salaryMonth; }); ppl = ppl.filter(function (x) { return x.df || x.fee || x.comm || x.sales; }); }
-    return { from: from, to: to, salaryShown: pay, people: ppl, items: pay ? e.items : e.items.filter(function (i) { return i.kind !== 'เงินเดือน'; }) };
+    if (!pay) { ppl.forEach(function (x) { x.salary = 0; delete x.salaryMonth; x.deduct = 0; x.sso = 0; x.lateDed = 0; }); ppl = ppl.filter(function (x) { return x.df || x.fee || x.comm || x.sales; }); }
+    return { from: from, to: to, salaryShown: pay, people: ppl, items: pay ? e.items : e.items.filter(function (i) { return i.kind !== 'เงินเดือน' && i.kind !== 'หัก'; }) };
   };
 
   /* ---------- สต้อก ---------- */
@@ -4250,6 +4307,9 @@ var LS = {
   sget: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
   sset: function (k, v) { try { if (v == null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) {} }
 };
+// สีพื้น: ค่าเริ่มต้น = สว่าง (ขาว) ทุกเครื่อง · กดปุ่ม ☀️/🌙 ที่หน้าแรกเพื่อสลับ (จำไว้ในเครื่องนั้น)
+function themeSet(t) { t = t === 'dark' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', t); LS.set('hs_theme', t); }
+themeSet(LS.get('hs_theme', 'light'));
 var API_URL = (typeof window.CLINIC_API === 'string' && window.CLINIC_API) || LS.get('hs_api', '');
 var DEMO = !API_URL;
 var S = { token: null, user: null, boot: null, stack: [], cur: null, busy: false, dlg: 0, stock: null, v: {} };
@@ -4345,7 +4405,7 @@ function dialog(o) {
         if (S.busy) return;
         var er = box.querySelector('.err'); er.hidden = true;
         Promise.resolve().then(function () { return o.onOk ? o.onOk(box) : true; }).then(function (v) { if (v !== false) close(v === undefined ? true : v); })
-          .catch(function (e2) { if (e2 && e2.message === 'BUSY') return; er.textContent = e2.message || e2; er.hidden = false; });
+          .catch(function (e2) { if (e2 && e2.message === 'BUSY') return; er.textContent = e2.message || e2; er.hidden = false; try { er.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (x) {} });
       }
     };
     if (o.mount) o.mount(box);
@@ -4365,7 +4425,8 @@ function sigPad(cv) {
   cv.addEventListener('pointermove', function (e) { if (!last) return; var p = pt(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); last = p; drawn = true; });
   cv.addEventListener('pointerup', function () { last = null; });
   return { get: function () { if (!drawn) return ''; var c = document.createElement('canvas'); c.width = cv.width; c.height = cv.height; var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(cv, 0, 0); return c.toDataURL('image/jpeg', .7); },
-    clear: function () { ctx.clearRect(0, 0, cv.width, cv.height); drawn = false; } };
+    clear: function () { ctx.clearRect(0, 0, cv.width, cv.height); drawn = false; },
+    scribble: function () { var r = cv.getBoundingClientRect(), w = r.width, h = r.height, x = w * .12, y = h * .6; ctx.beginPath(); ctx.moveTo(x, y); for (var i = 0; i < 26; i++) { x += w * .028; y = h * (.35 + .4 * Math.abs(Math.sin(i * .9 + Math.random()))); ctx.lineTo(x, y); } ctx.stroke(); drawn = true; } };
 }
 function sigBlock(id, label) { return '<div class="stack" style="gap:.3rem"><div class="row"><span class="small muted sp">' + esc(label) + '</span><button type="button" class="btn q sm" data-clear="' + id + '">ล้าง</button></div><canvas class="sig" id="' + id + '"></canvas></div>'; }
 function mountSigs(root) { var pads = {}; $$('canvas.sig', root).forEach(function (c) { pads[c.id] = sigPad(c); }); $$('[data-clear]', root).forEach(function (b) { b.onclick = function () { pads[b.dataset.clear].clear(); }; }); return pads; }
@@ -4428,7 +4489,7 @@ function renderTop() {
     '<div class="ttl">' + esc(isHome ? S.user.branchName : (TITLES[c.name] || '')) + '</div>' +
     (isHome ? '' : '<button class="btn q sm hide-sm" onclick="home()" aria-label="หน้าแรก">' + ic('home') + '</button>') +
     '<div class="who"><b>' + esc(S.user.name) + '</b><br>' + esc(S.user.roles.map(function (r) { return ROLE_TH[r] || r; }).join(' · ')) + '</div>' +
-    (isHome ? '<button class="btn q sm" data-a="logout" aria-label="ออกจากระบบ">' + ic('out') + '</button>' : '') + '</div>';
+    (isHome ? '<button class="btn q sm" data-a="theme" aria-label="สลับสีพื้น" title="สลับพื้นขาว/ดำ">' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙') + '</button><button class="btn q sm" data-a="logout" aria-label="ออกจากระบบ">' + ic('out') + '</button>' : '') + '</div>';
 }
 
 /* ---------- เข้าระบบ ---------- */
@@ -4471,7 +4532,8 @@ function loginScreen(step) {
   $('#pin').onclick = function (e) { var k = e.target.closest('[data-k]'); if (!k) return; k = k.dataset.k; if (k === '⌫') pin = pin.slice(0, -1); else if (k === 'ล้าง') pin = ''; else if (pin.length < 8) pin += k; draw(); if (pin.length === 4 && DEMO) submit(); };
   $('#go').onclick = submit;
   $$('[data-pin]').forEach(function (b) { b.onclick = function () { pin = b.dataset.pin; draw(); submit(); }; });
-  document.onkeydown = function (e) { if (S.user || !$('#pin')) return; if (/^\d$/.test(e.key) && pin.length < 8) { pin += e.key; draw(); } else if (e.key === 'Backspace') { pin = pin.slice(0, -1); draw(); } else if (e.key === 'Enter') submit(); };
+  document.onkeydown = function (e) { if (S.user || !$('#pin')) return; if (/^\d$/.test(e.key) && pin.length < 8) { pin += e.key; draw(); } else if (e.key === 'Backspace') { pin = pin.slice(0, -1); draw(); } else if (e.key === 'Escape' || e.key === 'Delete') { pin = ''; draw(); } else if (e.key === 'Enter') { e.preventDefault(); submit(); } };
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches) { var kh = document.createElement('p'); kh.className = 'xs muted'; kh.style.textAlign = 'center'; kh.textContent = '⌨️ พิมพ์รหัสจากคีย์บอร์ดได้ · Enter = เข้าระบบ · Esc = ล้าง'; $('#pin').after(kh); }
 }
 function start() {
   applyBrand(S.user && S.user.brand); S.stack = []; S.cur = { name: 'home' };
@@ -4487,7 +4549,7 @@ var TILES = [
   { k: 'lead', t: 'ลงลีด + นัด', s: 'จากแชทที่แอดมินส่งมา · ลงนัดในตัว', ic: 'chat', r: FRONT.concat(['adminpage']), hero: 1 },
   { k: 'walkin', t: 'Walk-in', s: 'คนไข้เดินเข้ามา · ค้นหา/ลงทะเบียน', ic: 'walk', r: FRONT, hero: 1 },
   { k: 'arrivals', t: 'คนไข้นัดไว้แล้ว', s: 'กดรับเข้าคิวเมื่อมาถึง', ic: 'cal', r: FRONT, b: 'booked' },
-  { k: 'bookNew', t: 'ลงนัด', s: 'จองห้อง/เตียงอัตโนมัติ', ic: 'plus', r: FRONT },
+  { k: 'bookNew', t: 'ลงนัด', s: 'ระบบจัดห้องให้ · เปลี่ยนห้องเองได้', ic: 'plus', r: FRONT },
   { k: 'due', t: 'เก็บเงิน / ค้างจ่าย', s: 'บิลที่ยังไม่ได้ชำระ', ic: 'cash', r: FRONT, b: 'due' },
   { k: 'rcFind', t: 'ใบเสร็จย้อนหลัง', s: 'ค้นหา · ดู · พิมพ์ซ้ำ', ic: 'search', r: FRONT.concat(['account']) },
   { k: 'queue', t: 'คิววันนี้', s: 'สถานะคนไข้ทุกคน', ic: 'list', r: FRONT.concat(['sales']) },
@@ -4556,6 +4618,7 @@ function settingsDlg() {
 
 /* ---------- ตัวจัดการคลิก ---------- */
 var ACT = {
+  theme: function (el) { var d = document.documentElement.getAttribute('data-theme') === 'dark'; themeSet(d ? 'light' : 'dark'); el.textContent = d ? '🌙' : '☀️'; },
   logout: function () { ask('ออกจากระบบ?', 'แท็บเล็ตจะกลับไปหน้าใส่รหัส', 'ออกจากระบบ').then(function (ok) { if (ok) logout(); }); },
   settings: settingsDlg,
   pickBranch: function (el) { LS.set('hs_br', el.dataset.b); LS.set('hs_brn', el.dataset.n); LS.set('hs_brand', el.dataset.brand || ''); loginScreen('pin'); },
@@ -4620,7 +4683,7 @@ function regHtml(arg, cp) {
   var paper = arg === 'paper', pre = !cp && arg && typeof arg === 'object' ? arg : null;
   S.v.reg = { img: '', paper: paper, pre: pre, complete: cp ? cp.hn : '' };
   var f = cp || pre || {}, V = function (k) { return f[k] ? ' value="' + esc(f[k]) + '"' : ''; };
-  return '<form class="stack" id="rf" autocomplete="off">' +
+  return '<form class="stack" id="rf" autocomplete="off">' + (DEMO || has(['admin', 'owner']) ? '<div class="row"><span class="sp"></span><button type="button" class="btn w sm" data-a="regFake">🎲 กรอกข้อมูลทดสอบ</button></div>' : '') +
     (paper ? '<div class="note">คนไข้เก่าที่มีแฟ้มกระดาษ: ใส่ HN เดิมจากแฟ้ม ไม่ต้องเซ็นใหม่ (ใบยินยอมอยู่ในแฟ้มแล้ว)</div>' : '') +
     (pre ? '<div class="note">ลงทะเบียนล่วงหน้าจากลีด — ให้คนไข้เซ็นยินยอมวันที่มาถึง</div>' : '') +
     (cp ? '<div class="note">' + esc(cp.hn) + ' · ลงชื่อไว้จากลีดแล้ว — กรอกข้อมูลที่เหลือ แล้วให้คนไข้เซ็นยินยอม (ใช้ HN เดิม)</div>' : '') +
@@ -4696,6 +4759,24 @@ function idCamera() {
       } }).then(function (d) { stop(); return d || ''; }, function (e) { stop(); throw e; });
   });
 }
+
+/* ปุ่มกรอกข้อมูลทดสอบ (เห็นเฉพาะโหมดทดลอง / ผู้ดูแลระบบ / Owner) — ชื่อขึ้นต้นด้วย "ทดสอบ" จะได้แยกออกง่าย */
+ACT.regFake = function () {
+  var F = $('#rf'); if (!F) return; var R = function (a) { return a[Math.floor(Math.random() * a.length)]; }, N = function (a, b) { return a + Math.floor(Math.random() * (b - a + 1)); };
+  var g = R(['หญิง', 'หญิง', 'หญิง', 'ชาย']), fn = g === 'หญิง' ? R(['ปิยะนุช', 'กมลวรรณ', 'ศิริพร', 'ณัฐธิดา', 'พิมพ์ชนก', 'วราภรณ์', 'สุภาวดี', 'อรอุมา']) : R(['ธนากร', 'ภานุพงศ์', 'กิตติพัฒน์', 'ณัฐวุฒิ', 'อนุชา']);
+  var ln = R(['ใจดี', 'แสงทอง', 'บุญมา', 'ศรีสุข', 'ทองคำ', 'มีสุข', 'วงศ์ไทย']), en = { 'ปิยะนุช': 'Piyanuch', 'กมลวรรณ': 'Kamonwan', 'ศิริพร': 'Siriporn', 'ณัฐธิดา': 'Nattida', 'พิมพ์ชนก': 'Pimchanok', 'วราภรณ์': 'Waraporn', 'สุภาวดี': 'Supawadee', 'อรอุมา': 'Onuma', 'ธนากร': 'Thanakorn', 'ภานุพงศ์': 'Panupong', 'กิตติพัฒน์': 'Kittipat', 'ณัฐวุฒิ': 'Nattawut', 'อนุชา': 'Anucha' }[fn];
+  var d = [N(1, 8)]; for (var i = 0; i < 11; i++) d.push(N(0, 9)); var sm = 0; for (i = 0; i < 12; i++) sm += d[i] * (13 - i); d.push((11 - sm % 11) % 10);
+  var ph = '0' + R(['8', '9', '6']) + N(10000000, 99999999), set = function (n, v) { var e = F.querySelector('[name="' + n + '"]'); if (!e) return; if (e.type === 'checkbox') e.checked = !!v; else e.value = v; e.dispatchEvent(new Event('change', { bubbles: true })); };
+  set('title', g === 'หญิง' ? R(['นางสาว', 'นาง']) : 'นาย'); set('name', 'ทดสอบ ' + fn + ' ' + ln); set('nickname', R(['มิ้นท์', 'แพร', 'ฝน', 'เบล', 'โบว์', 'ต้น', 'เอิร์ธ'])); set('nameEn', en + ' Test');
+  set('idcard', d.join('')); set('dob', N(1978, 2004) + '-' + ('0' + N(1, 12)).slice(-2) + '-' + ('0' + N(1, 28)).slice(-2)); set('gender', g); set('phone', ph); set('noEmail', false); set('email', 'test' + N(1000, 9999) + '@example.com');
+  set('occupation', R(['พนักงานบริษัท', 'ธุรกิจส่วนตัว', 'ข้าราชการ', 'นักศึกษา', 'ฟรีแลนซ์'])); var ch = F.querySelector('[name=channel]'); if (ch && ch.options.length) ch.selectedIndex = N(0, ch.options.length - 1);
+  set('address', N(1, 199) + '/' + N(1, 99) + ' ' + R(['ถ.นิมมานเหมินท์', 'ถ.ห้วยแก้ว', 'ถ.เชียงใหม่-ลำปาง', 'ถ.สุเทพ']) + ' ต.' + R(['สุเทพ', 'ช้างเผือก', 'ฟ้าฮ่าม', 'หนองป่าครั่ง']) + ' อ.เมือง จ.เชียงใหม่ 50' + R(['200', '300']));
+  set('allergy', R(['', '', 'Penicillin', 'อาหารทะเล'])); set('chronic', R(['', '', 'ภูมิแพ้', 'ความดันสูง'])); set('supplements', R(['', 'วิตามินซี', 'คอลลาเจน'])); set('silicone', R(['ไม่เคย', 'ไม่เคย', 'เคย'])); set('smoking', R(['ไม่สูบ', 'ไม่สูบ', 'สูบ']));
+  set('emName', R(['คุณแม่', 'คุณพ่อ', 'สามี', 'พี่สาว']) + ' ' + fn); set('emPhone', '08' + N(10000000, 99999999)); set('consent', true); set('mktConsent', Math.random() < .7);
+  var ohn = F.querySelector('[name=oldHn]'); if (ohn && !ohn.value) ohn.value = String(N(10000, 19999));
+  var pads = S.v.reg && S.v.reg.pads; if (pads) Object.keys(pads).forEach(function (k) { pads[k].clear(); pads[k].scribble(); });
+  toast('กรอกข้อมูลทดสอบแล้ว — ชื่อขึ้นต้นด้วย "ทดสอบ" · ตรวจแล้วกดบันทึก');
+};
 ACT.saveReg = function () {
   var F = $('#rf'), d = {}, R = S.v.reg;
   $$('input,select,textarea', F).forEach(function (el) { if (!el.name) return; d[el.name] = el.type === 'checkbox' ? el.checked : el.value.trim(); });
@@ -4884,14 +4965,12 @@ ACT.depositDlg = function (el) {
   depositOpen(S.v.pt.patient, '');
 };
 function depositOpen(p, nt0, am0) {
-  var sel = (S.v.pos && S.v.pos.hn === p.hn && S.v.pos.sellers && S.v.pos.sellers.length ? S.v.pos.sellers.map(function (x) { return { name: x.name, pct: x.pct }; }) : [{ name: S.user.name, pct: 100 }]);
   dialog({ title: p.wallet < 0 ? 'รับชำระยอดค้าง / มัดจำ' : 'รับมัดจำ', ok: 'เพิ่มในบิลแล้วไปรับเงิน',
     body: (p.wallet < 0 ? '<div class="note w small">ยอดค้างชำระเดิม ' + bt(-p.wallet) + ' — เงินที่รับจะหักยอดค้างก่อน</div>' : '') +
-      '<label>มัดจำ/ชำระค่าอะไร<input id="nt" value="' + esc(nt0 || '') + '" placeholder="เช่น มัดจำตาสองชั้น / ชำระงวด 2"></label><label>จำนวนเงิน (บาท)<input id="am" type="number" inputmode="decimal" value="' + (am0 ? am0 : '') + '"></label><label class="ck"><input type="checkbox" id="sg"> มัดจำงานศัลยกรรม (คิดค่าคอมเรทศัลยกรรม)</label>' + sellerPicker(sel) +
-      '<p class="xs muted">ยอดนี้นับเป็นยอดขายของเซลวันนี้ · เงินเข้าวงเงินของลูกค้า วันมาทำหักจากวงเงิน (ไม่คิดค่าคอมซ้ำ)</p>',
-    mount: function (b) { bindSellers(b, sel, function () { return b.querySelector('#am').value; }); b.querySelector('#am').oninput = function () { sel.sync(); }; },
-    onOk: function (b) { var am = nz(b.querySelector('#am').value); need(am > 0 || '', 'ใส่จำนวนเงิน'); need(sel.length || '', 'เลือกผู้ขาย'); if (!sel.toPct()) return false;
-      return call('saleCommit', { hn: p.hn, items: [{ topup: am, deposit: true, surg: b.querySelector('#sg').checked, note: b.querySelector('#nt').value }], sellers: sel }, { write: true }).then(function (r) { setTimeout(function () { go('pay', r.vn); }, 30); }); } });
+      '<label>มัดจำ/ชำระค่าอะไร<input id="nt" value="' + esc(nt0 || '') + '" placeholder="เช่น มัดจำตาสองชั้น / ชำระงวด 2"></label><label>จำนวนเงิน (บาท)<input id="am" type="number" inputmode="decimal" value="' + (am0 ? am0 : '') + '"></label><label class="ck"><input type="checkbox" id="sg"> มัดจำงานศัลยกรรม (คิดค่าคอมเรทศัลยกรรม)</label>' +
+      '<p class="xs muted">เลือกผู้ขาย/แบ่งค่าคอมที่หน้ารับเงินถัดไป · เงินเข้าวงเงินของลูกค้า วันมาทำหักจากวงเงิน (ไม่คิดค่าคอมซ้ำ)</p>',
+    onOk: function (b) { var am = nz(b.querySelector('#am').value); need(am > 0 || '', 'ใส่จำนวนเงิน'); 
+      return call('saleCommit', { hn: p.hn, items: [{ topup: am, deposit: true, surg: b.querySelector('#sg').checked, note: b.querySelector('#nt').value }] }, { write: true }).then(function (r) { setTimeout(function () { go('pay', r.vn); }, 30); }); } });
 }
 
 ACT.topupDlg = function () {
@@ -4964,15 +5043,16 @@ function posHtml() {
     '<input id="pq" placeholder="ค้นหารายการ…" value="' + esc(P.q) + '"><div class="tabs" id="cats">' + cats.map(function (c) { return '<button class="' + (c === P.cat && !P.q ? 'on' : '') + '" data-c="' + esc(c) + '">' + esc(c) + '</button>'; }).join('') + '</div>' +
     '<div class="prod" id="prods">' + prodButtons() + '</div></div></div>' +
     '<div class="card stack cart" style="position:sticky;top:calc(70px + env(safe-area-inset-top,0px))"><div class="sec"><h2>ตะกร้า</h2><span class="pill">' + P.cart.length + ' รายการ</span></div><div class="list" id="cart">' + cartHtml() + '</div>' +
-    sellerPicker(P.sellers) +
+    '<p class="xs muted">ผู้ขาย / แบ่งค่าคอม เลือกที่หน้ารับเงิน (หลังหักมัดจำ · โปรแอดมิน)</p>' +
     '<div class="tot"><span>รวม</span><span id="ctot">' + bt(cartTotal()) + '</span></div>' +
+    '<div id="cwal" class="note small"' + (P.pt.wallet > 0 ? '' : ' hidden') + '></div>' +
     '<button class="btn p lg blk" data-a="posCommit"' + (P.cart.length ? '' : ' disabled') + '>บันทึกรายการ</button>' +
     '<p class="xs muted">คอร์ส/โปร จะเปิดใช้งานเมื่อชำระเงินแล้ว · หัตถการส่งเข้าคิวทำ</p></div></div>';
 }
 function prodButtons() {
   var P = S.v.pos, q = P.q.toLowerCase(), out = [];
   if (!q && P.cat === 'โปร' || q) S.boot.promos.forEach(function (p) { if (!q || p.name.toLowerCase().indexOf(q) >= 0) out.push('<button class="promo" data-pr="' + esc(p.code) + '"><span class="xs muted">โปร' + (p.end ? ' · ถึง ' + esc(thDate(p.end)) : '') + '</span><b>' + esc(p.name) + '</b><span class="xs muted">' + esc(p.parts.map(function (x) { return x.part + (x.qty > 1 ? ' ×' + x.qty : ''); }).join(' + ')) + '</span><span class="pr">' + bt(p.price) + '</span></button>'); });
-  S.boot.items.forEach(function (i) { if (q ? (i.name.toLowerCase().indexOf(q) >= 0 || i.code.toLowerCase() === q) : i.category === P.cat) out.push('<button data-it="' + esc(i.code) + '"><span class="xs muted">' + esc({ proc: 'หัตถการ', product: 'สินค้า', service: 'ค่าบริการ', course: 'คอร์ส', buffet: 'บุฟเฟต์' }[i.type] || '') + (i.parts ? ' · ' + i.parts.map(function (x) { return x.sessions > 999 ? 'ไม่จำกัด' : x.sessions + ' ครั้ง'; }).join('+') : i.sessions ? ' · ' + i.sessions + ' ครั้ง' : '') + '</span><b>' + esc(i.name) + '</b><span class="pr">' + bt(i.price) + (i.unit ? ' / ' + esc(i.unit) : '') + '</span></button>'); });
+  S.boot.items.forEach(function (i) { if (q ? (i.name.toLowerCase().indexOf(q) >= 0 || i.code.toLowerCase() === q) : i.category === P.cat) out.push('<button data-it="' + esc(i.code) + '"><span class="xs muted">' + (i.optOf ? '<b style="color:var(--accent)">ออฟชั่นเคส' + esc(i.feeGroup) + '</b> · ' : '') + esc({ proc: 'หัตถการ', product: 'สินค้า', service: 'ค่าบริการ', course: 'คอร์ส', buffet: 'บุฟเฟต์' }[i.type] || '') + (i.parts ? ' · ' + i.parts.map(function (x) { return x.sessions > 999 ? 'ไม่จำกัด' : x.sessions + ' ครั้ง'; }).join('+') : i.sessions ? ' · ' + i.sessions + ' ครั้ง' : '') + '</span><b>' + esc(i.name) + '</b><span class="pr">' + bt(i.price) + (i.unit ? ' / ' + esc(i.unit) : '') + '</span></button>'); });
   if (has(['front', 'manager', 'sales'])) out.push('<button class="addnew" data-new="1"><b>+ เพิ่มรายการใหม่</b><span class="xs muted">' + (q ? 'ไม่เจอ "' + esc(P.q) + '" — เพิ่มเลย' : 'ไม่มีในปุ่ม พิมพ์ชื่อ+ราคาเอง') + (has(['manager']) ? '' : ' · ผู้จัดการใส่รหัส') + '</span></button>');
   return out.join('') || '<div class="empty">ไม่พบรายการ</div>';
 }
@@ -4991,8 +5071,10 @@ function cartHtml() {
       '<div class="stack r" style="gap:.2rem"><span class="num">' + bt(lineTotal(l)) + '</span><button class="btn q sm" data-rm="' + i + '" aria-label="ลบ">✕</button></div></div>';
   }).join('') : '<div class="empty">แตะรายการด้านซ้ายเพื่อเพิ่ม</div>';
 }
-function posRedraw(full) { if (S.v.pos.sellers.sync) S.v.pos.sellers.sync(); if (full) { $('#prods').innerHTML = prodButtons(); $$('#cats button').forEach(function (b) { b.classList.toggle('on', b.dataset.c === S.v.pos.cat && !S.v.pos.q); }); } $('#cart').innerHTML = cartHtml(); $('#ctot').textContent = bt(cartTotal()); $('[data-a=posCommit]').disabled = !S.v.pos.cart.length; $('.cart .pill').textContent = S.v.pos.cart.length + ' รายการ'; }
-SCR.pos.after = function () {
+function posWal() { var P = S.v.pos, el = $('#cwal'); if (!el || !P || !(P.pt.wallet > 0)) return; var t = cartTotal(), use = Math.min(P.pt.wallet, t);
+  el.innerHTML = '💰 ลูกค้ามีมัดจำ/วงเงิน <b>' + bt(P.pt.wallet) + '</b> — ตอนรับเงินระบบหักให้อัตโนมัติ' + (t > 0 ? ' · ลูกค้าจ่ายเพิ่ม <b>' + bt(Math.max(0, t - use)) + '</b> · ค่าคอมคิดจากส่วนที่จ่ายเพิ่มนี้ (มัดจำคิดให้คนปิดไปแล้วตอนรับมัดจำ)' : ''); }
+function posRedraw(full) { if (full) { $('#prods').innerHTML = prodButtons(); $$('#cats button').forEach(function (b) { b.classList.toggle('on', b.dataset.c === S.v.pos.cat && !S.v.pos.q); }); } $('#cart').innerHTML = cartHtml(); $('#ctot').textContent = bt(cartTotal()); posWal(); $('[data-a=posCommit]').disabled = !S.v.pos.cart.length; $('.cart .pill').textContent = S.v.pos.cart.length + ' รายการ'; }
+SCR.pos.after = function () { posWal();
   var P = S.v.pos;
   $('#pq').oninput = function (e) { P.q = e.target.value.trim(); posRedraw(1); };
   $('#cats').onclick = function (e) { var b = e.target.closest('[data-c]'); if (!b) return; P.cat = b.dataset.c; P.q = ''; $('#pq').value = ''; posRedraw(1); };
@@ -5013,8 +5095,8 @@ SCR.pos.after = function () {
     else if (b.dataset.dp) { i = +b.dataset.dp; P.cart[i].dpct = !P.cart[i].dpct; }
     else return; posRedraw(); };
   c.onchange = function (e) { var t = e.target; if (t.dataset.d != null) { var l = P.cart[+t.dataset.d]; l.disc = Math.max(0, nz(t.value)); if (l.dpct) l.disc = Math.min(100, l.disc); posRedraw(); } if (t.dataset.ch != null) P.cart[+t.dataset.ch].choice = t.value; if (t.dataset.qv != null) { var q = Math.round(nz(t.value) * 100) / 100; P.cart[+t.dataset.qv].qty = q > 0 ? q : 1; posRedraw(); } };
-  bindSellers($('.cart'), P.sellers, cartTotal);
 };
+function optGroups() { var g = ['ตา', 'จมูก', 'หน้าอก']; S.boot.items.forEach(function (x) { if (x.feeGroup && g.indexOf(x.feeGroup) < 0 && x.feeGroup !== 'ไฝ') g.push(x.feeGroup); }); return g; }
 function quickAdd(P) {
   var cats = posCats().filter(function (c) { return c !== 'โปร'; }), T = [['proc', 'หัตถการ'], ['course', 'คอร์ส'], ['product', 'ยา/สินค้า'], ['service', 'ค่าบริการ']];
   var sp = (S.boot.stockPick || []).filter(function (x) { return x.category !== 'ของสิ้นเปลือง'; });
@@ -5023,6 +5105,7 @@ function quickAdd(P) {
       '<div class="g2"><label>ราคา (บาท) *<input id="qp" type="number" inputmode="decimal"></label><label>หมวด<select id="qc">' + opts(cats, P.cat !== 'โปร' ? P.cat : '') + '</select></label></div>' +
       '<div><div class="small muted">ประเภท</div><div class="chips" id="qt">' + T.map(function (t, i) { return '<button type="button" data-t="' + t[0] + '" class="' + (i ? '' : 'on') + '">' + t[1] + '</button>'; }).join('') + '</div></div>' +
       '<label id="qsw" hidden>จำนวนครั้งในคอร์ส (รวมแถม)<input id="qs" type="number" inputmode="numeric"></label>' +
+      '<div id="qog" hidden class="stack" style="gap:.35rem"><div class="small b">ศัลยกรรม: รายการนี้คือ</div><div class="chips" id="qo">' + [['', 'เคสหลัก / ทำแยก']].concat(optGroups().map(function (g) { return [g, 'ออฟชั่นเคส' + g]; })).concat([['*', 'ออฟชั่นเคสอื่น…']]).map(function (x, i) { return '<button type="button" data-o="' + esc(x[0]) + '" class="' + (i ? '' : 'on') + '">' + esc(x[1]) + '</button>'; }).join('') + '</div><input id="qox" hidden placeholder="ชื่อกลุ่มเคส เช่น หน้าอก / คาง"><span class="xs muted">ออฟชั่น = ขายคู่เคสหลักในบิลเดียวกัน · ค่ามือ Scrub/Circ ได้จากเคสหลัก (ราคาออฟชั่นนับรวมขั้นราคาเคส) · ออฟชั่นเองค่ามือ 0</span></div>' +
       '<div><div class="small muted">ใครทำ</div><div class="chips" id="qf"><button type="button" data-f="doctor" class="on">แพทย์</button><button type="button" data-f="staff">พนักงาน</button><button type="button" data-f="none">ไม่มี (ขายของ)</button></div></div>' +
       (sp.length ? '<details><summary class="small">ใช้ยา/ฟิลเลอร์จากสต้อก (ถ้ามี)</summary><div class="g2" style="margin-top:.5rem"><label>ของที่ใช้<select id="qk">' + opts(sp.map(function (x) { return [x.code, x.name + (x.unit ? ' (' + x.unit + ')' : '')]; }), '', '— ไม่ใช้ —') + '</select></label><label>ใช้ต่อครั้ง<input id="qq" type="number" inputmode="decimal" step="any"></label></div></details>' : '') +
       (has(['manager']) ? '' : '<label>รหัสผู้จัดการ (อนุมัติ) *<input id="qm" type="password" inputmode="numeric" autocomplete="off"></label>') +
@@ -5032,10 +5115,12 @@ function quickAdd(P) {
       t.onclick = function (e) { var x = e.target.closest('[data-t]'); if (!x) return; $$('#qt button').forEach(function (y) { y.classList.toggle('on', y === x); }); b.querySelector('#qsw').hidden = x.dataset.t !== 'course';
         if (x.dataset.t === 'product' || x.dataset.t === 'service') $$('#qf button').forEach(function (y) { y.classList.toggle('on', y.dataset.f === 'none'); }); };
       f.onclick = function (e) { var x = e.target.closest('[data-f]'); if (!x) return; $$('#qf button').forEach(function (y) { y.classList.toggle('on', y === x); }); };
+      var qc = b.querySelector('#qc'), sg = function () { b.querySelector('#qog').hidden = !/ศัลย|ผ่าตัด/.test(qc.value); }; qc.addEventListener('change', sg); sg();
+      b.querySelector('#qo').onclick = function (e) { var x = e.target.closest('[data-o]'); if (!x) return; $$('#qo button').forEach(function (y) { y.classList.toggle('on', y === x); }); var ox = b.querySelector('#qox'); ox.hidden = x.dataset.o !== '*'; if (!ox.hidden) ox.focus(); };
     },
     onOk: function (b) {
       var g = function (id) { var el = b.querySelector(id); return el ? el.value.trim() : ''; }, on1 = function (sel) { var el = b.querySelector(sel + ' button.on'); return el ? (el.dataset.t || el.dataset.f) : ''; };
-      var d = { name: need(g('#qn'), 'ใส่ชื่อรายการ'), price: need(g('#qp'), 'ใส่ราคา'), category: need(g('#qc'), 'เลือกหมวด'), type: on1('#qt'), performer: on1('#qf'), sessions: g('#qs'), stock: g('#qk'), stockQty: g('#qq'), approvePin: has(['manager']) ? '' : need(g('#qm'), 'ให้ผู้จัดการใส่รหัส') };
+      var d = { name: need(g('#qn'), 'ใส่ชื่อรายการ'), price: need(g('#qp'), 'ใส่ราคา'), category: need(g('#qc'), 'เลือกหมวด'), type: on1('#qt'), performer: on1('#qf'), sessions: g('#qs'), stock: g('#qk'), stockQty: g('#qq'), optionOf: (function () { if (b.querySelector('#qog').hidden) return ''; var o = b.querySelector('#qo button.on'), v = o ? o.dataset.o : ''; return v === '*' ? need(g('#qox'), 'ใส่ชื่อกลุ่มเคสของออฟชั่น') : v; })(), approvePin: has(['manager']) ? '' : need(g('#qm'), 'ให้ผู้จัดการใส่รหัส') };
       return call('itemQuickAdd', d, { write: true }).then(function (r) {
         var it = r.item; if (!it) return; S.boot.items = S.boot.items.filter(function (x) { return x.code !== it.code; }).concat([it]);
         P.cart.push({ item: it.code, name: it.name, price: it.price, qty: 1, disc: 0, dpct: false, unit: it.unit, presets: it.presets });
@@ -5047,9 +5132,7 @@ ACT.posCommit = function () {
   var P = S.v.pos;
   var miss = P.cart.filter(function (l) { return l.choices && !l.choice; })[0]; if (miss) return toast('เลือกตำแหน่งของ ' + miss.name + ' ก่อน', 1);
   var items = P.cart.map(function (l) { var g = l.price * l.qty; return { item: l.item, promo: l.promo, qty: l.qty, disc: l.dpct ? Math.round(g * l.disc) / 100 : l.disc, choice: l.choice }; });
-  if (!P.sellers.length) return toast('เลือกผู้ขายอย่างน้อย 1 คน', 1);
-  if (P.sellers.toPct && !P.sellers.toPct()) return;
-  call('saleCommit', { hn: P.hn, items: items, sellers: P.sellers }, { write: true }).then(function (r) {
+  call('saleCommit', { hn: P.hn, items: items }, { write: true }).then(function (r) {
     S.v.pos = null; toast('บันทึก ' + r.orders.length + ' รายการ');
     if (P.ret) { back(); return; }
     if (has(FRONT)) go('pay', r.vn, true); else back();
@@ -5074,25 +5157,54 @@ ACT.instPay = function (el) { var x = S.v.ins[+el.dataset.i]; call('patientPage'
 TITLES.pay = 'รับชำระเงิน';
 SCR.pay = function (vn) {
   return call('bill', { vn: vn }).then(function (b) {
-    var P = S.v.pay = { vn: vn, bill: b, lines: [], disc: 0, dpct: false };
+    var P = S.v.pay = { vn: vn, bill: b, lines: [], disc: 0, dpct: false, am: { on: false, admin: '', amt: 0 } };
     var un = b.orders.filter(function (o) { return !o.receipt; }), paid = b.orders.filter(function (o) { return o.receipt; });
+    P.sellers = sellersOf(un);
     if (!un.length || !b.subtotal) return '<div class="card empty">ไม่มียอดค้างชำระ<div style="margin-top:1rem"><button class="btn" onclick="back()">กลับ</button></div></div>';
     return '<div class="split"><div class="card stack"><div><div class="small muted">คิว ' + b.visit.queue + ' · ' + esc(b.visit.hn) + '</div><h2>' + esc(b.visit.name) + '</h2></div>' +
       (b.deal && b.deal.left > 0 ? '<div class="note small"><b>ลูกค้าจากเพจ:</b> แอดมิน ' + esc(b.deal.admin) + ' ปิด ' + esc(b.deal.note) + ' ไว้ ' + bt(b.deal.closed) + (b.deal.left < b.deal.closed ? ' (เหลือนับ ' + bt(b.deal.left) + ')' : '') + ' — ยอดถึงเท่านี้เป็นของแอดมิน เซลได้ส่วนที่ขายเกิน</div>' : '') +
       (b.pending ? '<div class="note small">มีหัตถการที่ยังไม่ได้ทำ — จ่ายก่อนได้ บิลจะปิดเมื่อทำครบ</div>' : '') +
       '<div class="list">' + un.map(function (o) { return orderRow(o, true); }).join('') + '</div>' +
       (paid.length ? '<details><summary class="small muted">จ่ายแล้ววันนี้ ' + paid.length + ' รายการ</summary><div class="list">' + paid.map(function (o) { return orderRow(o, false); }).join('') + '</div></details>' : '') +
+      '<div class="row" style="gap:.5rem"><button class="btn sm" data-go="pos" data-arg=\'' + esc(JSON.stringify({ hn: b.visit.hn, ret: 1 })) + '\'>+ ซื้อเพิ่ม</button><button class="btn sm w" data-a="depositDlg" data-hn="' + esc(b.visit.hn) + '">+ มัดจำ / เก็บวงเงินไว้</button></div>' +
       '<div class="row"><span class="sp muted">รวม (หลังลดรายการ)</span><span class="num">' + bt(b.subtotal) + '</span></div>' +
       '<div class="row"><span class="sp">ส่วนลดท้ายบิล</span><input id="bd" type="number" inputmode="decimal" style="width:110px" placeholder="0"><button class="btn sm" id="bdp" style="min-width:42px">฿</button></div>' +
       '<div class="tot"><span>ต้องชำระ</span><span id="net">' + bt(b.subtotal) + '</span></div></div>' +
       '<div class="card stack"><h2>ชำระโดย</h2>' + (b.wallet > 0 ? '<div class="note small row"><span class="sp">วงเงินสมาชิกคงเหลือ <b>' + bt(b.wallet) + '</b></span><button class="btn sm p" data-m="' + esc(S.boot.wallet) + '" id="wbtn">ใช้วงเงิน</button></div>' : '') + (b.wallet < 0 ? '<div class="note w small">คนไข้มียอดค้างชำระเดิม ' + bt(-b.wallet) + '</div>' : '') + '<div class="chips" id="pm">' + S.boot.payMethods.map(function (m) { return '<button data-m="' + esc(m.name) + '">' + esc(m.name) + (m.feePct ? ' <span class="xs">+' + m.feePct + '%</span>' : '') + '</button>'; }).join('') +
-      '<button data-m="' + esc(S.boot.ar) + '" class="w">ค้างชำระ / ผ่อนกับคลินิก</button></div>' +
+      (un.some(function (o) { return o.type === 'wallet'; }) ? '<button class="w" disabled style="opacity:.35;cursor:not-allowed;text-decoration:line-through" title="มัดจำ/เติมวงเงินต้องจ่ายเงินจริง">ค้างชำระ / ผ่อนกับคลินิก</button></div><div class="note w small">บิลนี้เป็น <b>มัดจำ/เติมวงเงิน</b> ต้องรับเงินจริง ผ่อนไม่ได้ · ถ้าลูกค้าจะผ่อน ให้ขายคอร์สจริงในหน้าขาย แล้วแบ่งจ่าย: เงินที่ได้วันนี้ + ค้างชำระ/ผ่อนกับคลินิก</div>' : '<button data-m="' + esc(S.boot.ar) + '" class="w">ค้างชำระ / ผ่อนกับคลินิก</button></div>') +
       '<div class="list" id="pl"></div><div class="row"><span class="sp muted">รับแล้ว</span><span class="num" id="got">฿0</span></div><div class="row"><span class="sp b" id="rmL">คงเหลือ</span><span class="num" id="rm"></span></div>' +
+      cmCard(P) +
       (S.boot.emailReceipts ? '<div class="card flat stack" style="gap:.45rem;padding:.7rem .85rem"><label class="ck"><input type="checkbox" id="emk"' + (b.email ? ' checked' : '') + '> ส่งใบเสร็จเข้าอีเมลลูกค้า</label>' +
       '<input id="emt" type="email" inputmode="email" autocomplete="off" placeholder="อีเมลลูกค้า" value="' + esc(b.email || '') + '"' + (b.email ? '' : ' hidden') + '>' + (b.email ? '' : '<span class="xs muted" id="emh" hidden>อีเมลนี้จะบันทึกในประวัติคนไข้ด้วย</span>') + '</div>' : '') +
       '<button class="btn p lg blk" data-a="doPay" id="pbtn" disabled>ยืนยันรับเงิน</button><p class="xs muted">แยกจ่ายหลายช่องทางได้ · เงินทอนได้เฉพาะเงินสด</p></div></div>';
   });
 };
+/* ---------- ค่าคอมบิลนี้ (หน้ารับเงิน): เงินจริงที่รับ − โปรต้นแอดมิน = ส่วนที่แบ่งให้ผู้ขาย ---------- */
+function sellersOf(os) {
+  var raw = String((os.map(function (o) { return o.seller; }).filter(function (x) { return x && x !== '-'; })[0]) || S.user.name);
+  var parts = raw.split(',').map(function (x) { var q = x.split(':'); return { name: q[0].trim(), pct: q.length > 1 ? nz(q[1]) : 0 }; }).filter(function (x) { return x.name; });
+  parts.forEach(function (x) { if (!x.pct) x.pct = 100 / parts.length; }); return parts;
+}
+function cmCard(P) {
+  var dl = P.bill.deal && P.bill.deal.left > 0, ads = S.boot.staff.filter(function (s) { return s.roles.indexOf('adminpage') >= 0 || s.roles.indexOf('sales') >= 0; });
+  return '<div class="card flat stack" id="cmc" style="gap:.55rem;padding:.75rem .85rem"><div class="row"><b class="sp">ค่าคอมบิลนี้</b><span class="xs muted">คิดจากเงินจริงที่รับวันนี้</span></div><div id="cmt" class="stack" style="gap:.15rem"></div>' +
+    (!dl && ads.length ? '<label class="ck"><input type="checkbox" id="amk"> ลูกค้าจากเพจ — หักโปรต้นให้แอดมิน</label><div class="g2" id="amw" hidden><label>แอดมินที่ปิด<select id="ama"><option value="">— เลือก —</option>' + ads.map(function (s) { return '<option>' + esc(s.name) + '</option>'; }).join('') + '</select></label><label>ยอดที่แอดมินปิดไว้ (บาท)<input id="amv" type="number" inputmode="decimal" placeholder="เช่น 2990"></label></div>' : '') +
+    sellerPicker(P.sellers) + '</div>';
+}
+function cmCalc() {
+  var P = S.v.pay, net = payNet(), sumM = function (m) { return P.lines.filter(function (l) { return l.method === m; }).reduce(function (s, l) { return s + nz(l.amount); }, 0); };
+  var wl = sumM(S.boot.wallet), arl = sumM(S.boot.ar), base = Math.max(0, Math.round((net - wl - arl) * 100) / 100), dl = P.bill.deal, adm = 0, by = '';
+  if (dl && dl.left > 0) { adm = Math.min(dl.left, base); by = dl.admin; } else if (P.am.on && P.am.admin) { adm = Math.min(Math.max(0, nz(P.am.amt)), base); by = P.am.admin; }
+  P.cmBase = Math.round((base - adm) * 100) / 100;
+  return { net: net, wl: wl, arl: arl, base: base, adm: adm, by: by, rest: P.cmBase };
+}
+function cmDraw() {
+  var el = $('#cmt'); if (!el) return; var c = cmCalc(), R = function (l, v, cls) { return '<div class="row small' + (cls ? ' ' + cls : '') + '"><span class="sp' + (cls ? '' : ' muted') + '">' + l + '</span><span class="num">' + v + '</span></div>'; };
+  el.innerHTML = R('ยอดบิล', bt(c.net)) + (c.wl ? R('− ใช้มัดจำ/วงเงิน <span class="xs">(คิดค่าคอมไปแล้วตอนรับมัดจำ)</span>', '−' + bt(c.wl)) : '') + (c.arl ? R('− ค้างชำระ/ผ่อน <span class="xs">(คิดตอนลูกค้าจ่ายงวด)</span>', '−' + bt(c.arl)) : '') +
+    ((c.wl || c.arl) ? R('= เงินจริงที่รับวันนี้', bt(c.base)) : '') + (c.adm ? R('− โปรต้นของแอดมิน ' + esc(c.by), '−' + bt(c.adm)) : '') + R('<b>แบ่งให้ผู้ขาย</b>', '<b>' + bt(c.rest) + '</b>', 'b');
+  var P = S.v.pay; if (P.sellers.sync) P.sellers.sync();
+}
+function refNeeded(m) { return !!(m && m.needRef && !/QR|พร้อมเพย์|promptpay|สแกน/i.test(m.name)); }
 function payNet() { var P = S.v.pay, s = P.bill.subtotal, d = P.dpct ? s * Math.min(100, P.disc) / 100 : P.disc; return Math.max(0, Math.round((s - Math.min(s, d)) * 100) / 100); }
 function payDraw() {
   var P = S.v.pay, net = payNet(), got = P.lines.reduce(function (s, l) { return s + nz(l.amount); }, 0), cash = P.lines.filter(function (l) { return l.method === 'เงินสด'; }).reduce(function (s, l) { return s + nz(l.amount); }, 0);
@@ -5102,7 +5214,7 @@ function payDraw() {
   var wl = P.lines.filter(function (l) { return l.method === S.boot.wallet; }).reduce(function (s, l) { return s + nz(l.amount); }, 0);
   var fee = P.lines.reduce(function (s, l) { var m = S.boot.payMethods.filter(function (x) { return x.name === l.method; })[0]; return s + (m && m.feePct ? Math.round(nz(l.amount) * m.feePct / 100) : 0); }, 0);
   P.fee = fee; var arl = P.lines.filter(function (l) { return l.method === S.boot.ar; }).reduce(function (s, l) { return s + nz(l.amount); }, 0);
-  var ok = rm <= 0 && (ch <= cash) && wl <= Math.max(0, P.bill.wallet) && (!arl || (P.arPin && Math.abs((P.arAmt || 0) - arl) < 0.01)) && P.lines.every(function (l) { var m = S.boot.payMethods.filter(function (x) { return x.name === l.method; })[0]; return isBeamM(l.method) || !m || !m.needRef || l.ref; }) && P.lines.filter(function (l) { return isBeamM(l.method); }).length <= 1 && !(arl && P.lines.some(function (l) { return isBeamM(l.method); }));
+  var ok = rm <= 0 && (ch <= cash) && wl <= Math.max(0, P.bill.wallet) && (!arl || (P.arPin && Math.abs((P.arAmt || 0) - arl) < 0.01)) && P.lines.every(function (l) { var m = S.boot.payMethods.filter(function (x) { return x.name === l.method; })[0]; return isBeamM(l.method) || !m || !refNeeded(m) || !(nz(l.amount) > 0) || l.ref; }) && P.lines.filter(function (l) { return isBeamM(l.method); }).length <= 1 && !(arl && P.lines.some(function (l) { return isBeamM(l.method); }));
   var b = $('#pbtn'); b.disabled = !ok || (net > 0 && !P.lines.length); b.textContent = 'ยืนยันรับเงิน ' + bt(net + fee) + (fee ? ' (รวมค่าธรรมเนียม ' + bt(fee) + ')' : '') + (arl ? ' · ค้าง ' + bt(arl) : '') + (ch > 0 && ok ? ' · ทอน ' + bt(ch) : '');
   if (arl && (!P.arPin || Math.abs((P.arAmt || 0) - arl) > 0.01)) b.textContent = P.arPin ? 'ยอดค้างเปลี่ยน — กดอนุมัติ/ตั้งงวดใหม่' : 'ค้างชำระต้องให้ผู้จัดการอนุมัติ + ตั้งงวด';
   if (ch > cash && rm < 0) b.textContent = 'ยอดเกิน — ทอนได้เฉพาะเงินสด';
@@ -5110,6 +5222,7 @@ function payDraw() {
   if (P.beam && !b.disabled) b.textContent = 'ไปหน้าจ่าย Beam ' + bt(nz(bmL[0].amount) + feeOfM(bmL[0].method, bmL[0].amount)) + (P.lines.length > 1 ? ' (ส่วนที่เหลือรับตามที่กรอก)' : '');
   if (bmL.length > 1) b.textContent = 'ใส่ Beam ได้บรรทัดเดียว';
   if (bmL.length && arl) b.textContent = 'ค้างชำระใช้คู่กับ Beam ไม่ได้';
+  cmDraw();
 }
 function isBeamM(n) { return S.boot.beam && /beam/i.test(String(n || '')); }
 function feeOfM(n, a) { var m = S.boot.payMethods.filter(function (x) { return x.name === n; })[0]; return m && m.feePct ? Math.round(nz(a) * m.feePct / 100) : 0; }
@@ -5117,7 +5230,7 @@ function payLines() {
   var P = S.v.pay;
   $('#pl').innerHTML = P.lines.map(function (l, i) { var m = S.boot.payMethods.filter(function (x) { return x.name === l.method; })[0] || {};
     var bm = isBeamM(l.method);
-    return '<div class="li"><div class="main stack" style="gap:.3rem"><div class="t">' + esc(l.method) + '</div>' + (bm ? '<span class="xs muted">กดยืนยันแล้วแท็บเล็ตจะเปิดหน้าจ่ายของ Beam ให้ลูกค้าเลือก บัตร · พร้อมเพย์ · โมบายแบงก์กิ้ง · วอลเล็ต · ผ่อน · จ่ายเสร็จบิลปิดเอง</span>' : m.needRef ? '<input data-rf="' + i + '" placeholder="เลขอ้างอิง/4 ตัวท้ายบัตร *" value="' + esc(l.ref || '') + '" style="min-height:38px">' : '') + (m.feePct ? '<span class="xs muted">+ค่าธรรมเนียม ' + m.feePct + '% เก็บจากลูกค้าเพิ่ม</span>' : '') + (l.method === S.boot.ar ? (P.arPin && P.arPlan && Math.abs((P.arAmt || 0) - nz(l.amount)) < 0.01 ? '<span class="pill g">อนุมัติแล้ว · ผ่อน ' + P.arPlan.length + ' งวด · งวดแรก ' + esc(thDate(P.arPlan[0].due)) + '</span> <button class="btn sm q" data-arok>แก้งวด</button>' : '<button class="btn sm w" data-arok>ตั้งงวดผ่อน + ผู้จัดการอนุมัติ</button>') : '') + '</div>' +
+    return '<div class="li"><div class="main stack" style="gap:.3rem"><div class="t">' + esc(l.method) + '</div>' + (bm ? '<span class="xs muted">กดยืนยันแล้วแท็บเล็ตจะเปิดหน้าจ่ายของ Beam ให้ลูกค้าเลือก บัตร · พร้อมเพย์ · โมบายแบงก์กิ้ง · วอลเล็ต · ผ่อน · จ่ายเสร็จบิลปิดเอง</span>' : m.needRef ? '<input data-rf="' + i + '" placeholder="' + (refNeeded(m) ? 'เลขอ้างอิง/4 ตัวท้ายบัตร *' : 'เลขอ้างอิง (ถ้ามี)') + '" value="' + esc(l.ref || '') + '" style="min-height:38px">' : '') + (m.feePct ? '<span class="xs muted">+ค่าธรรมเนียม ' + m.feePct + '% เก็บจากลูกค้าเพิ่ม</span>' : '') + (l.method === S.boot.ar ? (P.arPin && P.arPlan && Math.abs((P.arAmt || 0) - nz(l.amount)) < 0.01 ? '<span class="pill g">อนุมัติแล้ว · ผ่อน ' + (P.arPlan.length + 1) + ' งวด (งวดแรกวันนี้) · งวด 2 ' + esc(thDate(P.arPlan[0].due)) + '</span> <button class="btn sm q" data-arok>แก้งวด</button>' : '<button class="btn sm w" data-arok>ตั้งงวดผ่อน + ผู้จัดการอนุมัติ</button>') : '') + '</div>' +
       '<input data-am="' + i + '" type="number" inputmode="decimal" value="' + l.amount + '" style="width:120px" aria-label="จำนวนเงิน"' + (l.paid ? ' disabled' : '') + '>' + (l.paid ? '' : '<button class="btn q sm" data-x="' + i + '" aria-label="ลบ">✕</button>') + '</div>'; }).join('');
   payDraw();
 }
@@ -5128,32 +5241,39 @@ SCR.pay.after = function () {
   function addLine(e) { var b = e.target.closest('[data-m]'); if (!b) return; var got = P.lines.reduce(function (s, l) { return s + nz(l.amount); }, 0), amt = Math.max(0, Math.round((payNet() - got) * 100) / 100);
     if (b.dataset.m === S.boot.wallet) { if (P.lines.some(function (l) { return l.method === S.boot.wallet; })) return; amt = Math.min(amt, P.bill.wallet); }
     if (b.dataset.m === S.boot.ar && P.lines.some(function (l) { return l.method === S.boot.ar; })) return;
+    var ex = P.lines.map(function (l) { return l.method; }).indexOf(b.dataset.m); if (ex >= 0) { var ea = $('[data-am="' + ex + '"]'); if (ea) { if (amt > 0) { P.lines[ex].amount = Math.round((nz(P.lines[ex].amount) + amt) * 100) / 100; payLines(); ea = $('[data-am="' + ex + '"]'); } ea.select(); } return; }
     P.lines.push({ method: b.dataset.m, amount: amt, ref: '' }); payLines(); var a = $$('[data-am]').pop(); if (a) a.select(); }
   var ek = $('#emk'); if (ek) ek.onchange = function () { $('#emt').hidden = !ek.checked; var h = $('#emh'); if (h) h.hidden = !ek.checked; if (ek.checked) $('#emt').focus(); };
+  var cc = cmCalc(); P.sellers.forEach(function (x) { x.amt = Math.round(cc.rest * x.pct) / 100; }); bindSellers($('#cmc'), P.sellers, function () { return P.cmBase || 0; });
+  var amk = $('#amk'); if (amk) { amk.onchange = function () { P.am.on = amk.checked; $('#amw').hidden = !amk.checked; payDraw(); }; $('#ama').onchange = function (e) { P.am.admin = e.target.value; payDraw(); }; $('#amv').oninput = function (e) { P.am.amt = nz(e.target.value); payDraw(); }; }
   $('#pm').onclick = addLine; var wb = $('#wbtn'); if (wb) wb.onclick = addLine;
   var pl = $('#pl');
   pl.oninput = function (e) { var t = e.target; if (t.dataset.am != null) P.lines[+t.dataset.am].amount = nz(t.value); if (t.dataset.rf != null) P.lines[+t.dataset.rf].ref = t.value.trim(); payDraw(); };
   pl.onclick = function (e) {
     if (e.target.closest('[data-arok]')) { var arAmt = P.lines.filter(function (l) { return l.method === S.boot.ar; }).reduce(function (s, l) { return s + nz(l.amount); }, 0); if (!(arAmt > 0)) return toast('ใส่ยอดค้างชำระก่อน', 1);
+      var first = P.lines.filter(function (l) { return l.method !== S.boot.ar && l.method !== S.boot.wallet; }).reduce(function (s, l) { return s + nz(l.amount); }, 0);
+      if (!(first > 0)) return dialog({ title: 'ต้องจ่ายงวดแรกวันนี้ก่อน', ok: false, cancel: 'เข้าใจแล้ว', body: '<p>ผ่อนกับคลินิก ลูกค้าต้องจ่าย<b>งวดแรกวันนี้</b></p><ol class="small"><li>กดช่องทางที่ลูกค้าจ่ายวันนี้ (เงินสด / QR / บัตร) แล้วใส่ยอดงวดแรก</li><li>แก้ยอด “ค้างชำระ” ให้เหลือเฉพาะส่วนที่ผ่อน</li><li>กด “ตั้งงวดผ่อน” อีกครั้ง</li></ol><p class="xs muted">เช่น บิล 6,000 ผ่อน 3 งวด → เงินสด 2,000 (งวด 1) + ค้างชำระ 4,000 (งวด 2–3)</p>' });
       return dialog({ title: 'ผ่อนกับคลินิก · ' + bt(arAmt), ok: 'อนุมัติ', wide: true, body: '<p class="small muted">ลูกค้าทำก่อนแล้วผ่อนจ่ายภายหลัง · ลงวันที่ต้องจ่ายแต่ละงวด ระบบเตือนที่หน้า “เก็บเงิน / ค้างจ่าย” เมื่อใกล้ถึงกำหนด</p>' +
-        '<div class="g2"><label>จำนวนงวด<select id="arn">' + [1, 2, 3, 4, 5, 6, 8, 10, 12].map(function (n) { return '<option value="' + n + '"' + (n === 3 ? ' selected' : '') + '>' + n + ' งวด</option>'; }).join('') + '</select></label><label>งวดแรกจ่ายวันที่<input id="ard" type="date" min="' + today() + '" value="' + addDays(today(), 30) + '"></label></div>' +
-        '<div class="tbl"><table><thead><tr><th>งวด</th><th>วันที่ต้องจ่าย</th><th class="n">ยอด (บาท)</th></tr></thead><tbody id="arrows"></tbody><tfoot><tr><td colspan="2" class="b">รวม</td><td class="n b" id="arsum"></td></tr></tfoot></table></div><p class="xs muted">แก้วันที่/ยอดแต่ละงวดได้ · ยอดรวมต้องเท่ากับยอดค้าง</p>' +
-        '<label>รหัสผู้จัดการ (อนุมัติ)<input id="mp" type="password" inputmode="numeric" autocomplete="off"></label>',
+        '<label>รหัสผู้จัดการ (อนุมัติ) *<input id="mp" type="password" inputmode="numeric" autocomplete="off" placeholder="ผู้จัดการ / Owner ใส่รหัส"></label>' +
+        '<div class="g2"><label>ผ่อนทั้งหมด (รวมงวดแรกวันนี้)<select id="arn">' + [2, 3, 4, 5, 6, 8, 10, 12].map(function (n) { return '<option value="' + (n - 1) + '"' + (n === 3 ? ' selected' : '') + '>' + n + ' งวด</option>'; }).join('') + '</select></label><label>งวดที่ 2 จ่ายวันที่<input id="ard" type="date" min="' + today() + '" value="' + addDays(today(), 30) + '"></label></div>' +
+        '<div class="tbl"><table><thead><tr><th>งวด</th><th>วันที่ต้องจ่าย</th><th class="n">ยอด (บาท)</th></tr></thead><tbody><tr style="background:var(--good-soft)"><td>1</td><td><b>วันนี้</b> · จ่ายแล้วในบิลนี้</td><td class="n b">' + fm(first) + '</td></tr></tbody><tbody id="arrows"></tbody><tfoot><tr><td colspan="2" class="b">รวมที่ผ่อน (งวด 2 เป็นต้นไป)</td><td class="n b" id="arsum"></td></tr></tfoot></table></div><p class="xs muted">แก้วันที่/ยอดแต่ละงวดได้ · ยอดรวมงวด 2 ขึ้นไปต้องเท่ากับยอดค้าง ' + bt(arAmt) + '</p>',
         mount: function (bx) { var n = bx.querySelector('#arn'), d0 = bx.querySelector('#ard'), tb = bx.querySelector('#arrows');
           function addMon(d, k) { var x = new Date(d + 'T00:00:00Z'), day = x.getUTCDate(); x.setUTCDate(1); x.setUTCMonth(x.getUTCMonth() + k); var dim = new Date(Date.UTC(x.getUTCFullYear(), x.getUTCMonth() + 1, 0)).getUTCDate(); x.setUTCDate(Math.min(day, dim)); return x.toISOString().slice(0, 10); }
           function tot() { var t = 0; $$('[data-ia]', tb).forEach(function (i) { t += nz(i.value); }); t = Math.round(t * 100) / 100; var el = bx.querySelector('#arsum'); el.textContent = bt(t); el.className = 'n b ' + (Math.abs(t - arAmt) > 0.01 ? 'dn' : 'up'); }
-          function build() { var k = +n.value, each = Math.floor(arAmt / k), rows = ''; for (var i = 0; i < k; i++) { var a = i === k - 1 ? Math.round((arAmt - each * (k - 1)) * 100) / 100 : each; rows += '<tr><td>' + (i + 1) + '/' + k + '</td><td><input type="date" data-id="' + i + '" min="' + today() + '" value="' + addMon(d0.value || addDays(today(), 30), i) + '" style="min-height:38px"></td><td class="n"><input type="number" inputmode="decimal" data-ia="' + i + '" value="' + a + '" style="width:120px;min-height:38px;text-align:right"></td></tr>'; } tb.innerHTML = rows; tot(); }
+          function build() { var k = +n.value, each = Math.floor(arAmt / k), rows = ''; for (var i = 0; i < k; i++) { var a = i === k - 1 ? Math.round((arAmt - each * (k - 1)) * 100) / 100 : each; rows += '<tr><td>' + (i + 2) + '/' + (k + 1) + '</td><td><input type="date" data-id="' + i + '" min="' + today() + '" value="' + addMon(d0.value || addDays(today(), 30), i) + '" style="min-height:38px"></td><td class="n"><input type="number" inputmode="decimal" data-ia="' + i + '" value="' + a + '" style="width:120px;min-height:38px;text-align:right"></td></tr>'; } tb.innerHTML = rows; tot(); }
           n.onchange = build; d0.onchange = build; tb.oninput = tot; build(); },
         onOk: function (bx) { var plan = $$('[data-id]', bx).map(function (i, k) { return { due: i.value, amount: nz(bx.querySelector('[data-ia="' + k + '"]').value) }; });
           if (plan.some(function (x) { return !x.due; })) throw new Error('ใส่วันที่ทุกงวด'); var t = plan.reduce(function (s, x) { return s + x.amount; }, 0); if (Math.abs(t - arAmt) > 0.01) throw new Error('ยอดรวมทุกงวด ' + bt(t) + ' ไม่เท่ากับยอดค้าง ' + bt(arAmt));
           P.arPin = need(bx.querySelector('#mp').value.trim(), 'ใส่รหัสผู้จัดการ'); P.arPlan = plan; P.arAmt = arAmt; payLines(); } }); }
     var b = e.target.closest('[data-x]'); if (!b) return; P.lines.splice(+b.dataset.x, 1); payLines(); };
+  var unp = P.bill.orders.filter(function (o) { return !o.receipt; });
+  if (P.bill.wallet > 0 && !P.lines.length && !unp.some(function (o) { return o.type === 'wallet'; })) { var wa = Math.min(P.bill.wallet, payNet()); if (wa > 0) { P.lines.push({ method: S.boot.wallet, amount: Math.round(wa * 100) / 100, ref: '' }); toast('หักมัดจำ/วงเงินของลูกค้า ' + bt(wa) + ' ให้แล้ว — ค่าคอมคิดเฉพาะส่วนที่จ่ายเพิ่ม'); } }
   payLines();
 };
 /* ---------- Beam แบบ Lana: เปิดหน้าจ่ายของ Beam → กลับมาแล้วระบบยืนยันกับ Beam เอง ---------- */
 function beamGo(P, disc) {
   var back = /^https:/.test(location.protocol) ? location.origin + location.pathname : '';
-  call('beamCreate', { vn: P.vn, draft: { discount: disc, lines: P.lines }, returnUrl: back }, { write: true, msg: 'กำลังเปิดหน้าจ่าย Beam…' }).then(function (r) {
+  call('beamCreate', { vn: P.vn, draft: { discount: disc, lines: P.lines, sellers: P.sl, adminManual: P.adm }, returnUrl: back }, { write: true, msg: 'กำลังเปิดหน้าจ่าย Beam…' }).then(function (r) {
     if (DEMO) return beamDemo(r);
     if (!back) { dialog({ title: 'เปิดหน้าจ่าย Beam', ok: false, cancel: 'ปิด', body: '<p class="small">เปิดจากไฟล์ในเครื่อง ระบบพากลับมาเองไม่ได้ — เปิดลิงก์นี้ให้ลูกค้าจ่าย แล้วกลับมากด "เช็กยอด"</p><code class="bq-url">' + esc(r.url) + '</code>' }); return beamWait(r.ref); }
     showBusy('กำลังไปหน้าจ่ายของ Beam…'); location.href = r.url;
@@ -5193,8 +5313,12 @@ ACT.doPay = function () {
   var P = S.v.pay, s = P.bill.subtotal, disc = P.dpct ? Math.round(s * Math.min(100, P.disc)) / 100 : P.disc;
   var ek = $('#emk'), to = ek && ek.checked ? $('#emt').value.trim() : '';
   if (to && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(to)) return toast('อีเมลไม่ถูกต้อง — แก้หรือเอาติ๊กส่งอีเมลออก', 1);
+  if (!P.sellers.length) return toast('เลือกผู้ขายอย่างน้อย 1 คน (ไม่มีเซล = คลินิก)', 1);
+  if (P.am.on && (!P.am.admin || !(P.am.amt > 0))) return toast('เลือกแอดมิน + ใส่ยอดที่แอดมินปิด หรือเอาติ๊กออก', 1);
+  if (P.sellers.toPct && !P.sellers.toPct()) return;
+  P.sl = P.sellers.map(function (x) { return { name: x.name, pct: x.pct }; }); P.adm = P.am.on ? { admin: P.am.admin, amount: P.am.amt } : null;
   if (P.beam) return beamGo(P, disc);
-  call('pay', { vn: P.vn, discount: disc, lines: P.lines, approvePin: P.arPin, arPlan: P.arPlan, emailTo: to, saveEmail: true }, { write: true, msg: to ? 'กำลังรับเงินและส่งใบเสร็จ…' : 'กำลังรับเงิน…' }).then(function (r) {
+  call('pay', { vn: P.vn, discount: disc, lines: P.lines, sellers: P.sl, adminManual: P.adm, approvePin: P.arPin, arPlan: P.arPlan, emailTo: to, saveEmail: true }, { write: true, msg: to ? 'กำลังรับเงินและส่งใบเสร็จ…' : 'กำลังรับเงิน…' }).then(function (r) {
     r._fresh = true; S.v.receipt = r; go('receipt', r.receipt, true);
     if (r.emailed) toast('ส่งใบเสร็จไปที่ ' + r.emailed + (DEMO ? ' (โหมดทดลอง ไม่ส่งจริง)' : '') + ' แล้ว'); else if (r.emailError) toast('รับเงินแล้ว แต่ส่งอีเมลไม่ได้: ' + r.emailError, 1);
   }).catch(fail);
@@ -5740,7 +5864,7 @@ SCR.bookNew = function (arg) {
       (B.moveId ? '<div class="note">ย้ายนัด ' + esc(B.moveId) + ' — เลือกวันและเวลาใหม่</div>' : '<div class="card stack"><h3>1. คนไข้</h3><div id="bp">' + bookPt() + '</div></div>' +
       '<div class="card stack"><h3>2. รายการ</h3><input id="bi" placeholder="พิมพ์ค้นหา เช่น Botox, Pico, IV"><div class="chips" id="bil"></div><div id="bcs"></div></div>') +
       '<div class="card stack"><h3>' + (B.moveId ? '' : '3. ') + 'วัน · เวลา</h3><div class="row"><input type="date" id="bd" value="' + B.date + '" min="' + today() + '" style="width:auto">' +
-      [0, 1, 2, 3, 7].map(function (n) { return '<button class="btn sm" data-bd="' + addDays(today(), n) + '">' + (n === 0 ? 'วันนี้' : n === 1 ? 'พรุ่งนี้' : thDate(addDays(today(), n), 1)) + '</button>'; }).join('') + '</div><div id="bneed" class="small muted"></div><div id="bsl" class="slots"></div></div></div>' +
+      [0, 1, 2, 3, 7].map(function (n) { return '<button class="btn sm" data-bd="' + addDays(today(), n) + '">' + (n === 0 ? 'วันนี้' : n === 1 ? 'พรุ่งนี้' : thDate(addDays(today(), n), 1)) + '</button>'; }).join('') + '</div><div id="bneed" class="small muted"></div><label class="ck" id="bncw" hidden><input type="checkbox" id="bnc"> ไม่ต้องตรวจก่อน — คุยกับเซลแล้วทำเลย (ไม่จองห้องตรวจ)</label><div id="bsl" class="slots"></div><div id="brm"></div></div></div>' +
       '<div class="card stack" style="position:sticky;top:calc(70px + env(safe-area-inset-top,0px))"><h3>สรุปนัด</h3><div id="bsum" class="small"></div><label>หมายเหตุ<input id="bn"></label><button class="btn p lg blk" data-a="bookSave" id="bsave" disabled>ยืนยันนัด</button></div></div>';
   });
 };
@@ -5762,30 +5886,36 @@ function bookCourses() {
 }
 function bookSlots() {
   var B = S.v.book, it = B.item || (B.moveId && B.moveItem);
-  B.slot = null; bookSum();
+  B.slot = null; B.room = ''; var rm0 = $('#brm'); if (rm0) rm0.innerHTML = ''; bookSum();
   if (!it) { $('#bsl').innerHTML = '<div class="small muted">เลือกรายการก่อน</div>'; return; }
   $('#bsl').innerHTML = '<div class="spin sm"></div>';
-  call('slots', { item: it, date: B.date, hn: B.hn, exceptId: B.moveId }).then(function (r) {
-    var n = r.need; $('#bneed').innerHTML = 'ใช้ ' + esc(n.type) + ' ' + n.dur + ' นาที' + (n.consult ? ' · ปรึกษาแพทย์ในห้องตรวจ 15 นาทีก่อน' : '') + (n.ipd ? ' · พักฟื้น IPD ' + n.ipd + ' นาทีหลังผ่าตัด' : '');
+  call('slots', { item: it, date: B.date, hn: B.hn, exceptId: B.moveId, noConsult: B.noConsult }).then(function (r) {
+    var n = r.need; $('#bneed').innerHTML = needTxt(n); $('#bncw').hidden = !(n.consult || (n.skip && !n.auto)); + (n.ipd ? ' · พักฟื้น IPD ' + n.ipd + ' นาทีหลังผ่าตัด' : '');
     B.slots = r.slots;
     $('#bsl').innerHTML = r.slots.length ? r.slots.map(function (s, i) { return '<button data-s="' + i + '"><b>' + esc(s.time) + '</b><br><span class="xs muted">' + esc(s.room) + '</span></button>'; }).join('') : '<div class="small muted">ไม่มีช่องว่างวันนี้ — ลองวันอื่น</div>';
   }).catch(function (e) { $('#bsl').innerHTML = '<div class="small dn">' + esc(e.message) + '</div>'; });
 }
+// เลือกห้องเองได้ — ระบบจัดให้ก่อน (ห้องตามประเภทรายการ) แตะเปลี่ยนเป็นห้องอื่นที่ว่างช่วงเวลานั้น
+function roomChips(s, cur) { if (!s || !s.rooms || !s.rooms.length) return ''; return '<div class="stack" style="gap:.3rem;margin-top:.4rem"><div class="small b">ห้อง (ระบบเลือกให้ ' + esc(s.room) + ' · แตะเปลี่ยนได้)</div><div class="chips">' + s.rooms.map(function (r) { return '<button type="button" data-rm="' + esc(r) + '" class="' + (r === cur ? 'on' : '') + '">' + esc(r) + '</button>'; }).join('') + '</div></div>'; }
+// ข้อความบอกว่านัดนี้จองห้องอะไรบ้าง
+function needTxt(n) { return (n.consult ? '<b>จอง 2 ห้องต่อกัน:</b> ห้องตรวจ (พบแพทย์ ' + n.consult + ' นาที) → ' : n.auto ? 'รายการนี้ไม่ต้องพบแพทย์ก่อน · ' : n.skip ? 'ไม่ต้องตรวจก่อน · ' : '') + esc(n.type) + ' ' + n.dur + ' นาที' + (n.ipd ? ' → พักฟื้น IPD ' + n.ipd + ' นาที' : ''); }
 function bookSum() {
   var B = S.v.book, it = S.boot.items.filter(function (i) { return i.code === B.item; })[0], s = B.slot;
   $('#bsum').innerHTML = (B.pt ? '<div><b>' + esc(B.pt.patient.name) + '</b></div>' : '') + (it ? '<div>' + esc(it.name) + (B.courseId ? ' · ใช้คอร์ส' : '') + '</div>' : '') +
-    '<div>' + thDate(B.date, 1) + (s ? ' · <b>' + esc(s.time) + '</b>' : '') + '</div>' + (s ? '<div class="muted">' + (s.cRoom ? esc(s.cRoom + ' ' + s.cStart + '–' + s.cEnd + ' → ') : '') + esc(s.room + ' ' + s.start + '–' + s.end) + (s.ipdRoom ? ' → ' + esc(s.ipdRoom + ' ถึง ' + s.ipdEnd) : '') + '</div>' : '');
+    '<div>' + thDate(B.date, 1) + (s ? ' · <b>' + esc(s.time) + '</b>' : '') + '</div>' + (s ? '<div class="muted">' + (s.cRoom ? esc(s.cRoom + ' ' + s.cStart + '–' + s.cEnd + ' → ') : '') + esc((B.room || s.room) + ' ' + s.start + '–' + s.end) + (s.ipdRoom ? ' → ' + esc(s.ipdRoom + ' ถึง ' + s.ipdEnd) : '') + '</div>' : '');
   $('#bsave').disabled = !(s && (B.moveId || (B.pt && B.item)));
 }
 SCR.bookNew.after = function () {
   var B = S.v.book;
   if (B.moveId) { var a = (S.v.sbook && S.v.sbook.appts || []).filter(function (x) { return x.id === B.moveId; })[0];
-    call('dayBook', { date: today() }).then(function () {}); if (a) { B.moveItem = a.item; B.hn = a.hn; } }
+    call('dayBook', { date: today() }).then(function () {}); if (a) { B.moveItem = a.item; B.hn = a.hn; B.noConsult = a.noConsult === 'ใช่' || a.noConsult === true; if ($('#bnc')) $('#bnc').checked = B.noConsult; } }
   if ($('#bi')) { bookItems(''); $('#bi').oninput = function (e) { bookItems(e.target.value.trim()); };
     $('#bil').onclick = function (e) { var x = e.target.closest('[data-i]'); if (!x) return; B.item = x.dataset.i; B.courseId = ''; $$('#bil button').forEach(function (y) { y.classList.toggle('on', y === x); }); bookCourses(); bookSlots(); }; }
   $('#bd').onchange = function (e) { B.date = e.target.value; bookSlots(); };
+  $('#bnc').onchange = function (e) { B.noConsult = e.target.checked; bookSlots(); };
   $$('[data-bd]').forEach(function (b) { b.onclick = function () { B.date = b.dataset.bd; $('#bd').value = B.date; bookSlots(); }; });
-  $('#bsl').onclick = function (e) { var x = e.target.closest('[data-s]'); if (!x) return; B.slot = B.slots[+x.dataset.s]; $$('#bsl button').forEach(function (y) { y.classList.toggle('on', y === x); }); bookSum(); };
+  $('#bsl').onclick = function (e) { var x = e.target.closest('[data-s]'); if (!x) return; B.slot = B.slots[+x.dataset.s]; B.room = B.slot.room; $$('#bsl button').forEach(function (y) { y.classList.toggle('on', y === x); }); $('#brm').innerHTML = roomChips(B.slot, B.room); bookSum(); };
+  $('#brm').onclick = function (e) { var x = e.target.closest('[data-rm]'); if (!x) return; B.room = x.dataset.rm; $('#brm').innerHTML = roomChips(B.slot, B.room); bookSum(); };
   var bq = $('#bq'); if (bq) bq.onkeydown = function (e) { if (e.key === 'Enter') ACT.bookPtFind(); };
   bookSlots();
 };
@@ -5811,7 +5941,7 @@ ACT.bookPtPick = function (el) { var B = S.v.book; B.hn = el.dataset.h; call('pa
 ACT.bookPtClear = function () { var B = S.v.book; B.pt = null; B.hn = ''; B.courseId = ''; $('#bp').innerHTML = bookPt(); var bq = $('#bq'); bq.onkeydown = function (e) { if (e.key === 'Enter') ACT.bookPtFind(); }; bookSlots(); };
 ACT.bookSave = function () {
   var B = S.v.book, s = B.slot;
-  var p = B.moveId ? call('apptMove', { id: B.moveId, date: B.date, time: s.time }, { write: true }) : call('apptCreate', { hn: B.hn, item: B.item, date: B.date, time: s.time, note: $('#bn').value, courseId: B.courseId, leadId: B.leadId }, { write: true });
+  var p = B.moveId ? call('apptMove', { id: B.moveId, date: B.date, time: s.time, room: B.room, noConsult: !!B.noConsult }, { write: true }) : call('apptCreate', { hn: B.hn, item: B.item, date: B.date, time: s.time, room: B.room, noConsult: !!B.noConsult, note: $('#bn').value, courseId: B.courseId, leadId: B.leadId }, { write: true });
   p.then(function (a) { toast('ลงนัดแล้ว ' + thDate(a.date, 1) + ' ' + (a.cStart || a.start) + ' · ' + a.room); back(); }).catch(function (e) { fail(e); bookSlots(); });
 };
 
@@ -5843,7 +5973,7 @@ ACT.leadBook = function (el) {
 TITLES.lead = 'ลงลีด + นัด';
 SCR.lead = function () {
   var brs = S.boot.branches;
-  return '<form class="stack" id="lf" style="max-width:720px;margin:0 auto"><div class="card stack"><h2>ลูกค้าจากแชท</h2><p class="small muted" style="margin:0">ลอกจากที่แอดมินส่งมาใน LINE · ลงครั้งเดียวได้ทั้ง ลีด + นัด + นัดรายวัน</p>' +
+  return '<form class="stack" id="lf" style="max-width:720px;margin:0 auto"><div class="card stack"><div class="row"><h2 class="sp">ลูกค้าจากแชท</h2>' + (DEMO || has(['admin', 'owner']) ? '<button type="button" class="btn w sm" data-a="leadFake">🎲 กรอกข้อมูลทดสอบ</button>' : '') + '</div><p class="small muted" style="margin:0">ลอกจากที่แอดมินส่งมาใน LINE · ลงครั้งเดียวได้ทั้ง ลีด + นัด + นัดรายวัน</p>' +
     '<div class="g2"><label>สาขาที่จะมา<select name="branch">' + opts(brs.map(function (b) { return [b.code, b.name]; }), S.user.branch) + '</select></label>' +
     '<label>ทักมาทางเพจ<select name="page">' + opts([['CNX', 'Dr.tan เชียงใหม่'], ['PTY', 'Tan พัทยา'], ['JB', 'Jungbin']], leadPage(S.user.branch)) + '</select></label></div>' +
     '<label>คนที่ตอบแชท / ปิดการขาย * <span class="xs">(คนนี้ได้ยอดที่ปิดในแชทและมัดจำ)</span><select name="admin">' + opts(closers().map(function (x) { return [x.name, x.name + ' · ' + x.role]; }), has(['adminpage']) && !has(['front']) ? S.user.name : '', '— เลือก —') + '</select></label>' +
@@ -5856,7 +5986,8 @@ SCR.lead = function () {
     '<span class="xs muted">ไม่มัดจำ = 0 · มัดจำแล้วใส่ยอด → เข้ายอดร้านวันนี้ + ค่าคอมคนปิด และเข้าวงเงินคนไข้ไว้หักตอนมาทำ · ราคาเต็มด้านบนนับเป็นยอดที่คนปิดการขายได้ ส่วนที่ขายเพิ่มหน้าร้านเป็นของเซล</span></div>' +
     '<div class="card flat stack" style="gap:.5rem;border:1px solid var(--line)"><b>ลงนัด</b><label class="ck"><input type="checkbox" id="lnoap"> <span><b>ยังไม่ได้นัด</b> — มัดจำไว้ก่อน / รอลูกค้าเลือกวัน <span class="xs muted">(ไปค้างที่ “ลีดรอลงนัด”)</span></span></label><div id="lapw" class="stack" style="gap:.5rem"><div id="lai" class="small muted">เลือกรายการด้านบนก่อน แล้วเลือกวันและเวลา</div><label id="laiw" hidden>บริการที่จะนัด (ใช้หาห้อง/เวลาว่าง)<select id="lais">' + opts(S.boot.items.filter(function (i) { return i.type === 'proc' || i.type === 'service'; }).map(function (i) { return [i.code, i.name]; }), '', '— เลือกบริการ —') + '</select></label>' +
     '<label>วันที่<input id="lad" type="date" value="' + today() + '" min="' + today() + '"></label>' +
-    '<div id="las" class="slots"></div><span class="xs muted">เลือกเวลาแล้ว ระบบลงนัดในตารางให้เลย หน้าร้านไม่ต้องลงซ้ำ · คนไข้ใหม่ลงชื่อไว้ก่อน วันที่มาค่อยกรอกประวัติและเซ็นยินยอม</span></div></div>' +
+    '<div id="laneed" class="xs muted"></div><label class="ck" id="lancw" hidden><input type="checkbox" id="lanc"> ไม่ต้องตรวจก่อน — คุยกับเซลแล้วทำเลย</label>' +
+    '<div id="las" class="slots"></div><div id="larm"></div><span class="xs muted">เลือกเวลาแล้ว ระบบลงนัดในตารางให้เลย หน้าร้านไม่ต้องลงซ้ำ · คนไข้ใหม่ลงชื่อไว้ก่อน วันที่มาค่อยกรอกประวัติและเซ็นยินยอม</span></div></div>' +
     '<button type="button" class="btn p lg blk" data-a="leadSave">บันทึกลีด</button></div></form>';
 };
 function closers() { var R = { manager: 'ผู้จัดการ', sales: 'เซล', adminpage: 'แอดมินเพจ' }; return S.boot.staff.filter(function (x) { return x.roles.some(function (r) { return R[r]; }); }).map(function (x) { var r = x.roles.filter(function (y) { return R[y]; })[0]; return { name: x.name, role: R[r] }; }).sort(function (a, b) { return a.role < b.role ? -1 : a.role > b.role ? 1 : 0; }); }
@@ -5869,10 +6000,10 @@ function leadPage(b) { return b === 'TCPY' ? 'PTY' : /^JB/.test(String(b)) ? 'JB
 SCR.lead.after = function () {
   var L = S.v.lap = { time: '', item: '' }, f = $('#lf'), fi = f.querySelector('[name=interest]'), fv = f.querySelector('[name=value]');
   f.querySelector('[name=branch]').addEventListener('change', function (e) { f.querySelector('[name=page]').value = leadPage(e.target.value); });
-  function load() { var d = $('#lad').value, b = f.querySelector('[name=branch]').value; L.time = ''; var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = 'บันทึกลีด';
-    if (!L.item) { $('#las').innerHTML = ''; return; }
+  function load() { var d = $('#lad').value, b = f.querySelector('[name=branch]').value; L.time = ''; L.room = ''; if ($('#larm')) $('#larm').innerHTML = ''; var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = 'บันทึกลีด';
+    if (!L.item) { $('#las').innerHTML = ''; $('#laneed').innerHTML = ''; $('#lancw').hidden = true; return; }
     $('#las').innerHTML = '<div class="spin sm"></div>';
-    call('slots', { item: L.item, date: d, branch: b }).then(function (r) { if (!$('#las')) return; L.slots = r.slots; $('#las').innerHTML = r.slots.length ? r.slots.map(function (x, i) { return '<button type="button" data-s="' + i + '"><b>' + esc(x.time) + '</b><br><span class="xs muted">' + esc(x.room) + '</span></button>'; }).join('') : '<div class="small muted">วันนี้ไม่มีช่องว่าง — ลองวันอื่น</div>'; })
+    call('slots', { item: L.item, date: d, branch: b, noConsult: L.noConsult }).then(function (r) { if (!$('#las')) return; L.slots = r.slots; $('#laneed').innerHTML = needTxt(r.need); $('#lancw').hidden = !(r.need.consult || (r.need.skip && !r.need.auto)); $('#las').innerHTML = r.slots.length ? r.slots.map(function (x, i) { return '<button type="button" data-s="' + i + '"><b>' + esc(x.time) + '</b><br><span class="xs muted">' + esc(x.room) + '</span></button>'; }).join('') : '<div class="small muted">วันนี้ไม่มีช่องว่าง — ลองวันอื่น</div>'; })
       .catch(function (e) { if ($('#las')) $('#las').innerHTML = '<div class="small dn">' + esc(e.message) + '</div>'; }); }
   function pick() { var tx = fi.value.trim(); if (tx === L.lastText) return; L.lastText = tx; var o = leadItem(tx); L.item = o && o.item || '';
     if (o && o.price && !num0(fv.value)) fv.value = o.price;
@@ -5880,9 +6011,23 @@ SCR.lead.after = function () {
     $('#lai').textContent = auto ? 'นัดทำ: ' + fi.value.trim() + ' — เลือกเวลาด้านล่าง' : fi.value.trim() ? 'เลือกบริการที่จะนัดด้านล่าง แล้วเลือกเวลา' : 'เลือกรายการด้านบนก่อน แล้วเลือกวันและเวลา';
     load(); }
   $('#lais').onchange = function () { L.item = this.value; load(); };
+  $('#lanc').onchange = function () { L.noConsult = this.checked; load(); };
+  $('#larm').onclick = function (e) { var x = e.target.closest('[data-rm]'); if (!x) return; L.room = x.dataset.rm; $('#larm').innerHTML = roomChips(L.sl, L.room); };
   $('#lnoap').onchange = function () { var on = this.checked; $('#lapw').hidden = on; if (on) { L.time = ''; $$('#las button').forEach(function (y) { y.classList.remove('on'); }); } var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = on ? 'บันทึกลีด (รอลงนัด)' : L.time ? 'บันทึกลีด + ลงนัด' : 'บันทึกลีด'; };
   fi.addEventListener('change', pick); $('#lad').onchange = load; f.querySelector('[name=branch]').addEventListener('change', load);
-  $('#las').onclick = function (e) { var x = e.target.closest('[data-s]'); if (!x) return; var t = L.slots[+x.dataset.s].time; L.time = L.time === t ? '' : t; $$('#las button').forEach(function (y) { y.classList.toggle('on', y === x && !!L.time); }); var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = L.time ? 'บันทึกลีด + ลงนัด' : 'บันทึกลีด'; };
+  $('#las').onclick = function (e) { var x = e.target.closest('[data-s]'); if (!x) return; var sl = L.slots[+x.dataset.s], t = sl.time; L.time = L.time === t ? '' : t; L.room = L.time ? sl.room : ''; L.sl = sl; $$('#las button').forEach(function (y) { y.classList.toggle('on', y === x && !!L.time); }); $('#larm').innerHTML = L.time ? roomChips(sl, L.room) : ''; var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = L.time ? 'บันทึกลีด + ลงนัด' : 'บันทึกลีด'; };
+};
+ACT.leadFake = function () {
+  var F = $('#lf'); if (!F) return; var R = function (a) { return a[Math.floor(Math.random() * a.length)]; }, N = function (a, b) { return a + Math.floor(Math.random() * (b - a + 1)); };
+  var set = function (n, v) { var e = F.querySelector('[name="' + n + '"]'); if (!e) return; e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); };
+  var ad = F.querySelector('[name=admin]'); if (ad && ad.options.length > 1 && !ad.value) ad.selectedIndex = N(1, ad.options.length - 1);
+  set('fbName', 'ทดสอบ ' + R(['Ploy', 'Mint', 'Fah', 'Bow', 'Nan', 'Kwan', 'Jane']) + ' ' + R(['Chanya', 'Sudarat', 'Pimpa', 'Wan', 'Nok'])); set('gender', R(['หญิง', 'หญิง', 'ชาย']));
+  set('phone', '0' + R(['8', '9', '6']) + N(10000000, 99999999)); set('channel', R(['Facebook', 'Facebook', 'TikTok', 'LINE OA', 'Instagram']));
+  set('ad', R(['Pico ต.ค.', 'Botox 99', 'ฟิลเลอร์ปาก', 'PAY DAY Botox', 'หน้าใส']));
+  var o = leadOpts(); var pick = R(o.filter(function (x) { return x.item; }).length ? o.filter(function (x) { return x.item; }) : o);
+  F.querySelector('[name=value]').value = ''; set('interest', pick.name);
+  var dp = Math.random() < .5; set('depAmt', dp ? R([500, 1000, 2000, 3000]) : 0); var dm = F.querySelector('[name=depMethod]'); if (dm) dm.selectedIndex = dp && dm.options.length > 1 ? 1 : 0;
+  toast('กรอกข้อมูลทดสอบแล้ว — เลือกเวลานัด หรือติ๊ก “ยังไม่ได้นัด” แล้วกดบันทึก');
 };
 ACT.leadSave = function () {
   var F = $('#lf'), d = {}; $$('input[name],select[name]', F).forEach(function (e) { d[e.name] = e.value.trim(); });
@@ -5890,10 +6035,10 @@ ACT.leadSave = function () {
   var L = S.v.lap || {};
   var noAp = $('#lnoap') && $('#lnoap').checked;
   if (!noAp && !(L.item && L.time)) return toast(L.item ? 'เลือกเวลานัด หรือติ๊ก “ยังไม่ได้นัด”' : 'เลือกรายการแล้วเลือกเวลานัด หรือติ๊ก “ยังไม่ได้นัด”', 1);
-  if (!noAp) d.appt = { item: L.item, date: $('#lad').value, time: L.time };
+  if (!noAp) d.appt = { item: L.item, date: $('#lad').value, time: L.time, room: L.room || '', noConsult: !!L.noConsult };
   if (!d.admin) return toast('ใส่ชื่อคนที่ตอบแชท/ปิดการขาย (ยอดที่ปิดในแชทคิดจากช่องนี้)', 1);
   call('leadCreate', d, { write: true }).then(function (r) {
-    F.reset(); if ($('#lapw')) $('#lapw').hidden = false; if ($('#laiw')) $('#laiw').hidden = true; if ($('#las')) $('#las').innerHTML = ''; L.time = ''; L.item = ''; L.slots = undefined; L.lastText = ''; if ($('#lai')) $('#lai').textContent = 'เลือกรายการด้านบนก่อน แล้วเลือกวันและเวลา'; var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = 'บันทึกลีด';
+    F.reset(); if ($('#lapw')) $('#lapw').hidden = false; if ($('#laiw')) $('#laiw').hidden = true; if ($('#las')) $('#las').innerHTML = ''; L.time = ''; L.room = ''; if ($('#larm')) $('#larm').innerHTML = ''; L.noConsult = false; if ($('#lanc')) $('#lanc').checked = false; if ($('#laneed')) $('#laneed').innerHTML = ''; L.item = ''; L.slots = undefined; L.lastText = ''; if ($('#lai')) $('#lai').textContent = 'เลือกรายการด้านบนก่อน แล้วเลือกวันและเวลา'; var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = 'บันทึกลีด';
     dialog({ title: r.appt ? 'ลงลีด + นัดแล้ว' : 'บันทึกลีดแล้ว', ok: 'ลงลีดคนถัดไป', cancel: false,
       body: '<div class="stack" style="gap:.4rem"><div><b>' + esc(r.lead.fbName) + '</b> · ' + esc(r.lead.phone) + ' · ลีด #' + esc(r.lead.id) + '</div>' +
         (r.deposit ? '<div class="note" style="background:var(--good-soft);color:var(--good)">💰 รับมัดจำ ' + bt(r.deposit.amount) + ' แล้ว · ใบเสร็จ ' + esc(r.deposit.receipt) + ' · เข้าวงเงินคนไข้</div>' : '') +
@@ -6308,8 +6453,8 @@ SCR.fees = function (o) {
   o = o || S.v.fe || { from: today().slice(0, 8) + '01', to: today(), scope: has(['owner']) ? 'ALL' : S.user.branch }; S.v.fe = o;
   return call('feesReport', o).then(function (r) {
     S.v.fr = r;
-    return '<div class="stack">' + rangeBar(o, 'fe') + '<div class="card tbl"><table><thead><tr><th>ชื่อ</th><th class="n">เคส</th><th class="n">DF</th><th class="n">ค่ามือ</th><th class="n">ยอดขาย</th><th class="n">ค่าคอม</th><th class="n">ค่าบริหาร</th><th class="n">เงินเดือน</th><th class="n">รวม</th></tr></thead><tbody>' +
-      r.people.sort(function (a, b) { return (b.df + b.fee + b.comm + (b.salary || 0)) - (a.df + a.fee + a.comm + (a.salary || 0)); }).map(function (p) { return '<tr><td>' + esc(p.name) + '</td><td class="n">' + p.cases + '</td><td class="n">' + fm(p.df) + '</td><td class="n">' + fm(p.fee) + '</td><td class="n">' + fm(p.sales) + '</td><td class="n">' + fm(p.comm - (p.mgmt || 0)) + '</td><td class="n">' + fm(p.mgmt || 0) + '</td><td class="n">' + fm(p.salary || 0) + '</td><td class="n b">' + fm(p.df + p.fee + p.comm + (p.salary || 0)) + '</td></tr>'; }).join('') +
+    return '<div class="stack">' + rangeBar(o, 'fe') + '<div class="card tbl"><table><thead><tr><th>ชื่อ</th><th class="n">เคส</th><th class="n">DF</th><th class="n">ค่ามือ</th><th class="n">ยอดขาย</th><th class="n">ค่าคอม</th><th class="n">ค่าบริหาร</th><th class="n">เงินเดือน</th><th class="n">หัก</th><th class="n">รับสุทธิ</th></tr></thead><tbody>' +
+      r.people.sort(function (a, b) { return (b.df + b.fee + b.comm + (b.salary || 0) - (b.deduct || 0)) - (a.df + a.fee + a.comm + (a.salary || 0) - (a.deduct || 0)); }).map(function (p) { return '<tr><td>' + esc(p.name) + '</td><td class="n">' + p.cases + '</td><td class="n">' + fm(p.df) + '</td><td class="n">' + fm(p.fee) + '</td><td class="n">' + fm(p.sales) + '</td><td class="n">' + fm(p.comm - (p.mgmt || 0)) + '</td><td class="n">' + fm(p.mgmt || 0) + '</td><td class="n">' + fm(p.salary || 0) + '</td><td class="n dn" title="' + esc('ประกันสังคม ' + fm(p.sso || 0) + ' · มาสาย ' + fm(p.lateDed || 0)) + '">' + (p.deduct ? '−' + fm(p.deduct) : '') + '</td><td class="n b">' + fm(p.df + p.fee + p.comm + (p.salary || 0) - (p.deduct || 0)) + '</td></tr>'; }).join('') +
       '</tbody></table></div><div class="row"><button class="btn p" data-a="expFees">ส่งออกรายละเอียดทุกเคส</button><span class="small muted">' + r.items.length + ' รายการ · DF = ราคาจริงต่อครั้ง × DF% · ค่าคอมเซล Skin ขั้นบันไดรายเดือน (ยอดทั้งเดือนถึงขั้นไหน ได้ % นั้นทั้งก้อน) · ศัลยกรรม 10% · ผู้จัดการ Skin 5% ศัลยกรรม 10% + ค่าบริหาร</span></div></div>';
   });
 };

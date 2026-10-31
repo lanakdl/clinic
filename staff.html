@@ -343,6 +343,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:
 .lx-scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:.2rem}.lx-scroll::-webkit-scrollbar{display:none}.lx-scroll button{flex:none;min-height:38px;padding:.35rem .8rem}
 .lx-task{border:2px solid var(--warn);background:var(--warn-soft)}.lx-task .li{padding:.5rem .1rem}.lx-task .list .li{border-color:color-mix(in srgb,var(--warn) 25%,transparent)}
 .lx-ti{font-size:1.4rem;width:2rem;text-align:center;flex:none}
+.lx-split.lx-ded>div{background:var(--bad-soft)}
 
 </style>
 </head>
@@ -372,12 +373,12 @@ var SCHEMA = {
   Rooms:      [['branch','สาขา'],['name','ชื่อห้อง/เตียง'],['type','ประเภท'],['machine','เครื่องประจำห้อง'],['active','ใช้งาน','b']],
   Staff:      [['code','รหัสพนักงาน'],['name','ชื่อ-สกุล'],['nick','ชื่อเล่น'],['role','บทบาท'],['role2','บทบาทที่ 2'],['branch','สาขาหลัก'],
                ['branches','สาขาที่เข้าได้ (ว่าง=ทุกสาขา)'],['phone','เบอร์โทร'],['email','อีเมล'],['license','เลขใบประกอบวิชาชีพ'],['pin','รหัสเข้าระบบ'],
-               ['shiftIn','เวลาเข้างาน'],['shiftOut','เวลาออกงาน'],['dayOff','วันหยุดประจำ'],['commPct','ค่าคอม %','n'],['salary','เงินเดือน (บาท/เดือน)','n'],['partTime','แพทย์ Part-time (ไม่ยุ่งสต้อก)','b'],['active','ใช้งาน','b'],['sign','ลายเซ็น (Drive)'],
+               ['shiftIn','เวลาเข้างาน'],['shiftOut','เวลาออกงาน'],['dayOff','วันหยุดประจำ'],['commPct','ค่าคอม %','n'],['salary','เงินเดือน (บาท/เดือน)','n'],['hourly','ค่าชั่วโมง (บาท/ชม. · แพทย์ว่าง=700)','n'],['sso','ประกันสังคม (บาท/เดือน)','n'],['partTime','แพทย์ Part-time (ไม่ยุ่งสต้อก)','b'],['active','ใช้งาน','b'],['sign','ลายเซ็น (Drive)'],
                ['lineId','LINE (ผูกแล้ว — ลบเพื่อผูกใหม่)'],['lineName','ชื่อ LINE'],['lineAt','ผูก LINE เมื่อ','t']],
   Items:      [['code','รหัสรายการ'],['name','ชื่อรายการ'],['category','หมวด'],['type','ประเภท'],['performer','ผู้ทำ'],
                ['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['dfPct','DF แพทย์ %','n'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['prepFee','ค่ามือตอนเตรียมให้หมอ (บาท/ครั้ง)','n'],['scrubFee','ค่ามือ Scrub (บาท/เคส)','n'],['circFee','ค่ามือ Circulating (บาท/เคส)','n'],['sessions','จำนวนครั้ง (คอร์ส)','n'],['validDays','อายุคอร์ส (วัน)','n'],
-               ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว'],['feeNext','ค่ามือหน่วยถัดไป (เช่น Filler cc ที่ 2 ขึ้นไป)','n'],['feeGroup','กลุ่มเคสผ่าตัด (หลัก+ออฟชั่น)'],['tierAt','ขั้นราคาเคส (รวมออฟชั่น)','n'],['scrubHi','Scrub เมื่อเกินขั้น','n'],['circHi','Circ เมื่อเกินขั้น','n'],['dfHiAt','DF ขั้นสูงเมื่อจำนวนถึง','n'],['dfHi','DF ขั้นสูง %','n'],['feeTiers','ค่ามือตามจำนวน (เช่น 1:30,3:60)']],
+               ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['noConsult','ไม่ต้องพบแพทย์ก่อน (ลูกค้าใหม่คุยเซลแล้วทำเลย)'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว'],['feeNext','ค่ามือหน่วยถัดไป (เช่น Filler cc ที่ 2 ขึ้นไป)','n'],['feeGroup','กลุ่มเคสผ่าตัด (หลัก+ออฟชั่น)'],['tierAt','ขั้นราคาเคส (รวมออฟชั่น)','n'],['scrubHi','Scrub เมื่อเกินขั้น','n'],['circHi','Circ เมื่อเกินขั้น','n'],['dfHiAt','DF ขั้นสูงเมื่อจำนวนถึง','n'],['dfHi','DF ขั้นสูง %','n'],['feeTiers','ค่ามือตามจำนวน (เช่น 1:30,3:60)']],
   CourseItems:[['course','รหัสคอร์ส'],['courseName','ชื่อคอร์ส'],['item','รหัสรายการที่ใช้ได้'],['itemName','ชื่อรายการ'],['sessions','จำนวนครั้ง','n']],
   Promos:     [['code','รหัสโปร'],['name','ชื่อโปร'],['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['start','วันเริ่ม'],['end','วันหมด'],['part','รายการในชุด'],['item','รหัสรายการ'],['qty','จำนวน','n'],['fullPrice','ราคาเต็ม','n'],['free','ของแถม'],['choice','ตัวเลือก'],['buffetDF','บุฟเฟต์ DF บาท/ครั้ง','n']],
@@ -397,7 +398,7 @@ var SCHEMA = {
                ['closed','ยอดที่แอดมินปิดได้','n'],['closedNote','ปิดโปร/รายการ'],['credited','นับให้แอดมินแล้ว','n'],['page','เพจที่ทักมา (CNX/PTY/JB)'],['depAt','มัดจำเมื่อ','t'],['depAmt','ยอดมัดจำ','n'],['depRc','ใบเสร็จมัดจำ']],
   Ads:        [['name','ชื่อแอด/โปร'],['channel','channel'],['active','ใช้งาน','b']],
   Appointments:[['id','เลขนัด'],['branch','สาขา'],['date','วันที่'],['start','เริ่ม'],['end','จบ'],['room','ห้อง'],['cRoom','ห้องตรวจ (ปรึกษา)'],['cStart','ปรึกษาเริ่ม'],['cEnd','ปรึกษาจบ'],
-               ['hn','HN'],['name','ชื่อ'],['phone','โทร'],['item','รายการ'],['itemName','ชื่อรายการ'],['courseId','ใช้คอร์ส'],['note','หมายเหตุ'],['status','สถานะ'],['vn','VN'],['leadId','ลีด'],['by','ผู้ลงนัด'],['created','เวลาลงนัด','t'],['ipdRoom','ห้องพักฟื้น'],['ipdEnd','พักฟื้นถึง']],
+               ['hn','HN'],['name','ชื่อ'],['phone','โทร'],['item','รายการ'],['itemName','ชื่อรายการ'],['courseId','ใช้คอร์ส'],['note','หมายเหตุ'],['status','สถานะ'],['vn','VN'],['leadId','ลีด'],['by','ผู้ลงนัด'],['created','เวลาลงนัด','t'],['ipdRoom','ห้องพักฟื้น'],['ipdEnd','พักฟื้นถึง'],['noConsult','ไม่ต้องตรวจก่อน']],
   Visits:     [['vn','VN'],['date','วันที่'],['branch','สาขา'],['queue','คิว','n'],['hn','HN'],['name','ชื่อ'],['stage','สถานะ'],['stageAt','เข้าสถานะเมื่อ','t'],['cc','อาการสำคัญ'],['vitals','สัญญาณชีพ'],
                ['doctor','แพทย์'],['room','ห้อง'],['claimedBy','ผู้รับงาน'],['numbAt','ทายาชาเมื่อ','t'],['numbMin','ยาชา (นาที)','n'],['created','เวลาเข้า','t'],['updated','อัปเดต','t'],['apptId','นัด'],['leadId','ลีด'],['buyMore','ซื้อเพิ่ม','b'],
                ['route','ส่งต่อไป (หลังคุย)'],['concern','ความกังวล/สิ่งที่อยากแก้'],['consultBy','ผู้คุยเบื้องต้น'],
@@ -602,10 +603,12 @@ function makeCore(store) {
     });
     return out;
   }
+  function hourlyOf(st) { if (!on(st.active)) return 0; if (!blank(st.hourly)) return num(st.hourly); return rolesOf(st).indexOf('doctor') >= 0 && !(num(st.salary) > 0) ? num(setting('doctorHourly', 700)) : 0; }
   function shiftOf(st, d) {
     st = st || {}; d = isDate(d) ? d : today();
     var own = { in: String(st.shiftIn || ''), out: String(st.shiftOut || '') }, rs = rolesOf(st), ex = String(setting('shiftExceptions', '')).split(/[\s,]+/);
-    if (on(st.partTime) || ex.indexOf(String(st.code)) >= 0 || rs.indexOf('owner') >= 0 || rs.indexOf('admin') >= 0) return own;
+    if (ex.indexOf(String(st.code)) >= 0 || rs.indexOf('owner') >= 0 || rs.indexOf('admin') >= 0) return own;
+    if (rs.indexOf('doctor') >= 0 || on(st.partTime)) return { in: '', out: '' };   // แพทย์จ่ายรายชั่วโมง ไม่ต้องเช็คสาย/ออกก่อน
     var wd = new Date(d + 'T00:00:00Z').getUTCDay(), offR = String(setting('shiftOfficeRoles', 'marketing account adminpage central')).split(/[\s,]+/);
     if (rs.some(function (r) { return offR.indexOf(r) >= 0; })) return shParse(setting('shiftOffice', '09:00-18:00'), wd) || own;
     return shParse(setting('shift_' + String(st.branch), String(st.branch) === 'DTCM' ? 'จ-ศ 10:30-19:30, ส-อา 10:00-19:00' : ''), wd) || shParse(setting('shiftDefault', '10:00-19:00'), wd) || own;
@@ -646,7 +649,7 @@ function makeCore(store) {
     var y = +mon.slice(0, 4), m = +mon.slice(5, 7), n = new Date(Date.UTC(y, m, 0)).getUTCDate(), days = [];
     for (var d = 1; d <= n; d++) { var ds = mon + '-' + ('0' + d).slice(-2); if (!wkEnd(ds)) days.push(ds); }
     var skip = String(setting('dayOffSkip', '')).split(/[\s,]+/), q = offQuota(), added = [];
-    var staff = rows('Staff').filter(function (s) { var rs = rolesOf(s); return on(s.active) && !on(s.partTime) && rs.length && rs.indexOf('owner') < 0 && rs.indexOf('admin') < 0 && skip.indexOf(String(s.code)) < 0; });
+    var staff = rows('Staff').filter(function (s) { var rs = rolesOf(s); return on(s.active) && !on(s.partTime) && rs.length && rs.indexOf('owner') < 0 && rs.indexOf('admin') < 0 && rs.indexOf('doctor') < 0 && skip.indexOf(String(s.code)) < 0; });
     function mine(code) { return rows('DayOffs').filter(function (x) { return String(x.staff) === String(code) && String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'พักร้อน'; }).map(function (x) { return String(x.date); }); }
     function offOn(br, ds) { return rows('DayOffs').filter(function (x) { return x.date === ds && String(x.branch) === br && OFF_LIVE.indexOf(x.status) >= 0; }).length; }
     // แจกทีละ 1 วันต่อคนวนไปเรื่อยๆ (คนที่มีน้อยได้ก่อน) จะได้ไม่มีใครเหมาวันดีๆ ไปหมด
@@ -848,7 +851,7 @@ function makeCore(store) {
     var items = rows('Items').filter(function (it) { return on(it.active === '' ? true : it.active) && priceAt(it, b) !== null && it.code && String(it.code).indexOf('ตัวอย่าง') !== 0; }).map(function (it) {
       var ci = rows('CourseItems').filter(function (c) { return String(c.course) === String(it.code); }).map(function (c) { return { item: c.item, name: c.itemName || ((itemByCode(c.item) || {}).name) || c.item, sessions: num(c.sessions) }; });
       return { code: String(it.code), name: String(it.name), category: String(it.category || 'อื่นๆ'), type: typeOf(it), performer: perfOf(it), price: priceAt(it, b),
-        dfPct: num(it.dfPct), staffFee: num(it.staffFee), sessions: num(it.sessions), validDays: num(it.validDays), minutes: num(it.minutes) || 30, numb: num(it.numb), roomType: String(it.roomType || ''), unit: String(it.unit || ''), presets: String(it.presets || '').split(/[\s,]+/).map(num).filter(function (x) { return x > 0; }), parts: ci.length ? ci : undefined };
+        dfPct: num(it.dfPct), staffFee: num(it.staffFee), sessions: num(it.sessions), validDays: num(it.validDays), minutes: num(it.minutes) || 30, numb: num(it.numb), roomType: String(it.roomType || ''), unit: String(it.unit || ''), feeGroup: String(it.feeGroup || '').trim() || undefined, optOf: String(it.feeGroup || '').trim() && !(num(it.tierAt) > 0) && !(num(it.scrubFee) > 0) ? 1 : undefined, presets: String(it.presets || '').split(/[\s,]+/).map(num).filter(function (x) { return x > 0; }), parts: ci.length ? ci : undefined };
     });
     var pm = {};
     rows('Promos').forEach(function (r) {
@@ -1041,19 +1044,25 @@ function makeCore(store) {
     return m;
   }
   function free(m, room, s, e) { return !(m[room] || []).some(function (x) { return s < x[1] && e > x[0]; }); }
-  function needFor(it, hn) {
-    var perf = perfOf(it), dur = num(it.minutes) || 30, numb = num(it.numb);
-    var consult = (perf === 'doctor' || perf === 'both' || !hn || !everSawDoctor(hn)) ? 15 : 0;
+  // ลูกค้าใหม่/รายการที่หมอทำ: จองห้องตรวจ (ปรึกษาแพทย์) ก่อน แล้วต่อห้องหัตถการทันที — จอง 2 ห้องต่อกันในนัดเดียว
+  // ไม่ต้องตรวจก่อน: ติ๊กตอนลงนัด หรือรายการที่ตั้ง "ไม่ต้องพบแพทย์ก่อน" (เช่น เลเซอร์ขน คุยกับเซลแล้วทำเลย)
+  function needFor(it, hn, o) {
+    o = o || {};
+    var perf = perfOf(it), dur = num(it.minutes) || 30, numb = num(it.numb), cm = Math.max(5, num(setting('consultMinutes', 10)) || 10);
+    var consult = (perf === 'doctor' || perf === 'both' || !hn || !everSawDoctor(hn)) ? cm : 0;
     if (perf === 'staff' && hn && everSawDoctor(hn)) consult = 0;
+    var ncCat = String(setting('noConsultCategories', 'Laser ขน')).split(/\s*,\s*/).indexOf(String(it.category)) >= 0, itNc = perf !== 'doctor' && (on(it.noConsult) || ncCat);
+    if (o.noConsult || itNc) consult = 0;
     var type = String(it.roomType || '').trim(); if (!type || type === '-') type = perf === 'doctor' ? 'ห้องหัตถการแพทย์' : 'เตียงทรีทเม้นท์';
-    return { dur: dur + numb, type: type, consult: consult, ipd: type === 'ห้องผ่าตัด' ? num(setting('ipdMinutes', 90)) : 0 };
+    return { dur: dur + numb, type: type, consult: consult, skip: consult === 0 && !!(o.noConsult || itNc), auto: itNc, ipd: type === 'ห้องผ่าตัด' ? num(setting('ipdMinutes', 90)) : 0 };
   }
-  function findSlots(b, date, it, hn, exceptId) {
+  function findSlots(b, date, it, hn, exceptId, o) {
     var br = find('Branches', 'code', b);
     var open = toMin((br && br.open) || setting('open', '10:00')), close = toMin((br && br.close) || setting('close', '20:00'));
-    var need = needFor(it, hn), m = busy(b, date, exceptId), out = [];
+    var need = needFor(it, hn, o), m = busy(b, date, exceptId), out = [];
     var rs = roomsOf(b, need.type); if (!rs.length) rs = roomsOf(b, '').filter(function (r) { return r.type !== 'ห้องตรวจ' && r.type !== 'ห้อง IPD'; });
     var crs = roomsOf(b, 'ห้องตรวจ'), ipds = roomsOf(b, 'ห้อง IPD');
+    var alt = roomsOf(b, '').filter(function (r) { return r.type !== 'ห้องตรวจ' && r.type !== 'ห้อง IPD' && rs.indexOf(r) < 0; }); // ห้องอื่นที่เลือกเองได้
     var nowMin = date === today() ? toMin(hm()) : -1;
     for (var t = open; t + need.consult + need.dur <= close; t += 15) {
       if (t < nowMin) continue;
@@ -1063,17 +1072,20 @@ function makeCore(store) {
       if (!r) continue;
       var ir = null;
       if (need.ipd && ipds.length) { ir = ipds.filter(function (x) { return free(m, x.name, e, e + need.ipd); })[0]; if (!ir) continue; }
-      out.push({ time: fromMin(t), room: r.name, cRoom: cr ? cr.name : '', start: fromMin(s), end: fromMin(e), cStart: cr ? fromMin(t) : '', cEnd: cr ? fromMin(t + need.consult) : '',
+      var fr = rs.concat(alt).filter(function (x) { return free(m, x.name, s, e); }).map(function (x) { return x.name; });
+      out.push({ time: fromMin(t), room: r.name, rooms: fr, cRoom: cr ? cr.name : '', start: fromMin(s), end: fromMin(e), cStart: cr ? fromMin(t) : '', cEnd: cr ? fromMin(t + need.consult) : '',
         ipdRoom: ir ? ir.name : '', ipdEnd: ir ? fromMin(e + need.ipd) : '' });
     }
     return { need: need, slots: out };
   }
 
+  // ห้องที่เลือกเองตอนลงนัด (ต้องว่างช่วงเวลานั้น) · ไม่เลือก = ห้องที่ระบบจัดให้
+  function roomPick(sl, room) { room = txt(room); if (!room || room === sl.room) return sl; if ((sl.rooms || []).indexOf(room) < 0) err(room + ' ไม่ว่างเวลา ' + sl.time + ' — เลือกห้องอื่น'); sl.room = room; return sl; }
   A.slots = function (p, u) {
     var it = itemByCode(p.item); if (!it) err('เลือกรายการก่อน');
     if (!isDate(p.date)) err('เลือกวันที่');
     var b = p.branch && find('Branches', 'code', p.branch) ? String(p.branch) : u.branch;
-    return findSlots(b, p.date, it, p.hn, p.exceptId);
+    return findSlots(b, p.date, it, p.hn, p.exceptId, { noConsult: on(p.noConsult) });
   };
 
   A.dayBook = function (p, u) {
@@ -1091,9 +1103,9 @@ function makeCore(store) {
     var pt = find('Patients', 'hn', p.hn); if (!pt) err('ไม่พบคนไข้');
     var it = itemByCode(p.item); if (!it) err('เลือกรายการ');
     if (!isDate(p.date) || p.date < today()) err('วันที่นัดต้องไม่ย้อนหลัง');
-    var sl = findSlots(u.branch, p.date, it, pt.hn).slots.filter(function (s) { return s.time === p.time; })[0];
-    if (!sl) err('เวลานี้ไม่ว่างแล้ว เลือกเวลาใหม่');
-    var a = add('Appointments', { id: nextId('AP', 'seq_AP'), branch: u.branch, date: p.date, start: sl.start, end: sl.end, room: sl.room, cRoom: sl.cRoom, cStart: sl.cStart, cEnd: sl.cEnd, ipdRoom: sl.ipdRoom, ipdEnd: sl.ipdEnd,
+    var sl = findSlots(u.branch, p.date, it, pt.hn, '', { noConsult: on(p.noConsult) }).slots.filter(function (s) { return s.time === p.time; })[0];
+    if (!sl) err('เวลานี้ไม่ว่างแล้ว เลือกเวลาใหม่'); sl = roomPick(sl, p.room);
+    var a = add('Appointments', { id: nextId('AP', 'seq_AP'), branch: u.branch, date: p.date, start: sl.start, end: sl.end, room: sl.room, cRoom: sl.cRoom, cStart: sl.cStart, cEnd: sl.cEnd, ipdRoom: sl.ipdRoom, ipdEnd: sl.ipdEnd, noConsult: on(p.noConsult) ? 'ใช่' : '',
       hn: pt.hn, name: pt.name, phone: pt.phone, item: it.code, itemName: it.name, courseId: txt(p.courseId), note: txt(p.note), status: 'BOOKED', vn: '', leadId: txt(p.leadId), by: u.name, created: stamp() });
     var ld = p.leadId ? find('Leads', 'id', p.leadId) : leadOf(pt.phone);
     if (ld && ['NEW', 'BOOKED'].indexOf(ld.status) >= 0) upd('Leads', ld, { status: 'BOOKED', hn: pt.hn, apptId: a.id });
@@ -1105,15 +1117,15 @@ function makeCore(store) {
   A.apptNoShow = function (p, u) { var a = apptOf(p.id, u); if (a.status !== 'BOOKED') err('นัดนี้ไม่ได้อยู่ในสถานะรอมา'); upd('Appointments', a, { status: 'NOSHOW' }); var ld = a.leadId && find('Leads', 'id', a.leadId); if (ld && ld.status === 'BOOKED') upd('Leads', ld, { status: 'NOSHOW' }); return true; };
   A.apptMove = function (p, u) {
     var a = apptOf(p.id, u); if (a.status !== 'BOOKED') err('ย้ายได้เฉพาะนัดที่ยังไม่มา');
-    var it = itemByCode(a.item); var sl = findSlots(u.branch, p.date, it, a.hn, a.id).slots.filter(function (s) { return s.time === p.time; })[0];
-    if (!sl) err('เวลานี้ไม่ว่าง');
-    upd('Appointments', a, { date: p.date, start: sl.start, end: sl.end, room: sl.room, cRoom: sl.cRoom, cStart: sl.cStart, cEnd: sl.cEnd, ipdRoom: sl.ipdRoom, ipdEnd: sl.ipdEnd }); log(u, 'apptMove', a.id + ' → ' + p.date + ' ' + p.time); return clean(a);
+    var it = itemByCode(a.item); var nc = p.noConsult == null ? on(a.noConsult) : on(p.noConsult), sl = findSlots(u.branch, p.date, it, a.hn, a.id, { noConsult: nc }).slots.filter(function (s) { return s.time === p.time; })[0];
+    if (!sl) err('เวลานี้ไม่ว่าง'); sl = roomPick(sl, p.room);
+    upd('Appointments', a, { date: p.date, start: sl.start, end: sl.end, room: sl.room, cRoom: sl.cRoom, cStart: sl.cStart, cEnd: sl.cEnd, ipdRoom: sl.ipdRoom, ipdEnd: sl.ipdEnd, noConsult: nc ? 'ใช่' : '' }); log(u, 'apptMove', a.id + ' → ' + p.date + ' ' + p.time); return clean(a);
   };
   A.apptArrive = function (p, u) {
     var a = apptOf(p.id, u); if (a.status !== 'BOOKED') err('นัดนี้ไม่ได้อยู่ในสถานะรอมา');
     if (a.date !== today()) err('นัดนี้ไม่ใช่ของวันนี้');
-    var it = itemByCode(a.item), route = it && needFor(it, a.hn).consult ? 'doctor' : 'treat';
-    var v = createVisit(a.hn, p.cc || a.itemName, p.vitals || '', u, route, a.id, a.leadId, on(setting('preConsult', 'ใช่')) && !p.skipConsult);
+    var it = itemByCode(a.item), route = it && needFor(it, a.hn, { noConsult: on(a.noConsult) }).consult ? 'doctor' : 'treat';
+    var v = createVisit(a.hn, p.cc || a.itemName, p.vitals || '', u, route, a.id, a.leadId, on(setting('preConsult', 'ใช่')) && !p.skipConsult && !on(a.noConsult));
     upd('Appointments', a, { status: 'ARRIVED', vn: v.vn });
     if (a.courseId) { try { redeem(a.courseId, u, v); } catch (e) { /* คอร์สใช้ไม่ได้ ให้ Front จัดการต่อ */ } }
     log(u, 'apptArrive', a.id + ' → ' + v.vn);
@@ -1496,14 +1508,16 @@ function makeCore(store) {
     var name = txt(p.name, 80), price = r2(num(p.price)), cat = txt(p.category, 40) || 'อื่นๆ', type = QTYPE[p.type] ? p.type : 'proc', perf = QPERF[p.performer] ? p.performer : (type === 'product' || type === 'service' ? 'none' : 'doctor');
     if (name.length < 2) err('ใส่ชื่อรายการ'); if (!(price >= 0) || blank(p.price)) err('ใส่ราคา');
     var ses = type === 'course' ? Math.round(num(p.sessions)) : 0; if (type === 'course' && !(ses >= 2)) err('คอร์สต้องมีจำนวนครั้ง 2 ขึ้นไป');
-    var ex = rows('Items').filter(function (x) { return normName(x.name) === normName(name); })[0], col = 'p_' + u.branch;
-    if (ex) { if (!blank(ex[col])) err('มีรายการนี้แล้ว: ' + ex.name + ' (' + ex.code + ') ' + num(ex[col]) + ' บาท — ค้นหาแล้วกดได้เลย');
+    var ex = rows('Items').filter(function (x) { return normName(x.name) === normName(name); })[0], col = 'p_' + u.branch, og = txt(p.optionOf, 30);
+    var OPT = og ? { feeGroup: og, tierAt: '', scrubHi: '', circHi: '', scrubFee: 0, circFee: 0, staffFee: 0 } : null; // ออฟชั่นศัลยกรรม: ค่ามือ 0 · ราคานับรวมเคสหลักในบิลเดียวกัน
+    if (ex) { if (OPT) upd('Items', ex, OPT); if (!blank(ex[col])) err('มีรายการนี้แล้ว: ' + ex.name + ' (' + ex.code + ') ' + num(ex[col]) + ' บาท — ค้นหาแล้วกดได้เลย');
       var pt = {}; pt[col] = price; upd('Items', ex, pt); log(u, 'itemQuickAdd', ex.code + ' ' + u.branch + ' ' + price); return { code: String(ex.code), existed: true, item: catalogFor(u.branch).items.filter(function (x) { return x.code === String(ex.code); })[0] }; }
     var code = 'N' + pad(store.next('item_new'), 3), o = { code: code, name: name, category: cat, type: QTYPE[type], performer: QPERF[perf], dfPct: perf === 'doctor' ? catDefault(cat, 'dfPct') : '', staffFee: perf !== 'none' ? catDefault(cat, 'staffFee') : '',
       sessions: ses || '', validDays: ses ? 365 : '', unit: txt(p.unit, 10), active: true, addedBy: mg ? u.name + ' · อนุมัติ ' + (mg.nick || mg.name) : u.name + ' (' + u.code + ')', addedAt: stamp(), reviewed: '' };
+    if (OPT) { for (var ok in OPT) o[ok] = OPT[ok]; if (perf === 'staff') o.performer = QPERF.doctor; }
     o[col] = price; add('Items', o);
     if (p.stock) { var sr = stockRow(u.branch, p.stock); if (!sr) err('ไม่พบของในสต้อก'); var q = num(p.stockQty); if (!(q > 0)) err('ใส่จำนวนที่ใช้ต่อครั้ง'); add('BOM', { item: code, stock: String(sr.code), qty: q }); }
-    log(u, 'itemQuickAdd', code + ' ' + name + ' ' + price);
+    log(u, 'itemQuickAdd', code + ' ' + name + ' ' + price + (og ? ' ออฟชั่น' + og : ''));
     return { code: code, item: catalogFor(u.branch).items.filter(function (x) { return x.code === code; })[0] };
   };
   A.newItems = function (p, u) {
@@ -1631,11 +1645,26 @@ function makeCore(store) {
     var l = v.leadId ? find('Leads', 'id', v.leadId) : null; if (open(l)) return l;
     return rows('Leads').filter(function (x) { return open(x) && (x.hn === v.hn || (pt && pt.phone && String(x.phone) === String(pt.phone))); }).slice(-1)[0] || null;
   }
+  // ผู้ขาย/แบ่งค่าคอม เลือกที่หน้ารับเงิน → เขียนทับ seller ของทุกรายการที่กำลังจ่าย
+  function sellersCheck(p, u) {
+    if (!(p.sellers && p.sellers.length)) return '';
+    var known = {}; rows('Staff').forEach(function (s) { [s.name, s.nick, s.code].forEach(function (k) { if (k) known[String(k)] = 1; }); }); known['คลินิก'] = 1;
+    p.sellers.forEach(function (x) { if (x && txt(x.name) && !known[txt(x.name)]) err('ไม่รู้จักผู้ขาย ' + txt(x.name)); });
+    return sellerStr(p, u);
+  }
+  function applySellers(os, ss) { if (ss) os.forEach(function (o) { if (String(o.seller || '') !== ss) upd('Orders', o, { seller: ss }); }); }
+  function adminManualOf(p) {
+    var m = p.adminManual; if (!m || !txt(m.admin) || !(num(m.amount) > 0)) return null;
+    var st = rows('Staff').filter(function (s) { return s.name === txt(m.admin) || s.nick === txt(m.admin) || String(s.code) === txt(m.admin); })[0];
+    if (!st) err('ไม่รู้จักแอดมิน ' + txt(m.admin));
+    return { admin: st.name, amount: r2(num(m.amount)) };
+  }
   A.pay = function (p, u) {
     var v = visitOf(p.vn, u);
     if (['DONE', 'CANCEL'].indexOf(v.stage) >= 0) err('บิลนี้ปิดแล้ว');
     var os = ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; });
     if (!os.length) err('ไม่มีรายการค้างชำระ');
+    var ssel = sellersCheck(p, u), dl0 = adminDeal(v), man = dl0 ? null : adminManualOf(p);
     var sub = sum(os, function (o) { return o.total; });
     var disc = Math.min(sub, Math.max(0, r2(num(p.discount)))), net = r2(sub - disc);
     var methods = {}; rows('PayMethods').forEach(function (m) { if (on(m.active === '' ? true : m.active)) methods[m.name] = m; });
@@ -1646,7 +1675,8 @@ function makeCore(store) {
     if (ar > 0) {
       var mg = mgrOk(p.approvePin); if (!mg) err('ค้างชำระต้องให้ผู้จัดการใส่รหัสอนุมัติ');
       if (ar > net) err('ยอดค้างชำระเกินยอดบิล');
-      var arPlan = instPlan(p.arPlan, ar);
+      var arPlan = instPlan(p.arPlan, ar), paidNow = r2(net - ar - wal);
+      if (!(paidNow > 0)) err('ผ่อนกับคลินิกต้องจ่ายงวดแรกวันนี้ก่อน — ใส่เงินสด/QR/บัตร เป็นงวดแรก แล้วที่เหลือค่อยลงค้างชำระ');
       if (os.some(function (o) { return o.type === 'wallet'; })) err('เติมวงเงิน/มัดจำ ต้องจ่ายเงินจริง');
     }
     if (wal > 0) {
@@ -1677,14 +1707,19 @@ function makeCore(store) {
     var acc = 0, opened = [];
     var cashRatio = net > 0 ? (net - wal - ar) / net : 1;
     os.forEach(function (o, i) { var share = i === os.length - 1 ? r2(net - acc) : r2(num(o.total) * net / sub); acc = r2(acc + share); var per = o.perVal || r2(share / Math.max(1, num(o.qty))); upd('Orders', o, { receipt: rc, paidNet: share, cashNet: r2(share * cashRatio), perVal: (o.type === 'course' || o.type === 'promo' || o.type === 'buffet' || o.type === 'wallet') ? 0 : per }); });
-    var deal = adminDeal(v);
+    applySellers(os, ssel);
+    var deal = dl0;
+    if (man) { var mb = sum(os, function (o) { return num(o.cashNet); }), mg2 = Math.min(man.amount, mb), ac3 = 0, cd2 = os.filter(function (o) { return num(o.cashNet) > 0; });
+      if (mg2 > 0) { cd2.forEach(function (o, i) { var g = i === cd2.length - 1 ? r2(mg2 - ac3) : r2(mg2 * num(o.cashNet) / mb); ac3 = r2(ac3 + g); upd('Orders', o, { adminShare: g, adminBy: man.admin }); }); log(u, 'adminShareManual', v.vn + ' ' + man.admin + ' ' + mg2); } }
     if (deal) { var left0 = r2(num(deal.closed) - num(deal.credited)), base0 = sum(os, function (o) { return num(o.cashNet); }), give = Math.min(left0, base0), acc2 = 0;
       if (give > 0) { var cand = os.filter(function (o) { return num(o.cashNet) > 0; });
         cand.forEach(function (o, i) { var g = i === cand.length - 1 ? r2(give - acc2) : r2(give * num(o.cashNet) / base0); acc2 = r2(acc2 + g); upd('Orders', o, { adminShare: g, adminBy: deal.admin }); });
         upd('Leads', deal, { credited: r2(num(deal.credited) + give), hn: v.hn }); } }
     if (wal > 0) walletMove(pt0, -wal, 'ใช้จ่าย', rc, u);
     if (ar > 0) walletMove(pt0, -ar, 'ค้างชำระ (ผ่อน) อนุมัติ ' + mg.code, rc, u, true);
-    if (ar > 0) arPlan.forEach(function (x, i) { add('Installments', { id: nextId('IN', 'seq_IN', 6), hn: v.hn, name: pt0 ? pt0.name : v.name, branch: u.branch, receipt: rc, no: i + 1, of: arPlan.length, due: x.due, amount: x.amount, paid: 0, status: 'OPEN', paidAt: '', created: stamp(), by: mg.name || mg.code }); });
+    if (ar > 0) { var ofN = arPlan.length + 1;
+      add('Installments', { id: nextId('IN', 'seq_IN', 6), hn: v.hn, name: pt0 ? pt0.name : v.name, branch: u.branch, receipt: rc, no: 1, of: ofN, due: today(), amount: paidNow, paid: paidNow, status: 'PAID', paidAt: stamp(), created: stamp(), by: mg.name || mg.code });
+      arPlan.forEach(function (x, i) { add('Installments', { id: nextId('IN', 'seq_IN', 6), hn: v.hn, name: pt0 ? pt0.name : v.name, branch: u.branch, receipt: rc, no: i + 2, of: ofN, due: x.due, amount: x.amount, paid: 0, status: 'OPEN', paidAt: '', created: stamp(), by: mg.name || mg.code }); }); }
     os.forEach(function (o) { if (o.type === 'wallet') { var cr = num(o.choice) || num(o.paidNet); walletMove(pt0, cr, /^มัดจำ/.test(o.name) ? o.name : 'เติมวงเงิน', rc, u, true); opened.push((/^มัดจำ/.test(o.name) ? o.name + ' ' : 'เติมวงเงิน ') + cr + ' บาท'); } });
     os.forEach(function (o) { if (o.type === 'course' || o.type === 'promo' || o.type === 'buffet') opened = opened.concat(openCourses(o, v, u, rc)); });
     var detail = lines.map(function (l) { return l.method + ' ' + l.amount + (l.fee ? ' +ค่าธรรมเนียม ' + l.fee : '') + (l.ref ? ' (' + l.ref + ')' : ''); }).join(' + ') || 'ส่วนลด 100%';
@@ -1890,7 +1925,8 @@ function makeCore(store) {
     var l = beamApi('POST', '/api/v1/payment-links', body), id = l.id || l.paymentLinkId;
     if (!id || !l.url) err('Beam ไม่ส่งลิงก์กลับมา');
     bl[0].ref = id;
-    var draft = { vn: v.vn, discount: r2(num(d.discount)), lines: lines, who: { code: u.code, name: u.name, branch: u.branch, roles: u.roles, brand: u.brand } };
+    applySellers(ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; }), sellersCheck(d, u)); adminManualOf(d);
+    var draft = { vn: v.vn, discount: r2(num(d.discount)), lines: lines, adminManual: d.adminManual || null, who: { code: u.code, name: u.name, branch: u.branch, roles: u.roles, brand: u.brand } };
     add('BeamCharges', { id: id, kind: 'LINK', vn: v.vn, hn: v.hn, branch: u.branch, method: bl[0].method, amount: amt, ref: ref, url: l.url, status: 'PENDING', created: stamp(), by: u.name, paidAt: '', receipt: '', draft: JSON.stringify(draft) });
     log(u, 'beamCreate', v.vn + ' ' + amt + ' ' + id); return { id: id, ref: ref, url: l.url, amount: amt };
   };
@@ -1902,7 +1938,7 @@ function makeCore(store) {
       var d = JSON.parse(r0.draft || '{}'); if (!d.who) return null;
       var v = find('Visits', 'vn', r0.vn), unpaid = ordersOf(r0.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; });
       if (!v || !unpaid.length) { upd('BeamCharges', r0, { status: 'PAID-ต้องตรวจ (บิลปิดไปแล้ว)', paidAt: stamp() }); return null; }
-      try { var out = A.pay({ vn: r0.vn, discount: d.discount, lines: d.lines }, d.who); return out.receipt; }
+      try { var out = A.pay({ vn: r0.vn, discount: d.discount, lines: d.lines, adminManual: d.adminManual }, d.who); return out.receipt; }
       catch (e) { upd('BeamCharges', r0, { status: 'PAID-ต้องตรวจ: ' + String(e.message).slice(0, 80), paidAt: stamp() }); return null; }
     });
   }
@@ -1951,7 +1987,7 @@ function makeCore(store) {
     // นัดเลยตอนลงลีด (ถ้าลูกค้าเลือกเวลาแล้ว) — เช็กเวลาว่างก่อนบันทึกอะไร
     var ap = p.appt && p.appt.item && p.appt.date && p.appt.time ? p.appt : null, ub = Object.assign({}, u, { branch: String(p.branch) }), apIt = null;
     if (ap) { apIt = itemByCode(ap.item); if (!apIt) err('เลือกรายการที่จะนัด'); if (!isDate(ap.date) || ap.date < today()) err('วันที่นัดต้องไม่ย้อนหลัง');
-      if (!findSlots(ub.branch, ap.date, apIt, pt ? pt.hn : '').slots.some(function (x) { return x.time === ap.time; })) err('เวลา ' + ap.time + ' ไม่ว่างแล้ว เลือกเวลาใหม่'); }
+      if (!findSlots(ub.branch, ap.date, apIt, pt ? pt.hn : '', '', { noConsult: on(ap.noConsult) }).slots.some(function (x) { return x.time === ap.time; })) err('เวลา ' + ap.time + ' ไม่ว่างแล้ว เลือกเวลาใหม่'); }
     var dp = p.deposit && num(p.deposit.amount) > 0 ? p.deposit : null;
     if (dp) { if (!txt(p.admin)) err('มัดจำต้องระบุคนที่ปิดการขาย'); var dm = find('PayMethods', 'name', txt(dp.method)); if (!dm) err('เลือกช่องทางที่ลูกค้าโอนมัดจำ'); if (isBeam(dm.name)) err('มัดจำผ่าน Beam ให้รับที่หน้าเก็บเงิน'); }
     var l = add('Leads', { id: nextId('L', 'seq_L', 5), date: today(), branch: p.branch, fbName: txt(p.fbName, 80), gender: txt(p.gender, 10), phone: phone, channel: txt(p.channel, 30),
@@ -1969,7 +2005,7 @@ function makeCore(store) {
     }
     if (ap) {
       if (!pt) { var np = A.registerPatient({ name: txt(p.fbName, 80), phone: phone, gender: p.gender, noEmail: true, pre: true, note: 'ลงทะเบียนจากลีด #' + l.id }, ub); pt = find('Patients', 'hn', np.hn); upd('Patients', pt, { channel: txt(p.channel, 30), ad: txt(p.ad, 120) }); upd('Leads', l, { hn: pt.hn }); }
-      appt = A.apptCreate({ hn: pt.hn, item: apIt.code, date: ap.date, time: ap.time, note: txt(ap.note), leadId: l.id }, ub);
+      appt = A.apptCreate({ hn: pt.hn, item: apIt.code, date: ap.date, time: ap.time, room: txt(ap.room), noConsult: on(ap.noConsult), note: txt(ap.note), leadId: l.id }, ub);
     }
     var br = find('Branches', 'code', p.branch);
     var msg = '🟢 ลีดใหม่ · ' + (br ? br.name : p.branch) + '\nคุณ ' + l.fbName + (l.gender ? ' (' + l.gender + ')' : '') + ' ' + phone + '\nรายการ: ' + (l.interest || '-') + (l.value ? ' ' + l.value.toLocaleString() + ' บาท' : '') +
@@ -2228,6 +2264,28 @@ function makeCore(store) {
       }
       ps.salary = tot; ps.salaryMonth = sal;
     });
+    // หัก: ประกันสังคม (ตามสัดส่วนวันเหมือนเงินเดือน) + มาสาย (เงินเดือน ÷ 30 ÷ 8 ÷ 60 = บาท/นาที × นาทีที่สาย)
+    var lateOn = on(setting('lateDeduct', 'ใช่')), lDay = num(setting('lateDayDiv', 30)) || 30, lHr = num(setting('lateHourDiv', 8)) || 8;
+    rows('Staff').forEach(function (s) {
+      if (!on(s.active) || (branchFilter && !branchFilter(s.branch))) return;
+      var code = String(s.code), sso = num(s.sso), sal = num(s.salary);
+      if (sso > 0) { var m = from.slice(0, 8) + '01';
+        while (m <= to) { var dim = new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7), 0)).getUTCDate(), me = m.slice(0, 8) + ('0' + dim).slice(-2), a1 = from > m ? from : m, b1 = to < me ? to : me, dd = Math.round((Date.parse(b1) - Date.parse(a1)) / 864e5) + 1;
+          if (dd > 0) { var amt = r2(sso * dd / dim), pd = P(code); pd.sso = r2((pd.sso || 0) + amt); pd.deduct = r2((pd.deduct || 0) + amt);
+            items.push({ who: code, kind: 'หัก', date: a1, branch: s.branch, hn: '', name: '', item: 'ประกันสังคม ' + m.slice(0, 7) + (dd < dim ? ' (' + dd + '/' + dim + ' วัน)' : ''), base: sso, pct: 0, amount: -amt }); }
+          m = addDays(me, 1); } }
+      if (lateOn && sal > 0 && !(hourlyOf(s) > 0)) { var perMin = sal / lDay / lHr / 60;
+        rows('Attendance').filter(function (a) { return String(a.staff) === code && a.date >= from && a.date <= to && num(a.late) > 0; }).forEach(function (a) {
+          var amt2 = r2(num(a.late) * perMin), pl = P(code); pl.lateDed = r2((pl.lateDed || 0) + amt2); pl.deduct = r2((pl.deduct || 0) + amt2);
+          items.push({ who: code, kind: 'หัก', date: a.date, branch: a.branch || s.branch, hn: '', name: '', item: 'มาสาย ' + num(a.late) + ' นาที (เข้า ' + a.in + ') × ' + r2(perMin) + ' บาท/นาที', base: r2(perMin), pct: 0, amount: -amt2 }); }); }
+    });
+    // ค่าชั่วโมง (แพทย์): นับจากเวลาเข้า–ออกจริง × เรท (ชีต Staff ช่อง hourly · แพทย์ที่ไม่มีเงินเดือนและช่องว่าง = Settings doctorHourly 700)
+    var hrRound = num(setting('doctorHourRound', 0));
+    rows('Staff').forEach(function (s) { var rate = hourlyOf(s); if (!(rate > 0)) return;
+      rows('Attendance').filter(function (a) { return String(a.staff) === String(s.code) && a.date >= from && a.date <= to && a.in && a.out && (!branchFilter || branchFilter(String(a.branch || s.branch))); }).forEach(function (a) {
+        var m = toMin(a.out) - toMin(a.in); if (m <= 0) return; if (hrRound > 0) m = Math.floor(m / hrRound) * hrRound; var amt = r2(m / 60 * rate), ph = P(String(s.code));
+        ph.salary = r2(ph.salary + amt); ph.hourPay = r2((ph.hourPay || 0) + amt); ph.hours = r2((ph.hours || 0) + m / 60);
+        items.push({ who: String(s.code), kind: 'เงินเดือน', date: a.date, branch: a.branch || s.branch, hn: '', name: '', item: 'ค่าชั่วโมง ' + a.in + '–' + a.out + ' (' + Math.floor(m / 60) + ' ชม.' + (m % 60 ? ' ' + (m % 60) + ' นาที' : '') + ' × ' + rate + ')', base: rate, pct: 0, amount: amt }); }); });
     // OT ที่ส่วนกลางอนุมัติแล้ว → บวกในเงินเดือน (นับตามวันที่ทำ OT)
     rows('OTs').forEach(function (x) { if (x.status !== 'APPROVED' || x.date < from || x.date > to || !(num(x.amount) > 0)) return; var s = find('Staff', 'code', x.staff) || {}; if (branchFilter && !branchFilter(s.branch || x.branch)) return;
       var po = P(String(x.staff)); po.salary = r2(po.salary + num(x.amount)); po.ot = r2((po.ot || 0) + num(x.amount));
@@ -2478,8 +2536,8 @@ function makeCore(store) {
     var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today();
     var e = earnings(from, to, scopeFn(p.scope, u));
     var pay = has(u, ['owner', 'admin', 'account']), ppl = Object.keys(e.people).map(function (k) { return e.people[k]; });
-    if (!pay) { ppl.forEach(function (x) { x.salary = 0; delete x.salaryMonth; }); ppl = ppl.filter(function (x) { return x.df || x.fee || x.comm || x.sales; }); }
-    return { from: from, to: to, salaryShown: pay, people: ppl, items: pay ? e.items : e.items.filter(function (i) { return i.kind !== 'เงินเดือน'; }) };
+    if (!pay) { ppl.forEach(function (x) { x.salary = 0; delete x.salaryMonth; x.deduct = 0; x.sso = 0; x.lateDed = 0; }); ppl = ppl.filter(function (x) { return x.df || x.fee || x.comm || x.sales; }); }
+    return { from: from, to: to, salaryShown: pay, people: ppl, items: pay ? e.items : e.items.filter(function (i) { return i.kind !== 'เงินเดือน' && i.kind !== 'หัก'; }) };
   };
 
   /* ---------- สต้อก ---------- */
@@ -3028,6 +3086,9 @@ var LS = {
   sget: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
   sset: function (k, v) { try { if (v == null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) {} }
 };
+// สีพื้น: ค่าเริ่มต้น = สว่าง (ขาว) ทุกเครื่อง · กดปุ่ม ☀️/🌙 ที่หน้าแรกเพื่อสลับ (จำไว้ในเครื่องนั้น)
+function themeSet(t) { t = t === 'dark' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', t); LS.set('hs_theme', t); }
+themeSet(LS.get('hs_theme', 'light'));
 var API_URL = (typeof window.CLINIC_API === 'string' && window.CLINIC_API) || LS.get('hs_api', '');
 var DEMO = !API_URL;
 var S = { token: null, user: null, boot: null, stack: [], cur: null, busy: false, dlg: 0, stock: null, v: {} };
@@ -3123,7 +3184,7 @@ function dialog(o) {
         if (S.busy) return;
         var er = box.querySelector('.err'); er.hidden = true;
         Promise.resolve().then(function () { return o.onOk ? o.onOk(box) : true; }).then(function (v) { if (v !== false) close(v === undefined ? true : v); })
-          .catch(function (e2) { if (e2 && e2.message === 'BUSY') return; er.textContent = e2.message || e2; er.hidden = false; });
+          .catch(function (e2) { if (e2 && e2.message === 'BUSY') return; er.textContent = e2.message || e2; er.hidden = false; try { er.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (x) {} });
       }
     };
     if (o.mount) o.mount(box);
@@ -3143,7 +3204,8 @@ function sigPad(cv) {
   cv.addEventListener('pointermove', function (e) { if (!last) return; var p = pt(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); last = p; drawn = true; });
   cv.addEventListener('pointerup', function () { last = null; });
   return { get: function () { if (!drawn) return ''; var c = document.createElement('canvas'); c.width = cv.width; c.height = cv.height; var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(cv, 0, 0); return c.toDataURL('image/jpeg', .7); },
-    clear: function () { ctx.clearRect(0, 0, cv.width, cv.height); drawn = false; } };
+    clear: function () { ctx.clearRect(0, 0, cv.width, cv.height); drawn = false; },
+    scribble: function () { var r = cv.getBoundingClientRect(), w = r.width, h = r.height, x = w * .12, y = h * .6; ctx.beginPath(); ctx.moveTo(x, y); for (var i = 0; i < 26; i++) { x += w * .028; y = h * (.35 + .4 * Math.abs(Math.sin(i * .9 + Math.random()))); ctx.lineTo(x, y); } ctx.stroke(); drawn = true; } };
 }
 function sigBlock(id, label) { return '<div class="stack" style="gap:.3rem"><div class="row"><span class="small muted sp">' + esc(label) + '</span><button type="button" class="btn q sm" data-clear="' + id + '">ล้าง</button></div><canvas class="sig" id="' + id + '"></canvas></div>'; }
 function mountSigs(root) { var pads = {}; $$('canvas.sig', root).forEach(function (c) { pads[c.id] = sigPad(c); }); $$('[data-clear]', root).forEach(function (b) { b.onclick = function () { pads[b.dataset.clear].clear(); }; }); return pads; }
@@ -3206,7 +3268,7 @@ function renderTop() {
     '<div class="ttl">' + esc(isHome ? S.user.branchName : (TITLES[c.name] || '')) + '</div>' +
     (isHome ? '' : '<button class="btn q sm hide-sm" onclick="home()" aria-label="หน้าแรก">' + ic('home') + '</button>') +
     '<div class="who"><b>' + esc(S.user.name) + '</b><br>' + esc(S.user.roles.map(function (r) { return ROLE_TH[r] || r; }).join(' · ')) + '</div>' +
-    (isHome ? '<button class="btn q sm" data-a="logout" aria-label="ออกจากระบบ">' + ic('out') + '</button>' : '') + '</div>';
+    (isHome ? '<button class="btn q sm" data-a="theme" aria-label="สลับสีพื้น" title="สลับพื้นขาว/ดำ">' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙') + '</button><button class="btn q sm" data-a="logout" aria-label="ออกจากระบบ">' + ic('out') + '</button>' : '') + '</div>';
 }
 
 /* ---------- เข้าระบบ ---------- */
@@ -3249,7 +3311,8 @@ function loginScreen(step) {
   $('#pin').onclick = function (e) { var k = e.target.closest('[data-k]'); if (!k) return; k = k.dataset.k; if (k === '⌫') pin = pin.slice(0, -1); else if (k === 'ล้าง') pin = ''; else if (pin.length < 8) pin += k; draw(); if (pin.length === 4 && DEMO) submit(); };
   $('#go').onclick = submit;
   $$('[data-pin]').forEach(function (b) { b.onclick = function () { pin = b.dataset.pin; draw(); submit(); }; });
-  document.onkeydown = function (e) { if (S.user || !$('#pin')) return; if (/^\d$/.test(e.key) && pin.length < 8) { pin += e.key; draw(); } else if (e.key === 'Backspace') { pin = pin.slice(0, -1); draw(); } else if (e.key === 'Enter') submit(); };
+  document.onkeydown = function (e) { if (S.user || !$('#pin')) return; if (/^\d$/.test(e.key) && pin.length < 8) { pin += e.key; draw(); } else if (e.key === 'Backspace') { pin = pin.slice(0, -1); draw(); } else if (e.key === 'Escape' || e.key === 'Delete') { pin = ''; draw(); } else if (e.key === 'Enter') { e.preventDefault(); submit(); } };
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches) { var kh = document.createElement('p'); kh.className = 'xs muted'; kh.style.textAlign = 'center'; kh.textContent = '⌨️ พิมพ์รหัสจากคีย์บอร์ดได้ · Enter = เข้าระบบ · Esc = ล้าง'; $('#pin').after(kh); }
 }
 function start() {
   applyBrand(S.user && S.user.brand); S.stack = []; S.cur = { name: 'home' };
@@ -3265,7 +3328,7 @@ var TILES = [
   { k: 'lead', t: 'ลงลีด + นัด', s: 'จากแชทที่แอดมินส่งมา · ลงนัดในตัว', ic: 'chat', r: FRONT.concat(['adminpage']), hero: 1 },
   { k: 'walkin', t: 'Walk-in', s: 'คนไข้เดินเข้ามา · ค้นหา/ลงทะเบียน', ic: 'walk', r: FRONT, hero: 1 },
   { k: 'arrivals', t: 'คนไข้นัดไว้แล้ว', s: 'กดรับเข้าคิวเมื่อมาถึง', ic: 'cal', r: FRONT, b: 'booked' },
-  { k: 'bookNew', t: 'ลงนัด', s: 'จองห้อง/เตียงอัตโนมัติ', ic: 'plus', r: FRONT },
+  { k: 'bookNew', t: 'ลงนัด', s: 'ระบบจัดห้องให้ · เปลี่ยนห้องเองได้', ic: 'plus', r: FRONT },
   { k: 'due', t: 'เก็บเงิน / ค้างจ่าย', s: 'บิลที่ยังไม่ได้ชำระ', ic: 'cash', r: FRONT, b: 'due' },
   { k: 'rcFind', t: 'ใบเสร็จย้อนหลัง', s: 'ค้นหา · ดู · พิมพ์ซ้ำ', ic: 'search', r: FRONT.concat(['account']) },
   { k: 'queue', t: 'คิววันนี้', s: 'สถานะคนไข้ทุกคน', ic: 'list', r: FRONT.concat(['sales']) },
@@ -3334,6 +3397,7 @@ function settingsDlg() {
 
 /* ---------- ตัวจัดการคลิก ---------- */
 var ACT = {
+  theme: function (el) { var d = document.documentElement.getAttribute('data-theme') === 'dark'; themeSet(d ? 'light' : 'dark'); el.textContent = d ? '🌙' : '☀️'; },
   logout: function () { ask('ออกจากระบบ?', 'แท็บเล็ตจะกลับไปหน้าใส่รหัส', 'ออกจากระบบ').then(function (ok) { if (ok) logout(); }); },
   settings: settingsDlg,
   pickBranch: function (el) { LS.set('hs_br', el.dataset.b); LS.set('hs_brn', el.dataset.n); LS.set('hs_brand', el.dataset.brand || ''); loginScreen('pin'); },
@@ -3518,11 +3582,12 @@ function rngOf(k) {
 function payTab() {
   var r0 = rngOf(L.rng);
   return call('myEarnings', r0).then(function (e) {
-    var sm = e.sum, comm = (sm.comm || 0) - (sm.mgmt || 0), tot = (sm.df || 0) + (sm.fee || 0) + (sm.comm || 0) + (sm.salary || 0);
-    var parts = [['เงินเดือน', (sm.salary || 0) - (sm.ot || 0)], ['OT', sm.ot], ['DF แพทย์', sm.df], ['ค่ามือ', sm.fee], ['ค่าคอม', comm], ['ค่าบริหาร', sm.mgmt]].filter(function (x) { return x[1]; });
+    var sm = e.sum, comm = (sm.comm || 0) - (sm.mgmt || 0), gross = (sm.df || 0) + (sm.fee || 0) + (sm.comm || 0) + (sm.salary || 0), tot = gross - (sm.deduct || 0);
+    var parts = [['เงินเดือน', (sm.salary || 0) - (sm.ot || 0) - (sm.hourPay || 0)], ['ค่าชั่วโมง', sm.hourPay], ['OT', sm.ot], ['DF แพทย์', sm.df], ['ค่ามือ', sm.fee], ['ค่าคอม', comm], ['ค่าบริหาร', sm.mgmt]].filter(function (x) { return x[1]; });
     return '<div class="chips" id="rng">' + RNG.map(function (x) { return '<button data-r="' + x[0] + '" class="' + (L.rng === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' +
-      '<div class="card stack lx-total"><div class="small muted">' + esc(thDate(e.from)) + (e.to !== e.from ? ' – ' + esc(thDate(e.to)) : '') + '</div><div class="l">รวมที่ได้</div><div class="lx-amt">' + bt(tot) + '</div>' +
+      '<div class="card stack lx-total"><div class="small muted">' + esc(thDate(e.from)) + (e.to !== e.from ? ' – ' + esc(thDate(e.to)) : '') + '</div><div class="l">' + (sm.deduct ? 'รับสุทธิ (หลังหัก)' : 'รวมที่ได้') + '</div><div class="lx-amt">' + bt(tot) + '</div>' +
       (parts.length ? '<div class="lx-split">' + parts.map(function (x) { return '<div><span class="xs muted">' + x[0] + '</span><b>' + bt(x[1]) + '</b></div>'; }).join('') + '</div>' : '') +
+      (sm.deduct ? '<div class="lx-split lx-ded">' + [['ประกันสังคม', sm.sso], ['หักมาสาย', sm.lateDed]].filter(function (x) { return x[1]; }).map(function (x) { return '<div><span class="xs muted">' + x[0] + '</span><b class="dn">−' + bt(x[1]) + '</b></div>'; }).join('') + '</div><div class="xs muted">รายได้ก่อนหัก ' + bt(gross) + ' · รายละเอียดการหักอยู่ในรายการด้านล่าง</div>' : '') +
       '<div class="row small muted"><span>' + (sm.cases || 0) + ' เคส</span>' + (sm.sales ? '<span>· ยอดขาย ' + bt(sm.sales) + '</span>' : '') + '<span>· ทำงาน ' + e.days + ' วัน ' + hmDur(e.hours) + '</span></div></div>' +
       lineComm(sm) +
       (e.leads ? '<div class="card row small"><span class="sp">ลีด ' + e.leads.total + ' · นัดได้ ' + e.leads.booked + ' · ซื้อ ' + e.leads.bought + '</span><b>' + bt(e.leads.value) + '</b></div>' : '') +
