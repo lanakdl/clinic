@@ -3889,7 +3889,8 @@ function makeCore(store) {
   PERM.saleFeed = ['owner', 'admin', 'account', 'manager'];
   // แจ้ง LINE: saleNotify = ทุกบิล / เฉพาะผิดปกติ (ค่าเริ่มต้น) / ไม่ · ส่งถึงใคร = saleNotifyRoles (ค่าเริ่มต้น owner) ที่ผูก LINE แล้ว
   var NOTIFY = [];
-  function saleRecips(branch) { var rs = String(setting('saleNotifyRoles', 'owner')).split(/\s*,\s*/);
+  function notifyRoles() { return String(setting('saleNotifyRoles', 'owner')).split(/\s*,\s*/).filter(String).map(function (r) { return roleOf(r) || r; }); } // ใส่ได้ทั้ง owner / ผู้ดูแลระบบ / บัญชี ฯลฯ
+  function saleRecips(branch) { var rs = notifyRoles();
     return rows('Staff').filter(function (s) { if (!on(s.active) || !s.lineId) return false; var rl = rolesOf(s); if (!rl.some(function (r) { return rs.indexOf(r) >= 0; })) return false; return rl.indexOf('owner') >= 0 || rl.indexOf('admin') >= 0 || rl.indexOf('account') >= 0 || canBranch(s, branch); }); }
   function saleText(c, dayTot) {
     var L = ['💰 ' + c.branchName + ' · ' + c.time.slice(11, 16) + ' · ' + c.receipt, c.hn + ' ' + c.name];
@@ -3911,13 +3912,30 @@ function makeCore(store) {
   // บิลที่รับเงินหลังเวลา since (สำหรับอีเมลสรุปรายชั่วโมง) + ยอดวันนี้แต่ละสาขา
   function saleSince(since) { var t = today(); since = String(since || t + ' 00:00'); var ps = rows('Payments').filter(function (p) { return String(p.time) > since; });
     return { cards: ps.map(function (p) { return saleCard(p.receipt); }).filter(Boolean), last: ps.length ? String(ps[ps.length - 1].time) : '', day: saleDay(t, null).by, date: t }; }
+  // สรุปบิลรวมเป็นข้อความเดียว (ส่ง LINE ทุกไม่กี่ชั่วโมง) — 1 คน = 1 ข้อความ (แบ่งเป็นหลายกล่องถ้ายาว) ประหยัดโควต้า
+  function saleDigestMsgs(since) {
+    var r = saleSince(since); if (!r.cards.length) return { last: '', msgs: [] };
+    var recips = rows('Staff').filter(function (s) { var rs = notifyRoles(); return on(s.active) && s.lineId && rolesOf(s).some(function (x) { return rs.indexOf(x) >= 0; }); });
+    var msgs = recips.map(function (s) {
+      var all = rolesOf(s).some(function (x) { return ['owner', 'admin', 'account'].indexOf(x) >= 0; }), mine = r.cards.filter(function (c) { return all || canBranch(s, c.branch); }); if (!mine.length) return null;
+      var day = r.day.filter(function (b) { return all || canBranch(s, b.branch); }), fl = mine.filter(function (c) { return c.flags.length; }).length, tot = sum(mine, function (c) { return c.net; });
+      var head = ['📊 ยอดขาย ' + since.slice(11, 16) + '–' + r.last.slice(11, 16) + ' (' + r.date.slice(8, 10) + '/' + r.date.slice(5, 7) + ')', 'ยอดวันนี้: ' + day.map(function (b) { return b.branch + ' ' + b.bills + ' บิล ' + fmt(b.net); }).join(' | '),
+        'บิลใหม่ ' + mine.length + ' ใบ · ' + fmt(tot) + (fl ? ' · ⚠️ ' + fl + ' ใบควรดู' : ''), ''].join('\n');
+      var lines = mine.map(function (c) { return c.time.slice(11, 16) + ' ' + c.branch + ' ' + c.hn + ' ' + c.name + '\n' +
+        c.items.map(function (i) { return ' • ' + i.name + (i.qty !== 1 ? ' ×' + i.qty : '') + ' ' + fmt(i.total) + (i.disc ? ' (ลด ' + fmt(i.disc) + ')' : ''); }).join('\n') +
+        (c.discount ? '\n ลดท้ายบิล ' + fmt(c.discount) : '') + '\n = ' + fmt(c.net) + (c.wallet ? ' หักมัดจำ ' + fmt(c.wallet) : '') + (c.ar ? ' ค้าง ' + fmt(c.ar) : '') + ' · ' + c.sellers + (c.admin ? ' · แอดมิน ' + c.admin.by : '') + (c.flags.length ? '\n ⚠️ ' + c.flags.join(' · ') : ''); });
+      var texts = [], cur = head; lines.forEach(function (l) { if ((cur + '\n' + l).length > 4800) { texts.push(cur); cur = ''; } cur += (cur ? '\n' : '') + l; }); if (cur) texts.push(cur);
+      if (texts.length > 5) { texts = texts.slice(0, 5); texts[4] += '\n… ยังมีอีก ดูต่อในแอป LINE แท็บงานของฉัน → 💰 ยอดขายวันนี้'; }
+      return { to: String(s.lineId), texts: texts }; }).filter(Boolean);
+    return { last: r.last, msgs: msgs };
+  }
   function takeNotify() { var o = NOTIFY; NOTIFY = []; return o; }
   // สรุปยอดขายปิดวัน (เรียกจาก trigger ตอนค่ำ) → ข้อความถึงเจ้าของ
   function saleDailyText(d) { d = d || today(); var sd = saleDay(d, null); if (!sd.list.length) return '';
     var fl = sd.list.map(function (p) { return saleCard(p.receipt); }).filter(function (c) { return c && c.flags.length; });
     return ['📊 สรุปยอดขาย ' + d].concat(sd.by.map(function (b) { return b.name + ': ' + b.bills + ' บิล · ' + fmt(b.net) + ' (รับจริง ' + fmt(b.cash) + ')'; }))
       .concat(['รวม ' + fmt(sum(sd.by, function (x) { return x.net; }))]).concat(fl.length ? ['⚠️ บิลที่ควรดู ' + fl.length + ' ใบ: ' + fl.slice(0, 15).map(function (c) { return c.receipt.slice(-8) + ' ' + c.flags[0]; }).join(' | ')] : []).join('\n'); }
-  function saleDailyMsgs(d) { var t = saleDailyText(d); if (!t) return []; var rs = String(setting('saleNotifyRoles', 'owner')).split(/\s*,\s*/);
+  function saleDailyMsgs(d) { var t = saleDailyText(d); if (!t) return []; var rs = notifyRoles();
     return rows('Staff').filter(function (s) { return on(s.active) && s.lineId && rolesOf(s).some(function (r) { return rs.indexOf(r) >= 0 && ['owner', 'admin', 'account'].indexOf(r) >= 0; }); }).map(function (s) { return { to: String(s.lineId), text: t }; }); }
   PERM.incomeReport = ['account', 'manager']; PERM.receiptLines = ['account']; PERM.payEdit = ['account']; WRITES.payEdit = 1;
   /* ---------- ยกเลิกบิล: หน้าร้านขอ → บัญชีอนุมัติ → บิลเดิมคงเลขไว้ (สถานะยกเลิก) รายการกลับเป็นยังไม่จ่าย ให้เก็บเงินใหม่ ---------- */
@@ -4219,7 +4237,7 @@ function makeCore(store) {
   };
   PERM.countPreview = ['manager'];
 
-  return { saleSince: saleSince, takeNotify: takeNotify, saleDailyMsgs: saleDailyMsgs, api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook, adsExport: adsExport, countRemind: countRemind, offAutoFill: offAutoFill };
+  return { saleDigestMsgs: saleDigestMsgs, saleSince: saleSince, takeNotify: takeNotify, saleDailyMsgs: saleDailyMsgs, api: api, login: login, branches: branchesPublic, schema: SCHEMA, version: CORE_VERSION, parseIdCard: parseIdCard, idValid: idValid, _A: A, lineLogin: lineLogin, lineBind: lineBind, receiptPreview: function (rc) { return receiptHtml(receiptData(rc)); }, beamHook: beamHook, adsExport: adsExport, countRemind: countRemind, offAutoFill: offAutoFill };
 }
 
 /* ---------- อ่านบัตรประชาชน (ข้อความจาก OCR) ---------- */
