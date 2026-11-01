@@ -1252,8 +1252,13 @@ function makeCore(store) {
     if (open) err('คนไข้มีคิวค้างอยู่วันนี้ (คิว ' + open.queue + ')');
     var d = today(), q = store.next('q_' + u.branch + d.replace(/-/g, ''));
     var ld = leadId ? find('Leads', 'id', leadId) : leadOf(pt.phone);
-    return add('Visits', { vn: u.branch + '-' + d.slice(2).replace(/-/g, '') + '-' + pad(q, 3), date: d, branch: u.branch, queue: q, hn: hn, name: pt.name, stage: st, stageAt: stamp(), trail: st + '@' + stamp().slice(11, 16),
+    var nv = add('Visits', { vn: u.branch + '-' + d.slice(2).replace(/-/g, '') + '-' + pad(q, 3), date: d, branch: u.branch, queue: q, hn: hn, name: pt.name, stage: st, stageAt: stamp(), trail: st + '@' + stamp().slice(11, 16),
       cc: txt(cc), vitals: txt(vitals), doctor: '', room: '', claimedBy: '', numbAt: '', numbMin: 0, created: stamp(), updated: stamp(), apptId: apptId || '', leadId: ld && !ld.vn ? ld.id : '', buyMore: false, route: route, concern: txt(concern), consultBy: '' });
+    // หัตถการที่จ่ายแล้วแต่ยังไม่ได้ทำ ค้างอยู่ใน visit วันนี้ที่ปิดไปแล้ว → ย้ายมาคิวใหม่ ให้ห้องทรีตเมนต์เห็นและกดทำเสร็จได้
+    rows('Visits').filter(function (x) { return x.hn === hn && x.date === d && x.branch === u.branch && x.vn !== nv.vn && x.stage === 'DONE'; }).forEach(function (x) {
+      ordersOf(x.vn).filter(function (o) { return o.status === 'PENDING' && o.type !== 'wallet'; }).forEach(function (o) { upd('Orders', o, { vn: nv.vn }); log(u, 'orderMove', o.id + ' ' + x.vn + ' → ' + nv.vn); });
+    });
+    return nv;
   }
   A.createVisit = function (p, u) {
     var vs = vitalsOf(p), v = createVisit(p.hn, p.cc, vs.text, u, p.route === 'treat' ? 'treat' : 'doctor', '', '', !!p.consult, p.concern);
@@ -1300,7 +1305,7 @@ function makeCore(store) {
   };
   PERM.lineQueue = ALL;
   A.queue = function (p, u) {
-    var d = today(), pts = {}, vs = rows('Visits').filter(function (v) { return v.branch === u.branch && v.date === d && v.stage !== 'SALE'; });
+    var d = today(), pts = {}, vs = rows('Visits').filter(function (v) { return v.branch === u.branch && v.date === d && v.stage !== 'SALE' && v.stage !== 'CANCEL'; });
     vs.forEach(function (v) { pts[v.hn] = 1; });
     var al = {}; rows('Patients').forEach(function (x) { if (pts[x.hn]) al[x.hn] = { allergy: x.allergy, nick: x.nickname, chronic: x.chronic }; });
     var ords = rows('Orders');
@@ -1860,7 +1865,8 @@ function makeCore(store) {
     var pt = find('Patients', 'hn', v.hn), ld = v.leadId ? find('Leads', 'id', v.leadId) : null;
     if (ld && (!ld.vn || ld.vn === v.vn)) upd('Leads', ld, { status: 'BOUGHT', vn: v.vn, hn: v.hn, actual: r2(num(ld.actual) + net), value: r2(num(ld.actual) + net) });
     var all = ordersOf(v.vn), pend = all.some(function (o) { return o.status === 'PENDING'; }), owe = all.some(function (o) { return !o.receipt && num(o.total) > 0; });
-    if (!owe && (v.stage === 'SALE' || (v.stage === 'BACK' && !pend))) setStage(v, 'DONE');
+    // ซื้อหัตถการแล้วจ่ายก่อน (ยังไม่ได้ทำ) → ไม่ปิด visit: กดรับเข้าคิวแล้วรายการไปโผล่ที่ห้องทรีตเมนต์ให้กดทำเสร็จ/ได้ค่ามือ
+    if (!owe && !pend && (v.stage === 'SALE' || v.stage === 'BACK')) setStage(v, 'DONE');
     log(u, 'pay', rc + ' ' + v.vn + ' ' + net + ' · ' + detail);
     try { saleQueue(rc); } catch (e) {}
     var mail = null;
@@ -2016,6 +2022,20 @@ function makeCore(store) {
     if (r.code >= 300) err('Beam ตอบกลับผิดพลาด: ' + ((j.error && (j.error.errorMessage || j.error.errorCode)) || j.message || j.errorMessage || ('HTTP ' + r.code)));
     return j;
   }
+  // ผ่อนบัตรแต่ละงวดมียอดขั้นต่ำที่ตั้งไว้ใน Beam (เช่น 6 เดือน ≥ 4,000) — ยอดไม่ถึง Beam ปฏิเสธทั้งลิงก์
+  // → ตัดงวดที่ไม่ถึงขั้นต่ำออกแล้วสร้างใหม่ (ลูกค้ายังจ่ายบัตร/QR/โมบายแบงก์กิ้ง/งวดที่ถึงขั้นต่ำได้)
+  function beamLinkPost(body) {
+    for (var i = 0; i < 6; i++) {
+      try { return beamApi('POST', '/api/v1/payment-links', body); }
+      catch (e) {
+        var ci = body.linkSettings && body.linkSettings.cardInstallments, m = /period\s*=\s*(\d+)\)?\s*minimum/i.exec(String(e.message || ''));
+        if (!ci || !m) throw e;
+        if (ci['installments' + m[1] + 'm']) delete ci['installments' + m[1] + 'm']; else { delete body.linkSettings.cardInstallments; continue; }
+        if (!Object.keys(ci).some(function (k) { return /^installments\d+m$/.test(k); })) delete body.linkSettings.cardInstallments;
+      }
+    }
+    return beamApi('POST', '/api/v1/payment-links', body);
+  }
   function beamCheck(row) {
     if (row.kind === 'LINK') { var l = beamApi('GET', '/api/v1/payment-links/' + encodeURIComponent(row.id)), st = String(l.status || '');
       return { status: st === 'PAID' ? 'PAID' : st === 'ACTIVE' ? 'PENDING' : 'FAILED', raw: st }; }
@@ -2047,7 +2067,7 @@ function makeCore(store) {
       linkSettings: { card: { isEnabled: true }, qrPromptPay: { isEnabled: true }, eWallets: { isEnabled: true }, mobileBanking: { isEnabled: true } } };
     if (on(setting('beamInstallments', 'ใช่'))) { var y = { isEnabled: true }; body.linkSettings.cardInstallments = { isEnabled: true, installments3m: y, installments4m: y, installments6m: y, installments10m: y }; }
     if (back) body.redirectUrl = back;
-    var l = beamApi('POST', '/api/v1/payment-links', body), id = l.id || l.paymentLinkId;
+    var l = beamLinkPost(body), id = l.id || l.paymentLinkId;
     if (!id || !l.url) err('Beam ไม่ส่งลิงก์กลับมา');
     bl[0].ref = id;
     applySellers(ordersOf(v.vn).filter(function (o) { return !o.receipt && num(o.total) > 0; }), sellersCheck(d, u)); adminManualOf(d);
@@ -3720,7 +3740,8 @@ var ACT = {
   changeBranch: function () { LS.del('hs_br'); loginScreen(); }
 };
 document.addEventListener('click', function (e) {
-  var g = e.target.closest('[data-go]');
+  var g = e.target.closest('[data-go]'), a0 = e.target.closest('[data-a]');
+  if (g && a0 && g.contains(a0) && a0 !== g) g = null;   // ปุ่มในแถวที่กดได้ → ทำปุ่ม ไม่เปิดแถว
   if (g && !g.closest('#dlg')) { e.preventDefault(); if (S.busy) return; go(g.dataset.go, g.dataset.arg); return; }
   var a = e.target.closest('[data-a]');
   if (a && ACT[a.dataset.a]) { e.preventDefault(); if (S.busy) return; ACT[a.dataset.a](a, e); }
@@ -3763,7 +3784,7 @@ function qRow(v, tap) {
   var live = v.stage !== 'DONE';
   return '<div class="li qrow' + (tap ? ' tap' : '') + '"' + (tap ? ' data-go="patient" data-arg="' + esc(v.hn) + '"' : '') + '><div class="qn">' + v.queue + '</div><div class="main"><div class="t">' + esc(v.name) + (v.nick ? ' <span class="muted">(' + esc(v.nick) + ')</span>' : '') + ' ' + stagePill(v.stage) + (live ? ' <span class="xs muted" style="white-space:nowrap">ขั้นนี้ ' + since(v.mins) + '</span>' : '') + '</div>' +
     '<div class="s">' + esc(((v.items || []).map(function (i) { return i.name || i; }).join(', ')) || v.cc || '—') + (v.room ? ' · ' + esc(v.room) : '') + (v.doctor ? ' · ' + esc(v.doctor) : '') + '</div>' + qTrail(v.trail || []) + '</div>' +
-    '<div class="stack r" style="gap:.15rem"><span class="pill ' + waitCls(v.stage === 'DONE' ? 0 : v.total, v.stage) + '">' + (live ? 'รอรวม ' + since(v.total) : 'เสร็จ') + '</span>' + (v.due > 0 ? '<span class="pill d">ค้าง ' + bt(v.due) + '</span>' : v.paid ? '<span class="pill g">จ่ายแล้ว</span>' : '') + '</div></div>';
+    '<div class="stack r" style="gap:.15rem">' + (tap && live && !v.paid && has(FRONT) ? '<button class="btn q sm" data-a="qCancel" data-vn="' + esc(v.vn) + '" data-n="' + esc(v.name) + '" data-q="' + v.queue + '" title="ยกเลิกคิวนี้">✕ ยกเลิกคิว</button>' : '') + '<span class="pill ' + waitCls(v.stage === 'DONE' ? 0 : v.total, v.stage) + '">' + (live ? 'รอรวม ' + since(v.total) : 'เสร็จ') + '</span>' + (v.due > 0 ? '<span class="pill d">ค้าง ' + bt(v.due) + '</span>' : v.paid ? '<span class="pill g">จ่ายแล้ว</span>' : '') + '</div></div>';
 }
 
 /* =====================================================================
