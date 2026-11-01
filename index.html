@@ -327,6 +327,9 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:
 .qtr span{white-space:nowrap}.qtr span.on{color:var(--accent);font-weight:700}.qtr i{font-style:normal;opacity:.8}.qtr b{opacity:.5;font-weight:400}
 @media (max-width:520px){.qrow{flex-wrap:wrap}.qrow>.stack.r{flex-direction:row;flex-wrap:wrap;width:100%;padding-left:3.4rem}}
 
+.top .who[data-a]{cursor:pointer}
+.top .outbtn{min-height:44px;min-width:60px;gap:.3rem;padding-inline:.7rem}
+
 </style>
 </head>
 <body>
@@ -1684,7 +1687,7 @@ var ROLE_MAP = {
   'front': 'front', 'front (หน้าร้าน)': 'front', 'หน้าร้าน': 'front', 'doctor': 'doctor', 'แพทย์': 'doctor', 'nurse': 'nurse', 'พยาบาล': 'nurse',
   'assistant': 'assistant', 'ผู้ช่วยแพทย์': 'assistant', 'therapist': 'therapist', 'พนักงานทรีทเม้นท์': 'therapist', 'sales': 'sales', 'เซล': 'sales',
   'manager': 'manager', 'ผู้จัดการสาขา': 'manager', 'central': 'central', 'คลังกลาง': 'central', 'account': 'account', 'บัญชี': 'account',
-  'adminpage': 'adminpage', 'แอดมินเพจ': 'adminpage', 'marketing': 'marketing', 'การตลาด': 'marketing', 'owner': 'owner', 'admin': 'admin', 'ผู้ดูแลระบบ': 'admin'
+  'adminpage': 'adminpage', 'แอดมินเพจ': 'adminpage', 'แอดมิน': 'adminpage', 'แอดมินแชท': 'adminpage', 'admin page': 'adminpage', 'marketing': 'marketing', 'การตลาด': 'marketing', 'owner': 'owner', 'admin': 'admin', 'ผู้ดูแลระบบ': 'admin'
 };
 var STAFF_ROLES = ['nurse', 'assistant', 'therapist'];
 var CLIN = ['doctor', 'nurse', 'assistant', 'therapist'];
@@ -1726,7 +1729,7 @@ function makeCore(store) {
   function sum(a, f) { var s = 0; for (var i = 0; i < a.length; i++) s += num(f ? f(a[i]) : a[i]); return r2(s); }
   function err(m) { throw new Error(m); }
   function log(u, a, d) { try { add('Log', { time: stamp(), user: (u.branch || '') + ' ' + u.code + ' ' + u.name, action: a, detail: String(d || '').slice(0, 500) }); } catch (e) {} }
-  function roleOf(v) { return ROLE_MAP[String(v || '').trim().toLowerCase()] || ROLE_MAP[String(v || '').trim()] || ''; }
+  function roleOf(v) { var k = String(v || '').replace(/\s+/g, ' ').trim(); return ROLE_MAP[k.toLowerCase()] || ROLE_MAP[k] || ''; }
   function rolesOf(st) { var a = [roleOf(st.role), roleOf(st.role2)].filter(String); return a; }
   function canBranch(st, b) { var s = String(st.branches || '').trim(); if (!s || s === 'ทุกสาขา' || s.toUpperCase() === 'ALL') return true; return s.split(/[\s,]+/).indexOf(b) >= 0 || String(st.branch) === b; }
   function has(u, list) { if (u.roles.indexOf('admin') >= 0 || u.roles.indexOf('owner') >= 0) return true; for (var i = 0; i < u.roles.length; i++) if (list.indexOf(u.roles[i]) >= 0) return true; return false; }
@@ -4790,8 +4793,8 @@ function renderTop() {
   t.innerHTML = '<div class="in">' + (isHome ? logo(S.user.brand) : '<button class="btn q sm" onclick="back()" aria-label="กลับ">' + ic('back') + '</button>') +
     '<div class="ttl">' + esc(isHome ? S.user.branchName : (TITLES[c.name] || '')) + '</div>' +
     (isHome ? '' : '<button class="btn q sm hide-sm" onclick="home()" aria-label="หน้าแรก">' + ic('home') + '</button>') +
-    '<div class="who"><b>' + esc(S.user.name) + '</b><br>' + esc(S.user.roles.map(function (r) { return ROLE_TH[r] || r; }).join(' · ')) + '</div>' +
-    (isHome ? '<button class="btn q sm" data-a="theme" aria-label="สลับสีพื้น" title="สลับพื้นขาว/ดำ">' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙') + '</button><button class="btn q sm" data-a="logout" aria-label="ออกจากระบบ">' + ic('out') + '</button>' : '') + '</div>';
+    '<div class="who"' + (isHome ? ' data-a="logout" role="button" title="แตะเพื่อออกจากระบบ"' : '') + '><b>' + esc(S.user.name) + '</b><br>' + esc(S.user.roles.map(function (r) { return ROLE_TH[r] || r; }).join(' · ')) + '</div>' +
+    (isHome ? '<button class="btn q sm" data-a="theme" aria-label="สลับสีพื้น" title="สลับพื้นขาว/ดำ">' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙') + '</button><button class="btn sm outbtn" data-a="logout" aria-label="ออกจากระบบ">' + ic('out') + '<span>ออก</span></button>' : '') + '</div>';
 }
 
 /* ---------- เข้าระบบ ---------- */
