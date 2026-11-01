@@ -2290,7 +2290,11 @@ function makeCore(store) {
     if (p.img) o.photo = store.savePhoto(pt.hn + '_id', p.img);
     if (p.consent && p.sign) { o.consent = now; o.sign = store.savePhoto(pt.hn + '_sign', p.sign); }
     if (p.mktConsent) o.mktConsent = now;
-    upd('Patients', pt, o); log(u, 'patientComplete', pt.hn); return cleanPt(pt);
+    if (p.channel !== undefined && txt(p.channel)) o.channel = txt(p.channel, 30); if (p.ad !== undefined) o.ad = txt(p.ad, 120);
+    var chg = Object.keys(o).filter(function (k) { return ['photo', 'sign', 'consent', 'mktConsent'].indexOf(k) < 0 && String(pt[k] == null ? '' : pt[k]) !== String(o[k] == null ? '' : o[k]); });
+    var HID = ['allergy', 'chronic', 'supplements', 'silicone', 'smoking', 'idcard', 'address'];   // ข้อมูลสุขภาพ/บัตร: บันทึกแค่ว่าแก้ช่องไหน ไม่เก็บค่าใน Log
+    var was = chg.map(function (k) { return HID.indexOf(k) >= 0 ? k + ' (แก้)' : k + ': ' + String(pt[k] == null ? '' : pt[k]).slice(0, 60) + ' → ' + String(o[k]).slice(0, 60); }).join(' | ');
+    upd('Patients', pt, o); log(u, p.edit ? 'patientEdit' : 'patientComplete', pt.hn + (was ? ' · ' + was : '')); return cleanPt(pt);
   };
   PERM.patientComplete = FRONTISH; WRITES.patientComplete = 1;
   A.setPhoto = function (p, u) {
@@ -5011,36 +5015,38 @@ var CHANNELS = ['Walk-in', 'เซลหามาเอง', 'Facebook', 'TikTok
 function opts(list, v, blank) { return (blank != null ? '<option value="">' + esc(blank) + '</option>' : '') + list.map(function (x) { var k = Array.isArray(x) ? x[0] : x, l = Array.isArray(x) ? x[1] : x; return '<option value="' + esc(k) + '"' + (String(k) === String(v) ? ' selected' : '') + '>' + esc(l) + '</option>'; }).join(''); }
 SCR.register = function (arg) {
   if (typeof arg === 'string' && arg.indexOf('complete:') === 0) return call('patientPage', { hn: arg.slice(9) }).then(function (d) { return regHtml(null, d.patient); });
+  if (typeof arg === 'string' && arg.indexOf('edit:') === 0) return call('patientPage', { hn: arg.slice(5) }).then(function (d) { return regHtml('edit', d.patient); });
   return regHtml(arg);
 };
 function regHtml(arg, cp) {
-  var paper = arg === 'paper', pre = !cp && arg && typeof arg === 'object' ? arg : null;
-  S.v.reg = { img: '', paper: paper, pre: pre, complete: cp ? cp.hn : '' };
+  var paper = arg === 'paper', edit = arg === 'edit' && cp, pre = !cp && arg && typeof arg === 'object' ? arg : null;
+  S.v.reg = { img: '', paper: paper, pre: pre, complete: cp ? cp.hn : '', edit: !!edit };
   var f = cp || pre || {}, V = function (k) { return f[k] ? ' value="' + esc(f[k]) + '"' : ''; };
-  return '<form class="stack" id="rf" autocomplete="off">' + (DEMO || has(['admin', 'owner']) ? '<div class="row"><span class="sp"></span><button type="button" class="btn w sm" data-a="regFake">🎲 กรอกข้อมูลทดสอบ</button></div>' : '') +
+  return '<form class="stack" id="rf" autocomplete="off">' + (!cp && (DEMO || has(['admin', 'owner'])) ? '<div class="row"><span class="sp"></span><button type="button" class="btn w sm" data-a="regFake">🎲 กรอกข้อมูลทดสอบ</button></div>' : '') +
     (paper ? '<div class="note">คนไข้เก่าที่มีแฟ้มกระดาษ: ใส่ HN เดิมจากแฟ้ม ไม่ต้องเซ็นใหม่ (ใบยินยอมอยู่ในแฟ้มแล้ว)</div>' : '') +
     (pre ? '<div class="note">ลงทะเบียนล่วงหน้าจากลีด — ให้คนไข้เซ็นยินยอมวันที่มาถึง</div>' : '') +
-    (cp ? '<div class="note">' + esc(cp.hn) + ' · ลงชื่อไว้จากลีดแล้ว — กรอกข้อมูลที่เหลือ แล้วให้คนไข้เซ็นยินยอม (ใช้ HN เดิม)</div>' : '') +
+    (edit ? '<div class="note">แก้ไขข้อมูล ' + esc(cp.hn) + ' · ' + esc(cp.name) + ' — HN เดิม ประวัติการรักษา/คอร์ส/ใบเสร็จเก่าไม่เปลี่ยน (ระบบบันทึกว่าใครแก้)</div>' : '') +
+    (cp && !edit ? '<div class="note">' + esc(cp.hn) + ' · ลงชื่อไว้จากลีดแล้ว — กรอกข้อมูลที่เหลือ แล้วให้คนไข้เซ็นยินยอม (ใช้ HN เดิม)</div>' : '') +
     '<div class="split"><div class="stack">' +
     (pre ? '' : '<div class="card stack"><div class="row"><h3 class="sp">บัตรประชาชน / พาสปอร์ต</h3><span class="pill">ไม่บังคับ</span></div>' +
       '<div class="row"><button type="button" class="btn" id="idcam" style="flex-direction:row">' + ic('cam', 18) + ' ถ่ายรูปบัตร</button><label class="btn q sm" style="flex-direction:row">เลือกจากรูปในเครื่อง<input type="file" accept="image/*" id="idf" hidden></label>' +
       '<button type="button" class="btn p" id="ocr" disabled>อ่านบัตรอัตโนมัติ</button></div><img id="idimg" class="idimg" hidden alt="รูปบัตร"><p class="xs muted">รูปบัตรเก็บใน Google Drive ของคลินิก ไม่บันทึกลงแท็บเล็ต</p></div>') +
     '<div class="card stack"><h3>ข้อมูลคนไข้</h3>' +
     (paper ? '<label>HN เดิม (จากแฟ้มกระดาษ) *<input name="oldHn" required placeholder="เช่น 10234"></label>' : '') +
-    '<div class="g3"><label>คำนำหน้า<select name="title">' + opts(['', 'นาย', 'นาง', 'นางสาว', 'Mr.', 'Mrs.', 'Ms.'], '') + '</select></label><label style="grid-column:span 2">ชื่อ-สกุล *<input name="name" required value="' + esc(f.name || '') + '"></label></div>' +
+    '<div class="g3"><label>คำนำหน้า<select name="title">' + opts(['', 'นาย', 'นาง', 'นางสาว', 'Mr.', 'Mrs.', 'Ms.'], f.title || '') + '</select></label><label style="grid-column:span 2">ชื่อ-สกุล *<input name="name" required value="' + esc(f.name || '') + '"></label></div>' +
     '<div class="g3"><label>ชื่อเล่น<input name="nickname"' + V('nickname') + '></label><label style="grid-column:span 2">ชื่อภาษาอังกฤษ<input name="nameEn"' + V('nameEn') + '></label></div>' +
     '<div class="g3"><label>เลขบัตร/พาสปอร์ต<input name="idcard" inputmode="numeric"' + V('idcard') + '></label><label>วันเกิด<input type="date" name="dob"' + V('dob') + '></label><label>เพศ<select name="gender">' + opts(['', 'หญิง', 'ชาย', 'อื่นๆ'], f.gender || '') + '</select></label></div>' +
     '<div class="g2"><label>เบอร์โทร * <span class="xs">(ใช้ยิงแอด)</span><input name="phone" type="tel" inputmode="tel" required value="' + esc(f.phone || '') + '"></label><label>อีเมล * <span class="xs">(ใช้ยิงแอด)</span><input name="email" type="email" inputmode="email"' + V('email') + '></label></div>' +
     '<label class="ck"><input type="checkbox" name="noEmail"' + (pre || (cp && !cp.email) ? ' checked' : '') + '> คนไข้ไม่มีอีเมล</label>' +
-    '<div class="g2"><label>อาชีพ<input name="occupation"></label><label>รู้จักคลินิกจาก<select name="channel">' + opts(CHANNELS, f.channel || 'Walk-in') + '</select></label></div>' +
+    '<div class="g2"><label>อาชีพ<input name="occupation"' + V('occupation') + '></label><label>รู้จักคลินิกจาก<select name="channel">' + opts(CHANNELS, f.channel || 'Walk-in') + '</select></label></div>' +
     '<label>มาจากแอด/โปร<select name="ad">' + opts((S.boot.ads || []).map(function (a) { return a.name; }), f.ad || '', '— ไม่ทราบ / ไม่ได้มาจากแอด —') + '</select></label>' +
     '<label>ที่อยู่<textarea name="address" style="min-height:60px">' + esc(f.address || '') + '</textarea></label></div></div>' +
     '<div class="stack"><div class="card stack"><h3>ประวัติสุขภาพ</h3><label>แพ้ยา/แพ้อาหาร<input name="allergy" placeholder="ไม่มี"' + V('allergy') + '></label><label>โรคประจำตัว<input name="chronic"' + V('chronic') + '></label>' +
-    '<label>ยา/อาหารเสริมที่ทานอยู่<input name="supplements"></label><div class="g2"><label>เคยฉีดซิลิโคน/ฟิลเลอร์<select name="silicone">' + opts(['', 'ไม่เคย', 'เคย']) + '</select></label>' +
-    '<label>สูบบุหรี่<select name="smoking">' + opts(['', 'ไม่สูบ', 'สูบ']) + '</select></label></div><div class="g2"><label>ผู้ติดต่อฉุกเฉิน<input name="emName"></label><label>เบอร์ฉุกเฉิน<input name="emPhone" type="tel"></label></div></div>' +
+    '<label>ยา/อาหารเสริมที่ทานอยู่<input name="supplements"' + V('supplements') + '></label><div class="g2"><label>เคยฉีดซิลิโคน/ฟิลเลอร์<select name="silicone">' + opts(['', 'ไม่เคย', 'เคย'], f.silicone || '') + '</select></label>' +
+    '<label>สูบบุหรี่<select name="smoking">' + opts(['', 'ไม่สูบ', 'สูบ'], f.smoking || '') + '</select></label></div><div class="g2"><label>ผู้ติดต่อฉุกเฉิน<input name="emName"' + V('emName') + '></label><label>เบอร์ฉุกเฉิน<input name="emPhone" type="tel"' + V('emPhone') + '></label></div></div>' +
     (paper || pre || (cp && !cp.needConsent) ? '' : '<div class="card stack"><h3>ความยินยอม</h3><label class="ck"><input type="checkbox" name="consent"> ข้าพเจ้ายินยอมให้คลินิกเก็บและใช้ข้อมูลสุขภาพเพื่อการรักษา (PDPA) *</label>' +
       '<label class="ck"><input type="checkbox" name="mktConsent"> ยินยอมรับข่าวสาร/โปรโมชั่น และให้ใช้เบอร์/อีเมลเพื่อโฆษณาที่ตรงความสนใจ</label>' + sigBlock('sg', 'ลายเซ็นคนไข้ *') + '</div>') +
-    '<button class="btn p lg blk" data-a="saveReg" type="button">' + (cp ? 'บันทึกข้อมูลคนไข้' : 'บันทึกและเปิดหน้าคนไข้') + '</button></div></div></form>';
+    '<button class="btn p lg blk" data-a="saveReg" type="button">' + (edit ? 'บันทึกการแก้ไข' : cp ? 'บันทึกข้อมูลคนไข้' : 'บันทึกและเปิดหน้าคนไข้') + '</button></div></div></form>';
 }
 SCR.register.after = function () {
   S.v.reg.pads = mountSigs($('#rf'));
@@ -5116,7 +5122,7 @@ ACT.saveReg = function () {
   $$('input,select,textarea', F).forEach(function (el) { if (!el.name) return; d[el.name] = el.type === 'checkbox' ? el.checked : el.value.trim(); });
   d.img = R.img; if (R.pads && R.pads.sg) d.sign = R.pads.sg.get();
   if (R.pre) { d.pre = true; }
-  if (R.complete) { d.hn = R.complete; return call('patientComplete', d, { write: true }).then(function (p) { toast('บันทึกข้อมูล ' + p.hn + ' แล้ว'); go('patient', p.hn, true); }).catch(fail); }
+  if (R.complete) { d.hn = R.complete; d.edit = R.edit ? 1 : ''; return call('patientComplete', d, { write: true }).then(function (p) { toast((R.edit ? 'แก้ข้อมูล ' : 'บันทึกข้อมูล ') + p.hn + ' แล้ว'); go('patient', p.hn, true); }).catch(fail); }
   call('registerPatient', d, { write: true }).then(function (p) {
     toast('ลงทะเบียนแล้ว ' + p.hn);
     if (R.pre && R.pre.after) { S.cur = S.stack.pop(); R.pre.after(p); return; }
@@ -5161,7 +5167,7 @@ SCR.patient = function (hn) {
       '<button class="btn sm" data-a="walletDlg">ประวัติวงเงิน</button>' + (S.boot.beam && has(FRONT.concat(['sales'])) ? '<button class="btn sm" data-a="linkDlg" data-hn="' + esc(p.hn) + '" data-k="' + (p.wallet < 0 ? 'debt' : 'deposit') + '" data-am="' + (p.wallet < 0 ? -p.wallet : '') + '">🔗 ส่งลิงก์จ่ายทาง LINE</button>' : '') + (has(FRONT.concat(['sales'])) ? '<button class="btn sm p" data-a="depositDlg">รับมัดจำ' + (p.wallet < 0 ? ' / ชำระยอดค้าง' : '') + '</button><button class="btn sm" data-a="topupDlg">+ เติมวงเงิน</button>' : '') + '</div>' +
       '<div id="instbox" data-hn="' + esc(p.hn) + '"></div>' +
       '<div class="row small"><span class="muted sp">ยอดใช้จ่ายสะสม ' + bt(d.spend) + '</span>' +
-      (p.hasPhoto ? '<button class="btn q sm" data-a="viewId">ดูรูปบัตร</button>' : '') + '<button class="btn q sm" data-a="photos">' + ic('img', 16) + ' รูปก่อน/หลัง</button>' +
+      (has(FRONT) ? '<button class="btn q sm" data-go="register" data-arg="edit:' + esc(p.hn) + '">✏️ แก้ข้อมูลคนไข้</button>' : '') + (p.hasPhoto ? '<button class="btn q sm" data-a="viewId">ดูรูปบัตร</button>' : '') + '<button class="btn q sm" data-a="photos">' + ic('img', 16) + ' รูปก่อน/หลัง</button>' +
       '<button class="btn q sm" data-a="reviewDlg">ขออนุญาตรูปรีวิว</button>' + (has(FRONT) ? '<button class="btn q sm" data-a="legacyDlg">+ คอร์สคงเหลือเดิม</button>' : '') + '</div></div>' +
       (o && d.openOrders.length ? '<div class="card stack"><div class="sec"><h2>รายการวันนี้</h2>' + stagePill(o.stage) + '</div><div class="list">' + d.openOrders.map(function (x) { return orderRow(x, has(FRONT) && !x.receipt && x.status !== 'DONE'); }).join('') + '</div></div>' : '') +
       (d.appts.length ? '<div class="card stack"><h2>นัดหมายที่จะถึง</h2><div class="list">' + d.appts.map(function (a) { return '<div class="li"><div class="main"><div class="t">' + esc(thDate(a.date, 1)) + ' ' + esc(a.cStart || a.start) + ' · ' + esc(a.itemName) + '</div><div class="s">' + esc(a.room) + (a.cRoom ? ' · ปรึกษาแพทย์ก่อน' : '') + '</div></div></div>'; }).join('') + '</div></div>' : '') +
