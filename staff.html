@@ -415,6 +415,7 @@ var SCHEMA = {
   Promos:     [['code','รหัสโปร'],['name','ชื่อโปร'],['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['start','วันเริ่ม'],['end','วันหมด'],['part','รายการในชุด'],['item','รหัสรายการ'],['qty','จำนวน','n'],['fullPrice','ราคาเต็ม','n'],['free','ของแถม'],['choice','ตัวเลือก'],['buffetDF','บุฟเฟต์ DF บาท/ครั้ง','n']],
   BOM:        [['item','รหัสรายการ'],['stock','รหัสของ'],['qty','จำนวนต่อครั้ง','n']],
+  BranchFees: [['branch','สาขา'],['item','รหัสรายการ'],['name','ชื่อรายการ'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['prepFee','ค่ามือตอนเตรียมให้หมอ (บาท/ครั้ง)','n'],['feeNext','ค่ามือหน่วยถัดไป','n'],['feeTiers','ค่ามือตามจำนวน'],['why','ที่มา']],
   Stock:      [['branch','สาขา (CENTRAL=คลังกลาง)'],['code','รหัสของ'],['name','ชื่อ'],['category','หมวด'],['unit','หน่วย'],['qty','คงเหลือ (หน่วยเล็กสุด)','n'],['cost','ต้นทุน/หน่วย','n'],['pack','ขนาดบรรจุ (หน่วยต่อขวด/กล่อง)','n'],['packName','ชื่อหน่วยใหญ่ (ขวด/กล่อง/ปากกา)'],['openDays','อายุหลังเปิดขวด (วัน · ว่าง=แบ่งไม่ได้)','n'],['min','จุดสั่งซื้อ','n'],['lot','Lot'],['expire','หมดอายุ']],
   StockMoves: [['time','เวลา','t'],['branch','สาขา'],['stock','รหัสของ'],['name','ชื่อ'],['qty','จำนวน(+/-)','n'],['type','ประเภท'],['ref','อ้างอิง'],['by','ผู้ทำรายการ'],['balance','คงเหลือหลังทำ','n']],
   Reqs:       [['id','เลขใบขอ'],['branch','สาขา'],['status','สถานะ'],['round','รอบ'],['note','หมายเหตุ'],['by','ผู้ขอ'],['created','วันที่ขอ','t'],['approvedBy','ผู้อนุมัติ'],['shippedAt','ส่งของ','t'],['receivedAt','รับของ','t']],
@@ -523,6 +524,11 @@ function makeCore(store) {
   function csv(v) { var s = String(v == null ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
   function brandOf(b) { var br = find('Branches', 'code', b); return br ? String(br.brand || '') : ''; }
   function itemByCode(c) { return find('Items', 'code', c); }
+  // ค่ามือแยกสาขา (แท็บ BranchFees) — ช่องที่ใส่ไว้ใช้แทนค่าในแท็บ Items เฉพาะสาขานั้น · ช่องว่าง = ใช้ค่าใน Items
+  function feeOf(it, br) {
+    var r = it ? rows('BranchFees').filter(function (x) { return String(x.branch) === String(br) && String(x.item) === String(it.code); })[0] : null, o = {};
+    ['staffFee', 'prepFee', 'feeNext', 'feeTiers'].forEach(function (k) { o[k] = r && !blank(r[k]) ? r[k] : (it ? it[k] : ''); }); return o;
+  }
   function cleanPt(p) { if (!p) return null; var o = {}; for (var k in p) if (k.indexOf('__') !== 0) o[k] = p[k]; o.hasPhoto = !!o.photo; o.hasSign = !!o.sign; o.mkt = !!o.mktConsent; o.needConsent = !o.consent; delete o.photo; delete o.sign; return o; }
   function clean(o) { if (!o) return null; var r = {}; for (var k in o) if (k.indexOf('__') !== 0) r[k] = o[k]; return r; }
   function staffName(code) { var s = find('Staff', 'code', code); return s ? (s.nick || s.name) : code; }
@@ -1308,10 +1314,11 @@ function makeCore(store) {
     var d = today(), pts = {}, vs = rows('Visits').filter(function (v) { return v.branch === u.branch && v.date === d && v.stage !== 'SALE' && v.stage !== 'CANCEL'; });
     vs.forEach(function (v) { pts[v.hn] = 1; });
     var al = {}; rows('Patients').forEach(function (x) { if (pts[x.hn]) al[x.hn] = { allergy: x.allergy, nick: x.nickname, chronic: x.chronic }; });
-    var ords = rows('Orders');
+    var ords = rows('Orders'), crs = {};
+    rows('Courses').forEach(function (c) { if (pts[c.hn] && c.status === 'ACTIVE' && (!c.expire || c.expire >= d) && (on(c.buffet) || num(c.total) > num(c.used))) crs[c.hn] = (crs[c.hn] || 0) + 1; });
     return vs.map(function (v) {
       var os = ords.filter(function (o) { return o.vn === v.vn; });
-      var o = clean(v);
+      var o = clean(v); o.courses = crs[v.hn] || 0;
       o.mins = minsSince(v.stageAt); o.numbMins = v.numbAt ? minsSince(v.numbAt) : 0; o.total = minsSince(v.created); o.trail = trailOf(v);
       o.allergy = (al[v.hn] || {}).allergy || ''; o.chronic = (al[v.hn] || {}).chronic || ''; o.nick = (al[v.hn] || {}).nick || '';
       o.items = os.map(function (x) { return { id: x.id, name: x.name, status: x.status, paid: !!x.receipt, type: x.type, stockPending: on(x.stockPending) }; });
@@ -1536,7 +1543,7 @@ function makeCore(store) {
     var who = Object.keys(need).length ? byPin(p, u) : null;
     var lots = issue(u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
     upd('Orders', o, { stockPending: later && hasBom, status: 'DONE', doctor: doc, staffs: staffs.join(' '), opNote: txt(p.opNote, 2000), lot: txt(p.lot, 120) || lots.join(', '), doneAt: stamp(),
-      dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(it && it.staffFee) : num(o.staffFee), prepFee: it && !blank(it.prepFee) ? num(it.prepFee) : '', scrub: scrub.join(' '), circ: circ.join(' '), scrubFee: num(it && it.scrubFee), circFee: num(it && it.circFee) });
+      dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(feeOf(it, u.branch).staffFee) : num(o.staffFee), prepFee: it && !blank(feeOf(it, u.branch).prepFee) ? num(feeOf(it, u.branch).prepFee) : '', scrub: scrub.join(' '), circ: circ.join(' '), scrubFee: num(it && it.scrubFee), circFee: num(it && it.circFee) });
     log(u, 'completeOrder', o.id + ' ' + o.name + ' แพทย์ ' + (doc || '-') + ' พนักงาน ' + (staffs.join(',') || '-'));
     return true;
   };
@@ -1625,7 +1632,7 @@ function makeCore(store) {
     return add('Orders', { id: nextId('OR', 'seq_OR', 7), vn: v.vn, item: String(it.code), name: o2.name || String(it.name), type: o2.type || type, category: String(it.category || ''),
       qty: qty, price: price, disc: disc, total: r2(gross - disc), paidNet: 0, upsell: !!o2.upsell, seller: txt(o2.seller || u.name, 60), receipt: '', status: proc,
       courseRef: o2.courseRef || '', promo: o2.promo || '', choice: txt(o2.choice, 120), perVal: num(o2.perVal), dfPct: o2.dfPct != null ? num(o2.dfPct) : (num(it.dfHiAt) > 0 && num(qty) >= num(it.dfHiAt) ? num(it.dfHi) : num(it.dfPct)),
-      staffFee: num(it.staffFee), dfFixed: num(o2.dfFixed), doctor: '', staffs: '', opNote: '', lot: '', doneAt: '', time: stamp(), by: u.name });
+      staffFee: num(feeOf(it, v.branch).staffFee), dfFixed: num(o2.dfFixed), doctor: '', staffs: '', opNote: '', lot: '', doneAt: '', time: stamp(), by: u.name });
   }
 
   /* ---------- หน้าร้านเพิ่มรายการขายเองได้ (ใช้ทันทีที่สาขานี้ · บัญชีตรวจ DF/ค่ามือทีหลัง) ---------- */
@@ -2361,8 +2368,8 @@ function makeCore(store) {
         var d = String(o.doneAt).slice(0, 10); if (d < from || d > to) return;
         var per = num(o.perVal) || (o.receipt ? r2(num(o.paidNet) / Math.max(1, num(o.qty))) : r2(num(o.total) / Math.max(1, num(o.qty))));
         var df = num(o.dfFixed) ? r2(num(o.dfFixed) * num(o.qty)) : r2(per * num(o.qty) * num(o.dfPct) / 100);
-        var staffs = String(o.staffs || '').split(' ').filter(String), prep = !!o.doctor && !blank(o.prepFee), fee = r2((prep ? num(o.prepFee) : num(o.staffFee)) * num(o.qty)), fit = itemByCode(o.item), fnx = fit && !blank(fit.feeNext) ? num(fit.feeNext) : -1;
-        var ftr = fit ? String(fit.feeTiers || '').trim() : '';
+        var staffs = String(o.staffs || '').split(' ').filter(String), prep = !!o.doctor && !blank(o.prepFee), fee = r2((prep ? num(o.prepFee) : num(o.staffFee)) * num(o.qty)), fit = itemByCode(o.item), ffe = feeOf(fit, v.branch), fnx = fit && !blank(ffe.feeNext) ? num(ffe.feeNext) : -1;
+        var ftr = fit ? String(ffe.feeTiers || '').trim() : '';
         if (ftr) { var tf = 0; ftr.split(',').forEach(function (x) { var q = x.split(':'); if (num(o.qty) >= num(q[0])) tf = num(q[1]); }); fee = tf; }   // เช่น Thermage ขายทีละ 100 ช็อต: 1:30,3:60,8:90,12:110
         else if (fnx >= 0 && num(o.qty) > 1 && fee > 0) fee = r2((prep ? num(o.prepFee) : num(o.staffFee)) + fnx * (num(o.qty) - 1));   // เช่น Filler cc แรก 30 · cc ถัดไปละ 5 · ใส่ 0 = เหมาต่อครั้ง ไม่คูณจำนวน
         if (o.doctor) { var pd = P(o.doctor); pd.df = r2(pd.df + df); pd.cases++; items.push({ who: o.doctor, kind: 'DF', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: per, pct: num(o.dfPct), amount: df, estimated: !o.receipt && !o.courseRef }); }
