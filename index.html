@@ -1785,12 +1785,15 @@ function makeCore(store) {
     var user = { code: String(st.code), name: String(st.nick || st.name), fullName: String(st.name), roles: roles, branch: branch, branchName: String(br.name), brand: String(br.brand || ''), partTime: on(st.partTime), stock: !on(st.partTime) && roles.some(function (r) { return STOCKR.concat(['owner', 'admin', 'account']).indexOf(r) >= 0; }) };
     var token = store.uuid();
     store.cachePut('s_' + token, JSON.stringify(user), 21600);
+    // แท็บเล็ตกลาง: อยู่ในระบบค้างได้ tabletLoginHours ชม. (ค่าเริ่มต้น 12) หรือจนกว่าจะกดออก — เก็บสำรองไว้ใน Script Properties (Cache อยู่ได้แค่ 6 ชม.)
+    var lh = num(setting('tabletLoginHours', 12)); if (lh > 6 && store.propSet) { var nowMs = store.now().getTime(); if (store.propClean) store.propClean('S_', nowMs); store.propSet('S_' + token, JSON.stringify({ u: user, exp: nowMs + Math.min(lh, 168) * 3600e3 })); }
     log(user, 'login', branch);
     return { token: token, user: user };
   }
 
   function auth(token) {
     var v = token && store.cacheGet('s_' + token);
+    if (!v && token && store.propGet) { try { var ps = JSON.parse(store.propGet('S_' + token) || 'null'); if (ps && ps.exp > store.now().getTime()) v = JSON.stringify(ps.u); } catch (e) {} }
     if (!v) err('AUTH');
     store.cachePut('s_' + token, v, 21600);
     return JSON.parse(v);
@@ -1799,7 +1802,7 @@ function makeCore(store) {
   /* ---------- สิทธิ์ ---------- */
   var ALL = '*', WALLET = 'วงเงินสมาชิก', AR = 'ค้างชำระ (ผ่อนกับคลินิก)';
   var PERM = {
-    boot: ALL, searchPatients: ALL, patientPage: ALL, getPhoto: SELLERS.concat(['adminpage']),
+    boot: ALL, logout: ALL, searchPatients: ALL, patientPage: ALL, getPhoto: SELLERS.concat(['adminpage']),
     registerPatient: FRONTISH.concat(['sales']), patientConsent: FRONTISH.concat(['sales']), setPhoto: FRONTISH.concat(CLIN).concat(['sales']), ocrIdCard: FRONTISH.concat(['sales']), addLegacyCourse: FRONTISH,
     dayBook: ALL, slots: FRONTISH.concat(['adminpage', 'sales']), apptCreate: FRONTISH.concat(['sales']), apptCancel: FRONTISH.concat(['sales']), apptMove: FRONTISH.concat(['sales']), apptArrive: FRONTISH.concat(['sales']), apptNoShow: FRONTISH.concat(['sales']),
     createVisit: FRONTISH.concat(['sales']), queue: ALL, cancelVisit: FRONTISH,
@@ -2164,7 +2167,7 @@ function makeCore(store) {
   }
 
   function api(token, action, p, rid) {
-    var u = auth(token);
+    var u = auth(token); if (action === 'logout') u._tok = token;
     var roles = PERM[action];
     if (!roles || !A[action]) err('ไม่รู้จักคำสั่ง');
     if (roles !== ALL && !has(u, roles)) err('ไม่มีสิทธิ์ใช้งานส่วนนี้');
@@ -2204,6 +2207,9 @@ function makeCore(store) {
     return { items: items, promos: promos };
   }
 
+  A.apptGet = function (p, u) { var a = find('Appointments', 'id', txt(p.id)); if (!a) err('ไม่พบนัด'); return { id: a.id, item: String(a.item), itemName: String(a.itemName || ''), hn: String(a.hn), date: String(a.date), start: String(a.start), noConsult: a.noConsult, name: String(a.name || '') }; };
+  PERM.apptGet = FRONTISH.concat(['sales', 'adminpage']);
+  A.logout = function (p, u) { var t = String(u._tok || ''); if (t) { store.cachePut('s_' + t, '', 1); if (store.propDel) store.propDel('S_' + t); } return true; };
   A.boot = function (p, u) {
     var c = catalogFor(u.branch);
     var br = find('Branches', 'code', u.branch);
@@ -4410,6 +4416,10 @@ function makeMemoryStore(seed, persistKey) {
     remove: function (t, row) { var a = T(t), i = a.indexOf(row); if (i >= 0) a.splice(i, 1); save(); },
     next: function (k) { db.seq[k] = (db.seq[k] || 0) + 1; save(); return db.seq[k]; },
     lock: function (fn) { try { return fn(); } finally { flush(); } },
+    propGet: function (k) { return (db.props || {})[k] || null; },
+    propSet: function (k, v) { db.props = db.props || {}; db.props[k] = v; },
+    propDel: function (k) { if (db.props) delete db.props[k]; },
+    propClean: function (pre, now) { var p = db.props || {}; Object.keys(p).forEach(function (k) { if (k.indexOf(pre) === 0) { try { if (JSON.parse(p[k]).exp < now) delete p[k]; } catch (e) { delete p[k]; } } }); },
     cacheGet: function (k) { var c = cache[k]; if (!c) return null; if (c.exp < Date.now()) { delete cache[k]; return null; } return c.v; },
     cachePut: function (k, v, sec) { cache[k] = { v: v, exp: Date.now() + sec * 1000 }; },
     now: function () { return new Date(); },
@@ -4732,7 +4742,7 @@ function call(action, p, opt) {
   }
   return run.then(function (r) {
     if (write || opt.spin) hideBusy();
-    if (!r.ok) { if (r.error === 'AUTH') { toast('หมดเวลาเข้าระบบ กรุณาเข้าใหม่', 1); logout(); } throw new Error(r.error || 'ผิดพลาด'); }
+    if (!r.ok) { if (r.error === 'AUTH') { toast('หมดเวลาเข้าระบบ กรุณาเข้าใหม่', 1); logout(true); } throw new Error(r.error || 'ผิดพลาด'); }
     return r.data;
   });
 }
@@ -4882,7 +4892,7 @@ function loginScreen(step) {
     showBusy('กำลังเข้าระบบ…');
     var run = DEMO ? new Promise(function (res) { setTimeout(function () { try { res({ ok: true, data: demoCore().core.login(br, pin) }); } catch (e) { res({ ok: false, error: e.message }); } }, 300); })
       : post({ fn: 'login', branch: br, pin: pin }).catch(function () { return { ok: false, error: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้' }; });
-    run.then(function (r) { hideBusy(); if (!r.ok) { pin = ''; draw(); return toast(r.error, 1); } S.token = r.data.token; S.user = r.data.user; LS.sset('hs_tok', S.token); LS.sset('hs_user', JSON.stringify(S.user)); start(); });
+    run.then(function (r) { hideBusy(); if (!r.ok) { pin = ''; draw(); return toast(r.error, 1); } S.token = r.data.token; S.user = r.data.user; LS.set('hs_tok', S.token); LS.set('hs_user', JSON.stringify(S.user)); start(); });
   }
   $('#pin').onclick = function (e) { var k = e.target.closest('[data-k]'); if (!k) return; k = k.dataset.k; if (k === '⌫') pin = pin.slice(0, -1); else if (k === 'ล้าง') pin = ''; else if (pin.length < 8) pin += k; draw(); if (pin.length === 4 && DEMO) submit(); };
   $('#go').onclick = submit;
@@ -4894,9 +4904,9 @@ function start() {
   applyBrand(S.user && S.user.brand); S.stack = []; S.cur = { name: 'home' };
   call('boot', {}, { spin: true }).then(function (b) { S.boot = b; S.stock = null; show();
     var bq = (location.search.match(/[?&]beam=([^&#]+)/) || [])[1]; if (bq && typeof beamWait === 'function') { try { history.replaceState(null, '', location.pathname); } catch (e) {} beamWait(decodeURIComponent(bq)); }
-  }).catch(function (e) { fail(e); logout(); });
+  }).catch(function (e) { fail(e); logout(true); });
 }
-function logout() { S.token = null; S.user = null; S.boot = null; LS.sset('hs_tok', null); LS.sset('hs_user', null); $('#dlg').hidden = true; loginScreen('pin'); }
+function logout(noServer) { if (S.token && noServer !== true) { try { call('logout', {}).catch(function () {}); } catch (e) {} } S.token = null; S.user = null; S.boot = null; LS.del('hs_tok'); LS.del('hs_user'); LS.sset('hs_tok', null); LS.sset('hs_user', null); $('#dlg').hidden = true; loginScreen('pin'); }
 
 /* ---------- หน้าแรก ---------- */
 var FRONT = ['front', 'manager'], CLINS = ['doctor', 'nurse', 'assistant', 'therapist'];
@@ -6177,9 +6187,9 @@ function overHandle(b, e) {
 }
 function bindSupplies(box, list) {
   var w = box.querySelector('#sup');
-  function draw() { w.innerHTML = supplyRows(list) || '<div class="small muted">ไม่มี</div>'; }
+  function draw() { w.innerHTML = supplyRows(list) || '<div class="small muted">ไม่มี</div>'; $$('select[data-k=stock]', w).forEach(function (s) { selSearch(s, '🔍 ค้นหาของ'); }); }
   draw();
-  w.onchange = function (e) { var r = e.target.closest('[data-sr]'); if (!r) return; var l = list[+r.dataset.sr]; l[e.target.dataset.k] = e.target.dataset.k === 'qty' ? nz(e.target.value) : e.target.value; };
+  w.onchange = function (e) { var r = e.target.closest('[data-sr]'); if (!r || !e.target.dataset.k) return; var l = list[+r.dataset.sr]; l[e.target.dataset.k] = e.target.dataset.k === 'qty' ? nz(e.target.value) : e.target.value; };
   w.onclick = function (e) { var x = e.target.closest('[data-del]'); if (x) { list.splice(+x.dataset.del, 1); draw(); } };
   box.querySelector('#addsup').onclick = function () { list.push({ stock: '', qty: 1 }); draw(); };
 }
@@ -6326,12 +6336,12 @@ SCR.bookNew = function (arg) {
   var B = S.v.book = { hn: '', leadId: '', moveId: '', item: '', date: today(), slot: null, courseId: '' };
   if (typeof arg === 'string') { if (arg.charAt(0) === '{') arg = JSON.parse(arg); else B.hn = arg; }
   if (arg && typeof arg === 'object') { B.hn = arg.hn || ''; B.leadId = arg.leadId || ''; B.moveId = arg.moveId || ''; }
-  var pre = B.moveId ? call('dayBook', { date: today() }).then(function () { return null; }) : Promise.resolve(null);
+  var pre = B.moveId ? call('apptGet', { id: B.moveId }).then(function (a) { B.moveItem = a.item; B.hn = a.hn; B.date = a.date >= today() ? a.date : today(); B.noConsult = a.noConsult === 'ใช่' || a.noConsult === true; B.moveInfo = a; return null; }) : Promise.resolve(null);
   var ptP = B.hn ? call('patientPage', { hn: B.hn }) : Promise.resolve(null);
   return Promise.all([ptP, pre]).then(function (r) {
     B.pt = r[0];
     return '<div class="split"><div class="stack">' +
-      (B.moveId ? '<div class="note">ย้ายนัด ' + esc(B.moveId) + ' — เลือกวันและเวลาใหม่</div>' : '<div class="card stack"><h3>1. คนไข้</h3><div id="bp">' + bookPt() + '</div></div>' +
+      (B.moveId ? '<div class="note">ย้ายนัด ' + esc(B.moveId) + (B.moveInfo ? ' · ' + esc(B.moveInfo.name + ' · ' + B.moveInfo.itemName + ' (เดิม ' + thDate(B.moveInfo.date, 1) + ' ' + B.moveInfo.start + ')') : '') + ' — เลือกวันและเวลาใหม่</div>' : '<div class="card stack"><h3>1. คนไข้</h3><div id="bp">' + bookPt() + '</div></div>' +
       '<div class="card stack"><h3>2. รายการ</h3><input id="bi" placeholder="พิมพ์ค้นหา เช่น Botox, Pico, IV"><div class="chips" id="bil"></div><div id="bcs"></div></div>') +
       '<div class="card stack"><h3>' + (B.moveId ? '' : '3. ') + 'วัน · เวลา</h3><div class="row"><input type="date" id="bd" value="' + B.date + '" min="' + today() + '" style="width:auto">' +
       [0, 1, 2, 3, 7].map(function (n) { return '<button class="btn sm" data-bd="' + addDays(today(), n) + '">' + (n === 0 ? 'วันนี้' : n === 1 ? 'พรุ่งนี้' : thDate(addDays(today(), n), 1)) + '</button>'; }).join('') + '</div><div id="bneed" class="small muted"></div><label class="ck" id="bncw" hidden><input type="checkbox" id="bnc"> ไม่ต้องตรวจก่อน — คุยกับเซลแล้วทำเลย (ไม่จองห้องตรวจ)</label><div id="bsl" class="slots"></div><div id="brm"></div></div></div>' +
@@ -6377,8 +6387,7 @@ function bookSum() {
 }
 SCR.bookNew.after = function () {
   var B = S.v.book;
-  if (B.moveId) { var a = (S.v.sbook && S.v.sbook.appts || []).filter(function (x) { return x.id === B.moveId; })[0];
-    call('dayBook', { date: today() }).then(function () {}); if (a) { B.moveItem = a.item; B.hn = a.hn; B.noConsult = a.noConsult === 'ใช่' || a.noConsult === true; if ($('#bnc')) $('#bnc').checked = B.noConsult; } }
+  if (B.moveId && $('#bnc')) $('#bnc').checked = !!B.noConsult;
   if ($('#bi')) { bookItems(''); $('#bi').oninput = function (e) { bookItems(e.target.value.trim()); };
     $('#bil').onclick = function (e) { var x = e.target.closest('[data-i]'); if (!x) return; B.item = x.dataset.i; B.courseId = ''; $$('#bil button').forEach(function (y) { y.classList.toggle('on', y === x); }); bookCourses(); bookSlots(); }; }
   $('#bd').onchange = function (e) { B.date = e.target.value; bookSlots(); };
@@ -6638,9 +6647,9 @@ SCR.stock = function (tab) {
   if (tab === 'reqs') body = call('reqList').then(function (rs) { return reqTable(rs, false); });
   if (tab === 'room') body = Promise.all([stockCache(true), call('roomIssueLog', { days: 14 })]).then(function (r) {
     var st = r[0].filter(function (s) { return /สิ้นเปลือง|วัสดุ/.test(s.category); }).concat(r[0].filter(function (s) { return !/สิ้นเปลือง|วัสดุ/.test(s.category); }));
-    S.v.ri = { room: '', lines: [] };
+    S.v.ri = { room: '', lines: [], all: st };
     return '<div class="split"><div class="card stack"><h2>เบิกของสิ้นเปลืองเข้าห้อง</h2><p class="small muted">เข็ม กระบอกฉีดยา ไม้พันสำลี สำลีแอลกอฮอล์ ถุงมือ — ตัดสต้อกตอนเบิก ไม่ต้องผูกกับเคส</p>' +
-      '<div class="small b">ห้อง</div>' + roomPicker('', {}, 0) + '<div class="small b">ของ</div><div class="chips" id="rig">' + st.slice(0, 16).map(function (s) { return '<button data-s="' + esc(s.code) + '">' + esc(s.name) + '<br><span class="xs muted">เหลือ ' + fm(s.qty) + ' ' + esc(s.unit) + '</span></button>'; }).join('') + '</div>' +
+      '<div class="small b">ห้อง</div>' + roomPicker('', {}, 0) + '<div class="small b">ของ</div><input id="rigq" type="search" placeholder="🔍 ค้นหาของ เช่น ถุงมือ, เข็ม, syringe" autocomplete="off"><div class="chips" id="rig">' + riChips(st, '') + '</div>' +
       '<div id="ril" class="list"></div>' + pinField() + '<button class="btn p lg blk" data-a="roomSend">บันทึกเบิกเข้าห้อง</button></div>' +
       '<div class="card stack"><h3>เบิกล่าสุด 14 วัน</h3>' + (r[1].length ? '<div class="list">' + r[1].slice(0, 30).map(function (m) { return '<div class="li"><div class="main"><div class="t">' + esc(m.name) + ' ×' + fm(-m.qty) + '</div><div class="s">' + esc(m.type.replace('เบิกใช้ในห้อง ', '')) + ' · ' + esc(m.time) + ' · ' + esc(m.by) + '</div></div></div>'; }).join('') + '</div>' : '<div class="empty">ยังไม่มี</div>') + '</div></div>';
   });
@@ -6657,7 +6666,11 @@ SCR.stock = function (tab) {
   });
   return body.then(function (h) { return head + h; });
 };
+function riChips(st, q) { q = String(q || '').toLowerCase().replace(/\s+/g, ''); var xs = st.filter(function (s) { return !q || (s.name + s.code + (s.category || '')).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
+  return xs.slice(0, q ? 40 : 16).map(function (s) { return '<button data-s="' + esc(s.code) + '">' + esc(s.name) + '<br><span class="xs muted">เหลือ ' + fm(s.qty) + ' ' + esc(s.unit) + '</span></button>'; }).join('') || '<span class="small muted">ไม่เจอ</span>'; }
 SCR.stock.after = function (tab) {
+  var rq = $('#rigq'); if (rq) rq.oninput = function () { $('#rig').innerHTML = riChips(S.v.ri.all || [], rq.value); };
+  ['#ws', '#vo'].forEach(function (k) { var s = $(k); if (s) selSearch(s, '🔍 ค้นหาของ'); });
   if (S.v.stab === 'suggest') $$('[data-sg]').forEach(function (i) { i.oninput = function () { var l = S.v.sug[+i.dataset.sg]; l.qty = Math.max(0, Math.round(nz(i.value) * (l.pack > 1 ? 1 : 100)) / (l.pack > 1 ? 1 : 100)) * (l.pack || 1); }; });
   if (S.v.stab === 'room') {
     var R = S.v.ri;
@@ -6683,7 +6696,7 @@ ACT.reqAdd = function () {
     var byC = {}; st.forEach(function (s) { byC[s.code] = s; });
     dialog({ title: 'เพิ่มรายการเบิก', ok: 'เพิ่ม', body: '<label>รายการ<select id="rs">' + opts(st.map(function (s) { return [s.code, s.name]; }), '', '— เลือก —') + '</select></label><div class="g2"><label>จำนวน<input id="rq" type="number" inputmode="decimal" step="any"></label><label>หน่วย<select id="ru"><option value="1">—</option></select></label></div><p class="xs muted" id="rh"></p>',
       onOk: function (b) { var c = need(b.querySelector('#rs').value, 'เลือกรายการ'), q = nz(b.querySelector('#rq').value) * (nz(b.querySelector('#ru').value) || 1); need(q > 0 || '', 'ใส่จำนวน'); S.v.sug.push({ stock: c, qty: q }); $('[data-a=reqSend]').disabled = false; toast('เพิ่มแล้ว ' + fm(q) + ' ' + ((byC[c] || {}).unit || '') + ' (' + S.v.sug.length + ' รายการ)'); } });
-    var rs = $('#rs'), ru = $('#ru'), rh = $('#rh');
+    var rs = $('#rs'), ru = $('#ru'), rh = $('#rh'); setTimeout(function () { if (rs) selSearch(rs, '🔍 ค้นหาของที่จะเบิก'); }, 0);
     if (rs && ru) rs.onchange = function () {   // ของที่มีขนาดบรรจุ: เลือกเบิกเป็นกล่อง/ขวดได้ ระบบแปลงเป็นหน่วยเล็กสุดให้
       var s = byC[rs.value]; if (!s) return; var pk = Number(s.pack) || 1;
       ru.innerHTML = pk > 1 ? '<option value="' + pk + '">' + esc(s.packName || 'ขวด') + ' (' + pk + ' ' + esc(s.unit) + ')</option>' : '<option value="1">' + esc(s.unit || 'หน่วย') + '</option>';   // ของแบ่งใช้: เบิกเป็นขวด/กล่องเต็มเท่านั้น
@@ -7193,7 +7206,7 @@ POLL.saleFeed = 1;
 if (location.protocol === 'http:' && /github\.io$/.test(location.hostname)) location.replace('https://' + location.host + location.pathname + location.search);
 /* เริ่มระบบ */
 (function () {
-  var tok = LS.sget('hs_tok'), u = LS.sget('hs_user');
+  var tok = LS.get('hs_tok') || LS.sget('hs_tok'), u = LS.get('hs_user') || LS.sget('hs_user');
   if (tok && u && !DEMO) { S.token = tok; S.user = JSON.parse(u); start(); return; }
   loginScreen(LS.get('hs_br', '') ? 'pin' : '');
 })();

@@ -567,12 +567,15 @@ function makeCore(store) {
     var user = { code: String(st.code), name: String(st.nick || st.name), fullName: String(st.name), roles: roles, branch: branch, branchName: String(br.name), brand: String(br.brand || ''), partTime: on(st.partTime), stock: !on(st.partTime) && roles.some(function (r) { return STOCKR.concat(['owner', 'admin', 'account']).indexOf(r) >= 0; }) };
     var token = store.uuid();
     store.cachePut('s_' + token, JSON.stringify(user), 21600);
+    // แท็บเล็ตกลาง: อยู่ในระบบค้างได้ tabletLoginHours ชม. (ค่าเริ่มต้น 12) หรือจนกว่าจะกดออก — เก็บสำรองไว้ใน Script Properties (Cache อยู่ได้แค่ 6 ชม.)
+    var lh = num(setting('tabletLoginHours', 12)); if (lh > 6 && store.propSet) { var nowMs = store.now().getTime(); if (store.propClean) store.propClean('S_', nowMs); store.propSet('S_' + token, JSON.stringify({ u: user, exp: nowMs + Math.min(lh, 168) * 3600e3 })); }
     log(user, 'login', branch);
     return { token: token, user: user };
   }
 
   function auth(token) {
     var v = token && store.cacheGet('s_' + token);
+    if (!v && token && store.propGet) { try { var ps = JSON.parse(store.propGet('S_' + token) || 'null'); if (ps && ps.exp > store.now().getTime()) v = JSON.stringify(ps.u); } catch (e) {} }
     if (!v) err('AUTH');
     store.cachePut('s_' + token, v, 21600);
     return JSON.parse(v);
@@ -581,7 +584,7 @@ function makeCore(store) {
   /* ---------- สิทธิ์ ---------- */
   var ALL = '*', WALLET = 'วงเงินสมาชิก', AR = 'ค้างชำระ (ผ่อนกับคลินิก)';
   var PERM = {
-    boot: ALL, searchPatients: ALL, patientPage: ALL, getPhoto: SELLERS.concat(['adminpage']),
+    boot: ALL, logout: ALL, searchPatients: ALL, patientPage: ALL, getPhoto: SELLERS.concat(['adminpage']),
     registerPatient: FRONTISH.concat(['sales']), patientConsent: FRONTISH.concat(['sales']), setPhoto: FRONTISH.concat(CLIN).concat(['sales']), ocrIdCard: FRONTISH.concat(['sales']), addLegacyCourse: FRONTISH,
     dayBook: ALL, slots: FRONTISH.concat(['adminpage', 'sales']), apptCreate: FRONTISH.concat(['sales']), apptCancel: FRONTISH.concat(['sales']), apptMove: FRONTISH.concat(['sales']), apptArrive: FRONTISH.concat(['sales']), apptNoShow: FRONTISH.concat(['sales']),
     createVisit: FRONTISH.concat(['sales']), queue: ALL, cancelVisit: FRONTISH,
@@ -946,7 +949,7 @@ function makeCore(store) {
   }
 
   function api(token, action, p, rid) {
-    var u = auth(token);
+    var u = auth(token); if (action === 'logout') u._tok = token;
     var roles = PERM[action];
     if (!roles || !A[action]) err('ไม่รู้จักคำสั่ง');
     if (roles !== ALL && !has(u, roles)) err('ไม่มีสิทธิ์ใช้งานส่วนนี้');
@@ -986,6 +989,9 @@ function makeCore(store) {
     return { items: items, promos: promos };
   }
 
+  A.apptGet = function (p, u) { var a = find('Appointments', 'id', txt(p.id)); if (!a) err('ไม่พบนัด'); return { id: a.id, item: String(a.item), itemName: String(a.itemName || ''), hn: String(a.hn), date: String(a.date), start: String(a.start), noConsult: a.noConsult, name: String(a.name || '') }; };
+  PERM.apptGet = FRONTISH.concat(['sales', 'adminpage']);
+  A.logout = function (p, u) { var t = String(u._tok || ''); if (t) { store.cachePut('s_' + t, '', 1); if (store.propDel) store.propDel('S_' + t); } return true; };
   A.boot = function (p, u) {
     var c = catalogFor(u.branch);
     var br = find('Branches', 'code', u.branch);
@@ -3192,6 +3198,10 @@ function makeMemoryStore(seed, persistKey) {
     remove: function (t, row) { var a = T(t), i = a.indexOf(row); if (i >= 0) a.splice(i, 1); save(); },
     next: function (k) { db.seq[k] = (db.seq[k] || 0) + 1; save(); return db.seq[k]; },
     lock: function (fn) { try { return fn(); } finally { flush(); } },
+    propGet: function (k) { return (db.props || {})[k] || null; },
+    propSet: function (k, v) { db.props = db.props || {}; db.props[k] = v; },
+    propDel: function (k) { if (db.props) delete db.props[k]; },
+    propClean: function (pre, now) { var p = db.props || {}; Object.keys(p).forEach(function (k) { if (k.indexOf(pre) === 0) { try { if (JSON.parse(p[k]).exp < now) delete p[k]; } catch (e) { delete p[k]; } } }); },
     cacheGet: function (k) { var c = cache[k]; if (!c) return null; if (c.exp < Date.now()) { delete cache[k]; return null; } return c.v; },
     cachePut: function (k, v, sec) { cache[k] = { v: v, exp: Date.now() + sec * 1000 }; },
     now: function () { return new Date(); },
@@ -3514,7 +3524,7 @@ function call(action, p, opt) {
   }
   return run.then(function (r) {
     if (write || opt.spin) hideBusy();
-    if (!r.ok) { if (r.error === 'AUTH') { toast('หมดเวลาเข้าระบบ กรุณาเข้าใหม่', 1); logout(); } throw new Error(r.error || 'ผิดพลาด'); }
+    if (!r.ok) { if (r.error === 'AUTH') { toast('หมดเวลาเข้าระบบ กรุณาเข้าใหม่', 1); logout(true); } throw new Error(r.error || 'ผิดพลาด'); }
     return r.data;
   });
 }
@@ -3664,7 +3674,7 @@ function loginScreen(step) {
     showBusy('กำลังเข้าระบบ…');
     var run = DEMO ? new Promise(function (res) { setTimeout(function () { try { res({ ok: true, data: demoCore().core.login(br, pin) }); } catch (e) { res({ ok: false, error: e.message }); } }, 300); })
       : post({ fn: 'login', branch: br, pin: pin }).catch(function () { return { ok: false, error: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้' }; });
-    run.then(function (r) { hideBusy(); if (!r.ok) { pin = ''; draw(); return toast(r.error, 1); } S.token = r.data.token; S.user = r.data.user; LS.sset('hs_tok', S.token); LS.sset('hs_user', JSON.stringify(S.user)); start(); });
+    run.then(function (r) { hideBusy(); if (!r.ok) { pin = ''; draw(); return toast(r.error, 1); } S.token = r.data.token; S.user = r.data.user; LS.set('hs_tok', S.token); LS.set('hs_user', JSON.stringify(S.user)); start(); });
   }
   $('#pin').onclick = function (e) { var k = e.target.closest('[data-k]'); if (!k) return; k = k.dataset.k; if (k === '⌫') pin = pin.slice(0, -1); else if (k === 'ล้าง') pin = ''; else if (pin.length < 8) pin += k; draw(); if (pin.length === 4 && DEMO) submit(); };
   $('#go').onclick = submit;
@@ -3676,9 +3686,9 @@ function start() {
   applyBrand(S.user && S.user.brand); S.stack = []; S.cur = { name: 'home' };
   call('boot', {}, { spin: true }).then(function (b) { S.boot = b; S.stock = null; show();
     var bq = (location.search.match(/[?&]beam=([^&#]+)/) || [])[1]; if (bq && typeof beamWait === 'function') { try { history.replaceState(null, '', location.pathname); } catch (e) {} beamWait(decodeURIComponent(bq)); }
-  }).catch(function (e) { fail(e); logout(); });
+  }).catch(function (e) { fail(e); logout(true); });
 }
-function logout() { S.token = null; S.user = null; S.boot = null; LS.sset('hs_tok', null); LS.sset('hs_user', null); $('#dlg').hidden = true; loginScreen('pin'); }
+function logout(noServer) { if (S.token && noServer !== true) { try { call('logout', {}).catch(function () {}); } catch (e) {} } S.token = null; S.user = null; S.boot = null; LS.del('hs_tok'); LS.del('hs_user'); LS.sset('hs_tok', null); LS.sset('hs_user', null); $('#dlg').hidden = true; loginScreen('pin'); }
 
 /* ---------- หน้าแรก ---------- */
 var FRONT = ['front', 'manager'], CLINS = ['doctor', 'nurse', 'assistant', 'therapist'];
@@ -3811,6 +3821,19 @@ function qRow(v, tap) {
   return '<div class="li qrow' + (tap ? ' tap' : '') + '"' + (tap ? ' data-go="patient" data-arg="' + esc(v.hn) + '"' : '') + '><div class="qn">' + v.queue + '</div><div class="main"><div class="t">' + esc(v.name) + (v.nick ? ' <span class="muted">(' + esc(v.nick) + ')</span>' : '') + ' ' + stagePill(v.stage) + (live ? ' <span class="xs muted" style="white-space:nowrap">ขั้นนี้ ' + since(v.mins) + '</span>' : '') + '</div>' +
     '<div class="s">' + esc(((v.items || []).map(function (i) { return i.name || i; }).join(', ')) || v.cc || '—') + (v.room ? ' · ' + esc(v.room) : '') + (v.doctor ? ' · ' + esc(v.doctor) : '') + '</div>' + qTrail(v.trail || []) + '</div>' +
     '<div class="stack r" style="gap:.15rem">' + (tap && live && !v.paid && has(FRONT) ? '<button class="btn q sm" data-a="qCancel" data-vn="' + esc(v.vn) + '" data-n="' + esc(v.name) + '" data-q="' + v.queue + '" title="ยกเลิกคิวนี้">✕ ยกเลิกคิว</button>' : '') + '<span class="pill ' + waitCls(v.stage === 'DONE' ? 0 : v.total, v.stage) + '">' + (live ? 'รอรวม ' + since(v.total) : 'เสร็จ') + '</span>' + (v.due > 0 ? '<span class="pill d">ค้าง ' + bt(v.due) + '</span>' : v.paid ? '<span class="pill g">จ่ายแล้ว</span>' : '') + '</div></div>';
+}
+
+// ช่องเลือกบริการแบบยาว → เพิ่มช่องพิมพ์ค้นหาไว้ข้างบน (กรองตามชื่อ/รหัส/หมวด · เหลือรายการเดียวเลือกให้เลย)
+function selSearch(sel, ph) {
+  if (!sel || sel._ss) return; sel._ss = 1;
+  var inp = document.createElement('input'); inp.type = 'search'; inp.placeholder = ph || '🔍 พิมพ์ค้นหาบริการ เช่น Botox, Pico, IV'; inp.autocomplete = 'off'; inp.style.marginBottom = '.35rem';
+  sel.parentNode.insertBefore(inp, sel);
+  var all = [].slice.call(sel.options).map(function (o) { return { o: o, t: (o.textContent + ' ' + o.value + ' ' + (o.dataset.c || '')).toLowerCase().replace(/\s+/g, '') }; });
+  inp.oninput = function () { var q = inp.value.toLowerCase().replace(/\s+/g, ''), hit = [];
+    all.forEach(function (x) { var ok = !x.o.value || !q || x.t.indexOf(q) >= 0; x.o.hidden = !ok; x.o.disabled = !ok && !!x.o.value; if (ok && x.o.value) hit.push(x.o); });
+    if (hit.length === 1 && sel.value !== hit[0].value) { sel.value = hit[0].value; sel.dispatchEvent(new Event('change')); }
+    sel.size = q && hit.length > 1 ? Math.min(8, hit.length + 1) : 0; };
+  sel.addEventListener('change', function () { sel.size = 0; });
 }
 
 /* =====================================================================
