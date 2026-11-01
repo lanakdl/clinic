@@ -2773,7 +2773,9 @@ function makeCore(store) {
       dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(feeOf(it, u.branch).staffFee) : num(o.staffFee), prepFee: it && !blank(feeOf(it, u.branch).prepFee) ? num(feeOf(it, u.branch).prepFee) : '', scrub: scrub.join(' '), circ: circ.join(' '), scrubFee: num(it && it.scrubFee), circFee: num(it && it.circFee) });
     var ff = freeFee(u.branch); if (on(o.free) && ff != null) upd('Orders', o, { staffFee: ff, prepFee: ff });
     ordersOf(o.vn).filter(function (x) { return x.status === 'PENDING' && String(x.choice) === 'ref:' + o.id; }).forEach(function (x) {   // ค่าบริการแพทย์ที่ผูกกับรายการนี้ → ปิดพร้อมกัน ให้แพทย์คนเดียวกัน
-      upd('Orders', x, { status: 'DONE', doctor: doc || x.doctor, staffs: '', doneAt: stamp(), dfPct: 100, stockPending: false }); });   // รายการแถม: ค่ามือแบบแถม (ตั้งที่ Settings › freeStaffFee เช่น TCPY:5)
+      var tot = num(x.total) || num(x.price), prep = x.item === 'MJFEE' && staffs.length ? Math.min(tot, num(setting('mjPrepFee', 5))) : 0;   // มีคนเตรียม → คนเตรียมได้ mjPrepFee (5) หมอได้ส่วนที่เหลือ (45)
+      upd('Orders', x, { status: 'DONE', doctor: doc || x.doctor, staffs: prep > 0 ? staffs.join(' ') : '', doneAt: stamp(), stockPending: false,
+        dfPct: prep > 0 ? 0 : 100, dfFixed: prep > 0 ? r2(tot - prep) : '', prepFee: prep > 0 ? prep : '', staffFee: prep > 0 ? prep : 0 }); });   // รายการแถม: ค่ามือแบบแถม (ตั้งที่ Settings › freeStaffFee เช่น TCPY:5)
     log(u, 'completeOrder', o.id + ' ' + o.name + ' แพทย์ ' + (doc || '-') + ' พนักงาน ' + (staffs.join(',') || '-'));
     return true;
   };
