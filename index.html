@@ -5031,6 +5031,19 @@ function qRow(v, tap) {
     '<div class="stack r" style="gap:.15rem">' + (tap && live && !v.paid && has(FRONT) ? '<button class="btn q sm" data-a="qCancel" data-vn="' + esc(v.vn) + '" data-n="' + esc(v.name) + '" data-q="' + v.queue + '" title="ยกเลิกคิวนี้">✕ ยกเลิกคิว</button>' : '') + '<span class="pill ' + waitCls(v.stage === 'DONE' ? 0 : v.total, v.stage) + '">' + (live ? 'รอรวม ' + since(v.total) : 'เสร็จ') + '</span>' + (v.due > 0 ? '<span class="pill d">ค้าง ' + bt(v.due) + '</span>' : v.paid ? '<span class="pill g">จ่ายแล้ว</span>' : '') + '</div></div>';
 }
 
+// ช่องเลือกบริการแบบยาว → เพิ่มช่องพิมพ์ค้นหาไว้ข้างบน (กรองตามชื่อ/รหัส/หมวด · เหลือรายการเดียวเลือกให้เลย)
+function selSearch(sel, ph) {
+  if (!sel || sel._ss) return; sel._ss = 1;
+  var inp = document.createElement('input'); inp.type = 'search'; inp.placeholder = ph || '🔍 พิมพ์ค้นหาบริการ เช่น Botox, Pico, IV'; inp.autocomplete = 'off'; inp.style.marginBottom = '.35rem';
+  sel.parentNode.insertBefore(inp, sel);
+  var all = [].slice.call(sel.options).map(function (o) { return { o: o, t: (o.textContent + ' ' + o.value + ' ' + (o.dataset.c || '')).toLowerCase().replace(/\s+/g, '') }; });
+  inp.oninput = function () { var q = inp.value.toLowerCase().replace(/\s+/g, ''), hit = [];
+    all.forEach(function (x) { var ok = !x.o.value || !q || x.t.indexOf(q) >= 0; x.o.hidden = !ok; x.o.disabled = !ok && !!x.o.value; if (ok && x.o.value) hit.push(x.o); });
+    if (hit.length === 1 && sel.value !== hit[0].value) { sel.value = hit[0].value; sel.dispatchEvent(new Event('change')); }
+    sel.size = q && hit.length > 1 ? Math.min(8, hit.length + 1) : 0; };
+  sel.addEventListener('change', function () { sel.size = 0; });
+}
+
 /* =====================================================================
  * หน้าร้าน: ค้นหา/ลงทะเบียน · หน้าคนไข้ · ขาย · เก็บเงิน · คิว
  * ===================================================================== */
@@ -5400,7 +5413,7 @@ ACT.legacyDlg = function () {
       '<div class="g3"><label>เหลือกี่ครั้ง<input id="lf" type="number" min="1" inputmode="numeric"></label><label>มูลค่าต่อครั้ง (บาท)<input id="pv" type="number" inputmode="decimal" placeholder="ใช้คิด DF"></label><label>หมดอายุ<input id="ex" type="date"></label></div>' +
       '<label class="btn" style="flex-direction:row">' + ic('cam', 18) + ' ถ่ายรูปบัตรคอร์ส / บิลเดิม (ถ้ามี)<input type="file" accept="image/*" capture="environment" id="lp" hidden></label><img id="lpi" class="idimg" hidden alt="">' +
       '<label>รหัสผู้จัดการ (อนุมัติ)<input id="mp" type="password" inputmode="numeric" autocomplete="off"></label>',
-    mount: function (b) { var f = b.querySelector('#lp'); f.onchange = function () { readImg(f.files[0]).then(function (d) { img = d; var i = b.querySelector('#lpi'); i.src = d; i.hidden = false; }); }; },
+    mount: function (b) { selSearch(b.querySelector('#it')); var f = b.querySelector('#lp'); f.onchange = function () { readImg(f.files[0]).then(function (d) { img = d; var i = b.querySelector('#lpi'); i.src = d; i.hidden = false; }); }; },
     onOk: function (b) { return call('addLegacyCourse', { hn: S.v.pt.patient.hn, item: need(b.querySelector('#it').value, 'เลือกบริการ'), left: b.querySelector('#lf').value, perVal: b.querySelector('#pv').value, expire: b.querySelector('#ex').value, approvePin: b.querySelector('#mp').value, img: img }, { write: true }).then(function () { toast('เพิ่มคอร์สแล้ว'); refresh(); }); } });
 };
 ACT.photos = function () {
@@ -5445,9 +5458,9 @@ function posHtml() {
     '<p class="xs muted">คอร์ส/โปร จะเปิดใช้งานเมื่อชำระเงินแล้ว · หัตถการส่งเข้าคิวทำ</p></div></div>';
 }
 function prodButtons() {
-  var P = S.v.pos, q = P.q.toLowerCase(), out = [];
-  if (!q && P.cat === 'โปร' || q) S.boot.promos.forEach(function (p) { if (!q || p.name.toLowerCase().indexOf(q) >= 0) out.push('<button class="promo" data-pr="' + esc(p.code) + '"><span class="xs muted">โปร' + (p.end ? ' · ถึง ' + esc(thDate(p.end)) : '') + '</span><b>' + esc(p.name) + '</b><span class="xs muted">' + esc(p.parts.map(function (x) { return x.part + (x.qty > 1 ? ' ×' + x.qty : ''); }).join(' + ')) + '</span><span class="pr">' + bt(p.price) + '</span></button>'); });
-  S.boot.items.forEach(function (i) { if (q ? (i.name.toLowerCase().indexOf(q) >= 0 || i.code.toLowerCase() === q) : i.category === P.cat) out.push('<button data-it="' + esc(i.code) + '"><span class="xs muted">' + (i.optOf ? '<b style="color:var(--accent)">ออฟชั่นเคส' + esc(i.feeGroup) + '</b> · ' : '') + esc({ proc: 'หัตถการ', product: 'สินค้า', service: 'ค่าบริการ', course: 'คอร์ส', buffet: 'บุฟเฟต์' }[i.type] || '') + (i.parts ? ' · ' + i.parts.map(function (x) { return x.sessions > 999 ? 'ไม่จำกัด' : x.sessions + ' ครั้ง'; }).join('+') : i.sessions ? ' · ' + i.sessions + ' ครั้ง' : '') + '</span><b>' + esc(i.name) + '</b><span class="pr">' + bt(i.price) + (i.unit ? ' / ' + esc(i.unit) : '') + '</span></button>'); });
+  var P = S.v.pos, q = P.q.toLowerCase().replace(/\s+/g, ''), out = [], nz0 = function (s) { return String(s || '').toLowerCase().replace(/\s+/g, ''); };
+  if (!q && P.cat === 'โปร' || q) S.boot.promos.forEach(function (p) { if (!q || nz0(p.name + p.code).indexOf(q) >= 0) out.push('<button class="promo" data-pr="' + esc(p.code) + '"><span class="xs muted">โปร' + (p.end ? ' · ถึง ' + esc(thDate(p.end)) : '') + '</span><b>' + esc(p.name) + '</b><span class="xs muted">' + esc(p.parts.map(function (x) { return x.part + (x.qty > 1 ? ' ×' + x.qty : ''); }).join(' + ')) + '</span><span class="pr">' + bt(p.price) + '</span></button>'); });
+  S.boot.items.forEach(function (i) { if (q ? nz0(i.name + i.code + (i.category || '')).indexOf(q) >= 0 : i.category === P.cat) out.push('<button data-it="' + esc(i.code) + '"><span class="xs muted">' + (i.optOf ? '<b style="color:var(--accent)">ออฟชั่นเคส' + esc(i.feeGroup) + '</b> · ' : '') + esc({ proc: 'หัตถการ', product: 'สินค้า', service: 'ค่าบริการ', course: 'คอร์ส', buffet: 'บุฟเฟต์' }[i.type] || '') + (i.parts ? ' · ' + i.parts.map(function (x) { return x.sessions > 999 ? 'ไม่จำกัด' : x.sessions + ' ครั้ง'; }).join('+') : i.sessions ? ' · ' + i.sessions + ' ครั้ง' : '') + '</span><b>' + esc(i.name) + '</b><span class="pr">' + bt(i.price) + (i.unit ? ' / ' + esc(i.unit) : '') + '</span></button>'); });
   if (has(['front', 'manager', 'sales'])) out.push('<button class="addnew" data-new="1"><b>+ เพิ่มรายการใหม่</b><span class="xs muted">' + (q ? 'ไม่เจอ "' + esc(P.q) + '" — เพิ่มเลย' : 'ไม่มีในปุ่ม พิมพ์ชื่อ+ราคาเอง') + (has(['manager']) ? '' : ' · ผู้จัดการใส่รหัส') + '</span></button>');
   return out.join('') || '<div class="empty">ไม่พบรายการ</div>';
 }
@@ -5906,7 +5919,8 @@ ACT.qCancelAll = function () {
 TITLES.arrivals = 'คนไข้นัดไว้แล้ว (วันนี้)';
 SCR.arrivals = function () {
   return call('dayBook', { date: today() }).then(function (d) {
-    var a = d.appts.filter(function (x) { return x.status !== 'CANCEL'; }).sort(function (x, y) { return (x.cStart || x.start) < (y.cStart || y.start) ? -1 : 1; });
+    var fin = function (x) { return x.status === 'NOSHOW' || (x.status !== 'BOOKED' && (!x.stage || x.stage === 'DONE' || x.stage === 'CANCEL')) ? 1 : 0; };   // จบคิวแล้ว (ปิดบิล/ไม่มา) → ไหลลงล่าง
+    var a = d.appts.filter(function (x) { return x.status !== 'CANCEL'; }).sort(function (x, y) { return fin(x) - fin(y) || ((x.cStart || x.start) < (y.cStart || y.start) ? -1 : 1); });
     var nowM = (function () { var t = new Date(Date.now() + 7 * 3600e3).toISOString().slice(11, 16).split(':'); return +t[0] * 60 + +t[1]; })();
     return '<div class="stack"><div class="row"><span class="sp muted">' + thDate(today(), 1) + ' · ' + a.length + ' นัด</span><button class="btn" data-go="sched">ดูตารางห้อง</button><button class="btn p" data-go="bookNew">+ ลงนัด</button></div><div class="card">' +
       (a.length ? '<div class="list">' + a.map(function (x) {
@@ -6330,7 +6344,7 @@ function bookPt() {
   return '<div class="row"><input id="bq" class="sp" placeholder="ค้นหา HN · ชื่อ · เบอร์" style="flex:1 1 200px"><button class="btn" data-a="bookPtFind">ค้นหา</button><button class="btn p" data-a="bookNewPt">+ ลูกค้าใหม่</button></div><div id="bqr" class="list"></div>';
 }
 function bookItems(q) {
-  var B = S.v.book, its = S.boot.items.filter(function (i) { return (i.type === 'proc' || i.type === 'service') && (!q || i.name.toLowerCase().indexOf(q.toLowerCase()) >= 0); });
+  var B = S.v.book, qq = String(q || '').toLowerCase().replace(/\s+/g, ''), its = S.boot.items.filter(function (i) { return (i.type === 'proc' || i.type === 'service') && (!qq || (i.name + i.code + (i.category || '')).toLowerCase().replace(/\s+/g, '').indexOf(qq) >= 0); });
   var cs = B.pt ? B.pt.courses.filter(function (c) { return c.status === 'ACTIVE'; }) : [];
   $('#bil').innerHTML = its.slice(0, 30).map(function (i) { var hasC = cs.some(function (c) { return c.item === i.code; }); return '<button data-i="' + esc(i.code) + '" class="' + (B.item === i.code ? 'on' : '') + '">' + esc(i.name) + '<br><span class="xs muted">' + (i.minutes + i.numb) + ' นาที' + (i.numb ? ' (รวมยาชา)' : '') + (hasC ? ' · มีคอร์ส' : '') + '</span></button>'; }).join('');
 }
@@ -6467,6 +6481,7 @@ SCR.lead.after = function () {
     $('#lai').textContent = auto ? 'นัดทำ: ' + fi.value.trim() + ' — เลือกเวลาด้านล่าง' : fi.value.trim() ? 'เลือกบริการที่จะนัดด้านล่าง แล้วเลือกเวลา' : 'เลือกรายการด้านบนก่อน แล้วเลือกวันและเวลา';
     load(); }
   $('#lais').onchange = function () { L.item = this.value; load(); };
+  selSearch($('#lais'));
   $('#lanc').onchange = function () { L.noConsult = this.checked; load(); };
   $('#larm').onclick = function (e) { var x = e.target.closest('[data-rm]'); if (!x) return; L.room = x.dataset.rm; $('#larm').innerHTML = roomChips(L.sl, L.room); };
   $('#lnoap').onchange = function () { var on = this.checked; $('#lapw').hidden = on; if (on) { L.time = ''; $$('#las button').forEach(function (y) { y.classList.remove('on'); }); } var sb = $('[data-a=leadSave]'); if (sb) sb.textContent = on ? 'บันทึกลีด (รอลงนัด)' : L.time ? 'บันทึกลีด + ลงนัด' : 'บันทึกลีด'; };
@@ -6969,7 +6984,7 @@ ACT.promoEdit = function (el) {
       '<div class="small b">ของในชุด</div><div id="pp" class="stack" style="gap:.5rem"></div><button type="button" class="btn sm" id="pa">+ เพิ่มของในชุด</button>' +
       '<p class="xs muted">ระบบแบ่งราคาโปรตามราคาเต็มของแต่ละอย่าง (รวมของแถม) เพื่อคิด DF ต่อครั้งให้ถูก · ขายแล้วเปิดเป็นคอร์สให้อัตโนมัติ</p>',
     mount: function (b) {
-      var w = b.querySelector('#pp'); function draw() { w.innerHTML = rowsHtml(); } draw();
+      var w = b.querySelector('#pp'); function draw() { w.innerHTML = rowsHtml(); $$('select[data-k=item]', w).forEach(function (s) { selSearch(s, '🔍 ค้นหารายการ'); }); } draw();
       b.querySelector('#pa').onclick = function () { x.parts.push({ part: '', item: '', qty: 1, fullPrice: '', free: false, choice: '' }); draw(); };
       w.onclick = function (e) { var d = e.target.closest('[data-del]'); if (d) { x.parts.splice(+d.dataset.del, 1); draw(); } };
       w.onchange = function (e) { var r = e.target.closest('[data-pi]'), k = e.target.dataset.k; if (!r || !k) return; var p = x.parts[+r.dataset.pi];
