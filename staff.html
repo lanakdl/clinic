@@ -409,7 +409,7 @@ var SCHEMA = {
                ['lineId','LINE (ผูกแล้ว — ลบเพื่อผูกใหม่)'],['lineName','ชื่อ LINE'],['lineAt','ผูก LINE เมื่อ','t']],
   Items:      [['code','รหัสรายการ'],['name','ชื่อรายการ'],['category','หมวด'],['type','ประเภท'],['performer','ผู้ทำ'],
                ['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
-               ['dfPct','DF แพทย์ %','n'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['prepFee','ค่ามือตอนเตรียมให้หมอ (บาท/ครั้ง)','n'],['scrubFee','ค่ามือ Scrub (บาท/เคส)','n'],['circFee','ค่ามือ Circulating (บาท/เคส)','n'],['sessions','จำนวนครั้ง (คอร์ส)','n'],['validDays','อายุคอร์ส (วัน)','n'],
+               ['dfPct','DF แพทย์ %','n'],['dfFixed','DF แพทย์ บาท/ครั้ง (แทน %)','n'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['prepFee','ค่ามือตอนเตรียมให้หมอ (บาท/ครั้ง)','n'],['scrubFee','ค่ามือ Scrub (บาท/เคส)','n'],['circFee','ค่ามือ Circulating (บาท/เคส)','n'],['sessions','จำนวนครั้ง (คอร์ส)','n'],['validDays','อายุคอร์ส (วัน)','n'],
                ['minutes','ใช้เวลา (นาที)','n'],['numb','ทายาชา (นาที)','n'],['roomType','ห้องที่ใช้'],['noConsult','ไม่ต้องพบแพทย์ก่อน (ลูกค้าใหม่คุยเซลแล้วทำเลย)'],['unit','หน่วยขาย (แบ่งขาย เช่น U, mg, cc)'],['presets','ปุ่มจำนวนลัด (เช่น 10,20,50)'],['note','หมายเหตุ'],['active','ใช้งาน','b'],['addedBy','เพิ่มจากหน้าร้านโดย'],['addedAt','เพิ่มเมื่อ','t'],['reviewed','บัญชีตรวจแล้ว'],['feeNext','ค่ามือหน่วยถัดไป (เช่น Filler cc ที่ 2 ขึ้นไป)','n'],['feeGroup','กลุ่มเคสผ่าตัด (หลัก+ออฟชั่น)'],['tierAt','ขั้นราคาเคส (รวมออฟชั่น)','n'],['scrubHi','Scrub เมื่อเกินขั้น','n'],['circHi','Circ เมื่อเกินขั้น','n'],['dfHiAt','DF ขั้นสูงเมื่อจำนวนถึง','n'],['dfHi','DF ขั้นสูง %','n'],['feeTiers','ค่ามือตามจำนวน (เช่น 1:30,3:60)']],
   CourseItems:[['course','รหัสคอร์ส'],['courseName','ชื่อคอร์ส'],['item','รหัสรายการที่ใช้ได้'],['itemName','ชื่อรายการ'],['sessions','จำนวนครั้ง','n']],
   Promos:     [['code','รหัสโปร'],['name','ชื่อโปร'],['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
@@ -440,7 +440,7 @@ var SCHEMA = {
   Orders:     [['id','เลขรายการ'],['vn','VN'],['item','รหัส'],['name','รายการ'],['type','ประเภท'],['category','หมวด'],['qty','จำนวน','n'],['price','ราคา/หน่วย','n'],['disc','ส่วนลด','n'],['total','รวม','n'],
                ['paidNet','รับจริง (หลังลดท้ายบิล)','n'],['cashNet','รับเป็นเงินจริง (ไม่รวมวงเงิน)','n'],['upsell','อัพเซล','b'],['seller','ผู้ขาย'],['adminShare','ยอดของแอดมิน (ปิดจากเพจ)','n'],['voidOf','จากบิลที่ยกเลิก'],['adminBy','แอดมินที่ปิด'],['receipt','ใบเสร็จ'],['status','สถานะ'],['courseRef','ใช้คอร์ส'],['promo','โปร'],['choice','ตัวเลือก'],
                ['perVal','มูลค่าต่อครั้ง','n'],['dfPct','DF %','n'],['staffFee','ค่ามือพนักงาน','n'],['prepFee','ค่ามือตอนเตรียม','n'],['scrub','Scrub'],['circ','Circulating'],['scrubFee','ค่ามือ Scrub','n'],['circFee','ค่ามือ Circulating','n'],['dfFixed','DF บาท/ครั้ง','n'],['doctor','แพทย์ผู้ทำ'],['staffs','พนักงานผู้ทำ'],
-               ['opNote','Operative note'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
+               ['opNote','Operative note'],['free','แถม (ให้ฟรี)','b'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
   Courses:    [['id','เลขคอร์ส'],['hn','HN'],['name','ชื่อ'],['src','รหัสที่ซื้อ'],['srcName','ซื้อจาก'],['item','รหัสบริการ'],['itemName','บริการ'],['total','ทั้งหมด','n'],['used','ใช้แล้ว','n'],
                ['perVal','ราคาจริงต่อครั้ง','n'],['dfPct','DF %','n'],['dfFixed','DF บาท/ครั้ง','n'],['expire','หมดอายุ'],['status','สถานะ'],['receipt','ใบเสร็จ'],['branch','สาขาที่ซื้อ'],
                ['created','วันที่ซื้อ','t'],['buffet','บุฟเฟต์','b'],['choice','ตัวเลือก'],['legacy','ยกมาจากกระดาษ','b'],['photo','รูปหลักฐาน']],
@@ -524,6 +524,15 @@ function makeCore(store) {
   function csv(v) { var s = String(v == null ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
   function brandOf(b) { var br = find('Branches', 'code', b); return br ? String(br.brand || '') : ''; }
   function itemByCode(c) { return find('Items', 'code', c); }
+  // Mounjaro: เก็บค่าบริการแพทย์จากคนไข้ทุกครั้งที่มาฉีด (Settings › mjDoctorFee · 0 = ไม่เก็บ) → แพทย์ที่ฉีดได้ DF เต็มจำนวน
+  function isMJ(name) { return /mounjaro|มันจาโร|มอนจาโร/i.test(String(name || '')); }
+  function addMjFee(v, parent, u) {
+    var fee = num(setting('mjDoctorFee', 50)); if (!(fee > 0)) return null;
+    if (ordersOf(v.vn).some(function (x) { return x.item === 'MJFEE'; })) return null;   // เก็บครั้งเดียวต่อการมา (ฉีด 5mg = ใช้คอร์ส 2.5 สองครั้ง ก็เก็บ 50 ครั้งเดียว)
+    var fit = { code: 'MJFEE', name: 'ค่าบริการแพทย์ (ฉีด Mounjaro)', category: 'ค่าบริการแพทย์', type: 'หัตถการ', dfPct: 100, staffFee: 0, performer: 'แพทย์' };
+    return addOrder(v, fit, 1, u, { price: fee, dfPct: 100, seller: '-', choice: 'ref:' + parent.id, forceStatus: 'PENDING' });
+  }
+  function freeFee(br) { var m = null; String(setting('freeStaffFee', 'TCPY:5')).split(/[\s,]+/).forEach(function (x) { var q = x.split(':'); if (q.length === 2 && q[0] === String(br)) m = num(q[1]); else if (q.length === 1 && q[0] !== '' && m == null) m = num(q[0]); }); return m; }
   // ค่ามือแยกสาขา (แท็บ BranchFees) — ช่องที่ใส่ไว้ใช้แทนค่าในแท็บ Items เฉพาะสาขานั้น · ช่องว่าง = ใช้ค่าใน Items
   function feeOf(it, br) {
     var r = it ? rows('BranchFees').filter(function (x) { return String(x.branch) === String(br) && String(x.item) === String(it.code); })[0] : null, o = {};
@@ -1544,6 +1553,9 @@ function makeCore(store) {
     var lots = issue(u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
     upd('Orders', o, { stockPending: later && hasBom, status: 'DONE', doctor: doc, staffs: staffs.join(' '), opNote: txt(p.opNote, 2000), lot: txt(p.lot, 120) || lots.join(', '), doneAt: stamp(),
       dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(feeOf(it, u.branch).staffFee) : num(o.staffFee), prepFee: it && !blank(feeOf(it, u.branch).prepFee) ? num(feeOf(it, u.branch).prepFee) : '', scrub: scrub.join(' '), circ: circ.join(' '), scrubFee: num(it && it.scrubFee), circFee: num(it && it.circFee) });
+    var ff = freeFee(u.branch); if (on(o.free) && ff != null) upd('Orders', o, { staffFee: ff, prepFee: ff });
+    ordersOf(o.vn).filter(function (x) { return x.status === 'PENDING' && String(x.choice) === 'ref:' + o.id; }).forEach(function (x) {   // ค่าบริการแพทย์ที่ผูกกับรายการนี้ → ปิดพร้อมกัน ให้แพทย์คนเดียวกัน
+      upd('Orders', x, { status: 'DONE', doctor: doc || x.doctor, staffs: '', doneAt: stamp(), dfPct: 100, stockPending: false }); });   // รายการแถม: ค่ามือแบบแถม (ตั้งที่ Settings › freeStaffFee เช่น TCPY:5)
     log(u, 'completeOrder', o.id + ' ' + o.name + ' แพทย์ ' + (doc || '-') + ' พนักงาน ' + (staffs.join(',') || '-'));
     return true;
   };
@@ -1632,7 +1644,7 @@ function makeCore(store) {
     return add('Orders', { id: nextId('OR', 'seq_OR', 7), vn: v.vn, item: String(it.code), name: o2.name || String(it.name), type: o2.type || type, category: String(it.category || ''),
       qty: qty, price: price, disc: disc, total: r2(gross - disc), paidNet: 0, upsell: !!o2.upsell, seller: txt(o2.seller || u.name, 60), receipt: '', status: proc,
       courseRef: o2.courseRef || '', promo: o2.promo || '', choice: txt(o2.choice, 120), perVal: num(o2.perVal), dfPct: o2.dfPct != null ? num(o2.dfPct) : (num(it.dfHiAt) > 0 && num(qty) >= num(it.dfHiAt) ? num(it.dfHi) : num(it.dfPct)),
-      staffFee: num(feeOf(it, v.branch).staffFee), dfFixed: num(o2.dfFixed), doctor: '', staffs: '', opNote: '', lot: '', doneAt: '', time: stamp(), by: u.name });
+      free: !!o2.free, staffFee: num(feeOf(it, v.branch).staffFee), dfFixed: num(o2.dfFixed) || num(it.dfFixed), doctor: '', staffs: '', opNote: '', lot: '', doneAt: '', time: stamp(), by: u.name });
   }
 
   /* ---------- หน้าร้านเพิ่มรายการขายเองได้ (ใช้ทันทีที่สาขานี้ · บัญชีตรวจ DF/ค่ามือทีหลัง) ---------- */
@@ -1691,7 +1703,9 @@ function makeCore(store) {
         return addOrder(v, fake, l.qty, u, { price: pr.price, type: 'promo', promo: pr.code, disc: l.disc, upsell: l.upsell || fromRoom, seller: p.seller, choice: l.choice, forceStatus: '-' });
       }
       var it = itemByCode(l.item); if (!it || priceAt(it, u.branch) === null) err('รายการ ' + l.item + ' ไม่มีขายที่สาขานี้');
-      return addOrder(v, it, l.qty, u, { disc: l.disc, upsell: l.upsell || fromRoom, seller: p.seller, choice: l.choice });
+      var ao = addOrder(v, it, l.qty, u, { disc: l.free ? 1e12 : l.disc, upsell: l.upsell || fromRoom, seller: p.seller, choice: l.choice, free: !!l.free });
+      if (isMJ(it.name) && typeOf(it) === 'proc' && /ปากกาลูกค้า|ปากกาของลูกค้า|ฝากปากกา/.test(String(it.name))) addMjFee(v, ao, u);   // ฉีดจากปากกาที่ลูกค้าซื้อเหมาไว้ (เข็มเดี่ยวที่แบ่งขาย = DF % ปกติ ไม่เก็บ 50)
+      return ao;
     });
     if (fromRoom || ['DR_DONE', 'NUMB', 'IN_TX', 'IN_DR'].indexOf(v.stage) >= 0) upd('Visits', v, { buyMore: true });
     log(u, 'saleCommit', v.vn + ' ' + out.length + ' รายการ ' + sum(out, function (o) { return o.total; }));
@@ -1716,6 +1730,7 @@ function makeCore(store) {
     var used = num(c.used) + 1;
     upd('Courses', c, { used: used, status: !buffet && used >= num(c.total) ? 'USED' : 'ACTIVE' });
     var o = addOrder(v, it, 1, u, { price: 0, name: 'ใช้คอร์ส: ' + c.itemName + (c.choice ? ' (' + c.choice + ')' : ''), type: 'redeem', courseRef: c.id, perVal: num(c.perVal), dfPct: num(c.dfPct), dfFixed: num(c.dfFixed), seller: '-', forceStatus: 'PENDING' });
+    if (isMJ(c.itemName) || isMJ(it.name)) addMjFee(v, o, u);
     return { vn: v.vn, queue: v.queue, queued: queued, left: buffet ? 'ไม่จำกัด' : num(c.total) - used, order: clean(o) };
   }
   A.useCourse = function (p, u) { var r = redeem(p.id, u, null); log(u, 'useCourse', p.id + ' → ' + r.vn); return r; };
@@ -1724,8 +1739,10 @@ function makeCore(store) {
     var o = find('Orders', 'id', p.id); if (!o) err('ไม่พบรายการ');
     var v = visitOf(o.vn, u);
     if (o.status === 'DONE') err('ทำไปแล้ว ลบไม่ได้'); if (o.receipt) err('ชำระเงินแล้ว ลบไม่ได้');
+    if (o.item === 'MJFEE' && find('Orders', 'id', String(o.choice).replace('ref:', ''))) err('ค่าบริการแพทย์ Mounjaro บังคับเก็บทุกครั้งที่ฉีด — ลบไม่ได้ (ถ้าไม่ฉีดแล้ว ให้ลบรายการฉีด/ใช้คอร์ส แล้ว 50 บาทจะหายเอง)');
     if (o.courseRef) restoreCourse(o.courseRef);
     store.remove('Orders', o); log(u, 'removeOrder', o.vn + ' ' + o.name);
+    ordersOf(o.vn).filter(function (x) { return String(x.choice) === 'ref:' + o.id && x.status !== 'DONE' && !x.receipt; }).forEach(function (x) { store.remove('Orders', x); });
     if (v.stage === 'SALE' && !ordersOf(v.vn).length) setStage(v, 'CANCEL');
     return true;
   };
@@ -1788,7 +1805,7 @@ function makeCore(store) {
     p.sellers.forEach(function (x) { if (x && txt(x.name) && !known[txt(x.name)]) err('ไม่รู้จักผู้ขาย ' + txt(x.name)); });
     return sellerStr(p, u);
   }
-  function applySellers(os, ss) { if (ss) os.forEach(function (o) { if (String(o.seller || '') !== ss) upd('Orders', o, { seller: ss }); }); }
+  function applySellers(os, ss) { if (ss) os.forEach(function (o) { if (o.item !== 'MJFEE' && String(o.seller || '') !== ss) upd('Orders', o, { seller: ss }); }); }
   function adminManualOf(p) {
     var m = p.adminManual; if (!m || !txt(m.admin) || !(num(m.amount) > 0)) return null;
     var st = rows('Staff').filter(function (s) { return s.name === txt(m.admin) || s.nick === txt(m.admin) || String(s.code) === txt(m.admin); })[0];
@@ -2389,7 +2406,7 @@ function makeCore(store) {
     var staffBy = {}; rows('Staff').forEach(function (s) { [s.nick, s.name, s.code].forEach(function (k) { if (k) staffBy[String(k)] = s; }); });
     var sl = [], branchTot = {};
     rows('Orders').forEach(function (o) {
-      if (!o.receipt) return; var pay = pays[o.receipt]; if (!pay) return;
+      if (!o.receipt || o.item === 'MJFEE') return; var pay = pays[o.receipt]; if (!pay) return;   // ค่าบริการแพทย์ Mounjaro = เงินผ่านให้หมอ ไม่นับยอดเซล
       var d = String(pay.time).slice(0, 10); if (d < mFrom || d > to || (branchFilter && !branchFilter(pay.branch))) return;
       var full = o.cashNet === '' || o.cashNet == null ? num(o.paidNet) : num(o.cashNet); if (full <= 0) return;
       var mo = d.slice(0, 7), surg = surgCats.indexOf(String(o.category)) >= 0, bk = pay.branch + '|' + mo;
@@ -2691,7 +2708,7 @@ function makeCore(store) {
       tot[d] = r2((tot[d] || 0) + amt); }
     function kindOf(st) { var rl = st ? rolesOf(st) : []; return rl.indexOf('manager') >= 0 || rl.indexOf('sales') >= 0 ? 'split' : 'one'; }
     rows('Orders').forEach(function (o) {
-      if (!o.receipt) return; var pay = pays[o.receipt]; if (!pay) return;
+      if (!o.receipt || o.item === 'MJFEE') return; var pay = pays[o.receipt]; if (!pay) return;
       var d = String(pay.time).slice(0, 10), full = o.cashNet === '' || o.cashNet == null ? num(o.paidNet) : num(o.cashNet); if (full <= 0) return;
       var surg = surgCats.indexOf(String(o.category)) >= 0, aS = Math.min(full, num(o.adminShare));
       if (aS > 0) { var ast = staffBy[String(o.adminBy)], ak = kindOf(ast); if (ak === 'split') put(d, String(ast.code), ast, ak, surg, aS); else put(d, 'PAGE', null, 'one', surg, aS); }
