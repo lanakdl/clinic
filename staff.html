@@ -1518,7 +1518,8 @@ function makeCore(store) {
       if (!std[c]) { off.push(srow.name); return; }
       var tot = r2((prior[c] || 0) + need[c]); if (tot > std[c] + 0.0001) over.push({ stock: c, name: srow.name, unit: srow.unit, std: std[c], used: tot, over: r2(tot - std[c]), value: r2((tot - std[c]) * num(srow.cost)) });
     });
-    if (off.length) err(off.join(', ') + ' ไม่อยู่ในรายการที่ขาย (' + o.name + ') — ให้หน้าร้าน/เซลเพิ่มรายการขายก่อน แล้วเบิกในรายการนั้น');
+    // ของที่ไม่อยู่ในสูตรของรายการที่ขาย: ค่าเริ่มต้น = เบิกได้ (บันทึกไว้ให้บัญชีดู) · Settings strictUse = ใช่ → บังคับให้ขายก่อน
+    if (off.length && on(setting('strictUse', 'ไม่'))) err(off.join(', ') + ' ไม่อยู่ในรายการที่ขาย (' + o.name + ') — ให้หน้าร้าน/เซลเพิ่มรายการขายก่อน แล้วเบิกในรายการนั้น');
     if (over.length && !txt(p.overReason)) err('OVER:' + JSON.stringify(over));
     return over;
   }
