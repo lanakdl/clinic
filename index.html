@@ -2794,7 +2794,7 @@ function makeCore(store) {
   PERM.supplyFix = ['account']; PERM.supplyFixList = ['account', 'manager']; WRITES.supplyFix = 1;
   A.stockPendingList = function (p, u) {
     var since = addDays(today(), -30), vs = {}; rows('Visits').forEach(function (v) { if (v.branch === u.branch) vs[v.vn] = v; });
-    return rows('Orders').filter(function (o) { return on(o.stockPending) && vs[o.vn] && String(o.doneAt).slice(0, 10) >= since; }).map(function (o) { var v = vs[o.vn]; return { id: o.id, vn: o.vn, name: o.name, hn: v.hn, patient: v.name, doctor: staffName(o.doctor), doneAt: o.doneAt }; }).reverse();
+    return rows('Orders').filter(function (o) { return on(o.stockPending) && vs[o.vn] && String(o.doneAt).slice(0, 10) >= since; }).map(function (o) { var v = vs[o.vn]; return { id: o.id, vn: o.vn, name: o.name, hn: v.hn, patient: v.name, doctor: staffName(o.doctor), doneAt: o.doneAt, doneAtFull: o.doneAt, opNote: '', bom: rows('BOM').filter(function (x) { return String(x.item) === String(o.item); }).map(function (x) { return { stock: x.stock, qty: num(x.qty) }; }) }; }).reverse();
   };
   PERM.recordSupplies = STOCKR; PERM.stockPendingList = STOCKV; WRITES.recordSupplies = 1;
 
@@ -4869,6 +4869,7 @@ var TILES = [
   { k: 'sched', t: 'ตารางนัด', s: 'ห้อง · เตียง · ทั้งวัน', ic: 'grid', r: FRONT.concat(CLINS).concat(['sales']) },
   { k: 'doctor', t: 'ห้องแพทย์', s: 'คนไข้รอตรวจ · บันทึก OPD', ic: 'steth', r: ['doctor'], hero: 1 },
   { k: 'or', t: 'ห้องทรีตเมนต์ / หัตถการ', s: 'รับงาน · ทายาชา · เบิกของ', ic: 'bed', r: CLINS, hero: 1 },
+  { k: 'pendStock', t: 'ยังไม่ได้บันทึกของ', s: 'ทำเสร็จแล้วแต่ยังไม่ตัดของ · มาเคลียร์ตอนคนไข้น้อย', ic: 'box', r: ['nurse', 'assistant', 'therapist', 'doctor', 'manager'], b: 'stockPending', stock: 1 },
   { k: 'search', t: 'ค้นหาคนไข้', s: 'ประวัติ · คอร์สคงเหลือ · ขาย', ic: 'search', r: FRONT.concat(CLINS, ['sales']) },
   { k: 'stock', t: 'สต้อกสาขา / เบิกของ', s: 'คงเหลือ · ขอเบิกจากคลังกลาง', ic: 'box', r: ['nurse', 'assistant', 'therapist', 'doctor', 'manager'], b: 'low', stock: 1 },
   { k: 'central', t: 'คลังกลาง', s: 'อนุมัติใบเบิก · รับของเข้า', ic: 'wh', r: ['central'], hero: 1, b: 'reqs' },
@@ -4898,7 +4899,7 @@ SCR.home = function () {
 SCR.home.after = function () {
   call('homeStats').then(function (s) {
     var st = s.stages || {};
-    var map = { booked: s.booked, due: s.due, leads: s.leads, low: s.low, reqs: s.reqs };
+    var map = { booked: s.booked, due: s.due, leads: s.leads, low: s.low, reqs: s.reqs, stockPending: s.stockPending };
     $$('[data-b]').forEach(function (b) { var v = map[b.dataset.b]; if (v) { b.textContent = v; b.hidden = false; } });
     var al = [];
     if (stk && has(['manager']) && s.countDue) al.push('<div class="note w row"><span class="sp">ถึงรอบนับสต้อกประจำสัปดาห์แล้ว</span><button class="btn sm w" data-go="stock" data-arg="count">นับสต้อก</button></div>');
@@ -5029,7 +5030,8 @@ function regHtml(arg, cp) {
     (cp && !edit ? '<div class="note">' + esc(cp.hn) + ' · ลงชื่อไว้จากลีดแล้ว — กรอกข้อมูลที่เหลือ แล้วให้คนไข้เซ็นยินยอม (ใช้ HN เดิม)</div>' : '') +
     '<div class="split"><div class="stack">' +
     (pre ? '' : '<div class="card stack"><div class="row"><h3 class="sp">บัตรประชาชน / พาสปอร์ต</h3><span class="pill">ไม่บังคับ</span></div>' +
-      '<div class="row"><button type="button" class="btn" id="idcam" style="flex-direction:row">' + ic('cam', 18) + ' ถ่ายรูปบัตร</button><label class="btn q sm" style="flex-direction:row">เลือกจากรูปในเครื่อง<input type="file" accept="image/*" id="idf" hidden></label>' +
+      '<div class="row">' + (camLive() ? '<button type="button" class="btn" id="idcam" style="flex-direction:row">' + ic('cam', 18) + ' ถ่ายรูปบัตร</button>' : '') +
+      '<label class="btn" id="idnat" style="flex-direction:row"' + (camLive() ? ' hidden' : '') + '>' + ic('cam', 18) + ' ถ่ายรูปบัตร (กล้องเครื่อง)<input type="file" accept="image/*" capture="environment" id="idcf" hidden></label><label class="btn q sm" style="flex-direction:row">เลือกจากรูปในเครื่อง<input type="file" accept="image/*" id="idf" hidden></label>' +
       '<button type="button" class="btn p" id="ocr" disabled>อ่านบัตรอัตโนมัติ</button></div><img id="idimg" class="idimg" hidden alt="รูปบัตร"><p class="xs muted">รูปบัตรเก็บใน Google Drive ของคลินิก ไม่บันทึกลงแท็บเล็ต</p></div>') +
     '<div class="card stack"><h3>ข้อมูลคนไข้</h3>' +
     (paper ? '<label>HN เดิม (จากแฟ้มกระดาษ) *<input name="oldHn" required placeholder="เช่น 10234"></label>' : '') +
@@ -5053,7 +5055,12 @@ SCR.register.after = function () {
   var f = $('#idf'); if (!f) return;
   function setId(d) { S.v.reg.img = d; var im = $('#idimg'); im.src = d; im.hidden = false; $('#ocr').disabled = false; }
   f.onchange = function () { readImg(f.files[0], 1600, .85).then(function (d) { imgQuality(d).then(function (q) { if (q.msg) toast(q.msg, 1); }); setId(d); }).catch(fail); };
-  $('#idcam').onclick = function () { idCamera().then(function (d) { if (d) setId(d); }).catch(function () { f.click(); }); };
+  var cf = $('#idcf'); if (cf) cf.onchange = function () { readImg(cf.files[0], 1600, .85).then(function (d) { imgQuality(d).then(function (q) { if (q.msg) toast(q.msg, 1); }); setId(d); }).catch(fail); };
+  var cb = $('#idcam'); if (cb) cb.onclick = function () {
+    var slow = setTimeout(function () { toast('ถ้ากล้องไม่ขึ้น: ดูแถบด้านบน/ล่างจอว่าถามสิทธิ์กล้องไหม แล้วกด "อนุญาต" หรือใช้ปุ่ม "กล้องเครื่อง"', 1); $('#idnat').hidden = false; }, 4000);
+    idCamera().then(function (d) { clearTimeout(slow); if (d) setId(d); }).catch(function (e) { clearTimeout(slow); $('#idnat').hidden = false;
+      toast(e && e.name === 'NotAllowedError' ? 'เว็บนี้ถูกปิดสิทธิ์กล้อง — กดรูปแม่กุญแจหน้าลิงก์ › สิทธิ์ › กล้อง › อนุญาต หรือกดปุ่ม "กล้องเครื่อง"' : 'เปิดกล้องในหน้าเว็บไม่ได้ — กดปุ่ม "ถ่ายรูปบัตร (กล้องเครื่อง)" แทน', 1); });
+  };
   $('#ocr').onclick = function () {
     call('ocrIdCard', { img: S.v.reg.img }, { spin: true, msg: 'กำลังอ่านบัตร…' }).then(function (r) {
       var F = $('#rf'), n = 0; ['title', 'name', 'nameEn', 'idcard', 'dob', 'gender', 'address'].forEach(function (k) { if (r[k] && F[k] && !F[k].value) { F[k].value = r[k]; n++; } });
@@ -5073,6 +5080,7 @@ function sharpOf(ctx, w, h) {   // ความคม = variance ของ Lapla
 }
 function qualMsg(q) { return q.light < 55 ? 'มืดไป — เปิดไฟหรือย้ายไปที่สว่าง' : q.glare > .06 ? 'แสงสะท้อนบนบัตร — เอียงบัตรเล็กน้อย' : q.sharp < 60 ? 'ภาพเบลอ — ถือนิ่งๆ แล้วถ่ายใหม่' : ''; }
 function imgQuality(src) { return new Promise(function (res) { var im = new Image(); im.onload = function () { var w = 480, h = Math.round(w * im.height / im.width), c = document.createElement('canvas'); c.width = w; c.height = h; var x = c.getContext('2d'); x.drawImage(im, 0, 0, w, h); var q = sharpOf(x, w, h); q.msg = qualMsg(q); res(q); }; im.onerror = function () { res({}); }; im.src = src; }); }
+function camLive() { return !!(window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }
 function idCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return Promise.reject(new Error('no camera'));
   return navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false }).then(function (stream) {
@@ -5981,9 +5989,10 @@ ACT.opdAdd = function () { var a = $('#of [name=addendum]').value.trim(); if (!a
 /* ---------- ห้องทรีตเมนต์ (แท็บเล็ตห้อง OR) ---------- */
 TITLES.or = 'ห้องทรีตเมนต์ / หัตถการ';
 SCR.or = function () {
-  return call('queue').then(function (q) {
+  return Promise.all([call('queue'), S.user.stock ? call('stockPendingList').catch(function () { return []; }) : Promise.resolve(null)]).then(function (rr) { var q = rr[0], pl = rr[1];
     var cols = [['รอทำ', ['DR_DONE', 'WAIT_TX']], ['ทายาชา', ['NUMB']], ['กำลังทำ', ['IN_TX']], ['รอแพทย์ / ส่งกลับแล้ว', ['WAIT_DR', 'IN_DR', 'BACK']]];
-    return '<div class="stack"><div class="row"><span class="sp muted small">แตะการ์ดเพื่อรับงาน · เลือกห้อง · บันทึกของที่ใช้</span><button class="btn sm" data-go="sched">ตารางห้อง</button>' + (S.user.stock ? '<button class="btn sm" data-go="stock" data-arg="room">เบิกของเข้าห้อง</button>' : '') + '</div><div class="board">' + cols.map(function (c) {
+    return '<div class="stack"><div class="row"><span class="sp muted small">แตะการ์ดเพื่อรับงาน · เลือกห้อง · บันทึกของที่ใช้</span><button class="btn sm" data-go="sched">ตารางห้อง</button>' + (S.user.stock ? '<button class="btn sm" data-go="stock" data-arg="room">เบิกของเข้าห้อง</button>' : '') +
+      (pl ? (pl.length ? '<button class="btn sm w" data-go="pendStock">📦 ยังไม่ได้บันทึกของ · ' + pl.length + ' รายการ</button>' : '<span class="pill g">บันทึกของครบ ✓</span>') : '') + '</div><div class="board">' + cols.map(function (c) {
       var vs = q.filter(function (v) { return c[1].indexOf(v.stage) >= 0; }).sort(function (a, b) { return b.mins - a.mins; });
       return '<div class="col"><h3><span>' + c[0] + '</span><span class="pill">' + vs.length + '</span></h3>' + vs.map(function (v) {
         var pend = v.items.filter(function (i) { return i.status === 'PENDING'; });
@@ -6128,7 +6137,7 @@ ACT.complete = function (el) {
     onOk: function (b) { var tm = function (k) { return $$('[data-team="' + k + '"] button.on', b).map(function (x) { return x.dataset.c; }); }; return call('completeOrder', { id: o.id, doctor: doc, staffs: staffs, scrub: tm('scrub'), circ: tm('circ'), stockLater: later, supplies: later ? [] : list.filter(function (s) { return s.stock; }), lot: b.querySelector('#lot').value, opNote: b.querySelector('#on').value, pin: pinVal(b), overReason: ovr(b) }, { write: true }).catch(function (e) { return overHandle(b, e); }).then(function () { S.stock = null; toast('บันทึกแล้ว · ตัดสต้อกแล้ว'); refresh(); }); } });
 };
 ACT.recSup = function (el) {
-  var o = S.v.tx.orders.filter(function (x) { return x.id === el.dataset.id; })[0], list = (o.bom || []).map(function (b) { return { stock: b.stock, qty: b.qty }; });
+  var o = ((S.v.tx && S.v.tx.orders) || []).concat(S.v.pend || []).filter(function (x) { return x.id === el.dataset.id; })[0]; if (!o) return; var list = (o.bom || []).map(function (b) { return { stock: b.stock, qty: b.qty }; });
   stockCache().then(function () {
     dialog({ title: 'บันทึกของที่ใช้ · ' + o.name, ok: 'บันทึก · ตัดสต้อก', wide: true, noFocus: true,
       body: '<div class="small muted">ทำโดย ' + esc(o.doctor || '') + ' ' + esc(o.doneAt || '') + (o.opNote ? ' · ' + esc(o.opNote) : '') + '</div><div id="sup" class="stack" style="gap:.4rem"></div><button type="button" class="btn q sm" id="addsup">+ เพิ่มของ</button>' +
@@ -6161,9 +6170,15 @@ ACT.txUseCourse = function (el) {
 TITLES.pendStock = 'รอบันทึกของที่ใช้';
 SCR.pendStock = function () {
   return call('stockPendingList').then(function (ls) {
-    return '<div class="card">' + (ls.length ? '<div class="list">' + ls.map(function (x) { return '<div class="li tap" data-go="tx" data-arg="' + esc(x.vn) + '"><div class="main"><div class="t">' + esc(x.name) + '</div><div class="s">' + esc(x.hn + ' ' + x.patient + ' · ' + x.doctor + ' · ' + x.doneAt) + '</div></div><span class="pill w">บันทึกของ</span></div>'; }).join('') + '</div>' : '<div class="empty">บันทึกครบแล้ว</div>') + '</div>';
+    S.v.pend = ls; var td = today(), A0 = ls.filter(function (x) { return String(x.doneAt).slice(0, 10) === td; }), B0 = ls.filter(function (x) { return String(x.doneAt).slice(0, 10) !== td; });
+    function sec(t, xs) { return xs.length ? '<div class="card stack"><div class="sec"><h2>' + t + '</h2><span class="pill w">' + xs.length + '</span></div><div class="list">' + xs.map(function (x) {
+      return '<div class="li"><div class="main"><div class="t">' + esc(x.patient) + ' · ' + esc(x.name) + '</div><div class="s">' + esc(x.hn + ' · ' + (x.doctor || '') + ' · ทำเสร็จ ' + String(x.doneAt).slice(td === String(x.doneAt).slice(0, 10) ? 11 : 0, 16)) + '</div></div>' +
+        (S.user.stock ? '<button class="btn sm p" data-a="recSup" data-id="' + esc(x.id) + '">บันทึกของ</button>' : '') + '<button class="btn sm q" data-go="tx" data-arg="' + esc(x.vn) + '">เปิดเคส</button></div>'; }).join('') + '</div></div>' : ''; }
+    return '<div class="stack"><p class="small muted">หัตถการที่ทำเสร็จแล้วแต่ยังไม่ได้ตัดของที่ใช้ · ช่วงคนไข้เยอะกด "ให้บันทึกทีหลัง" ได้ แล้วมาเคลียร์ที่หน้านี้ (คนไข้กลับไปแล้วก็บันทึกได้)</p>' +
+      (ls.length ? sec('วันนี้', A0) + sec('วันก่อน ๆ (ยังค้าง)', B0) : '<div class="card"><div class="empty">บันทึกของครบแล้ว ✓</div></div>') + '</div>';
   });
 };
+POLL.pendStock = 1;
 ACT.consent = function (el) {
   var pads, o = S.v.tx.orders.filter(function (x) { return x.id === el.dataset.id; })[0];
   dialog({ title: 'ใบยินยอมทำหัตถการ', ok: 'บันทึกใบยินยอม', noFocus: true,
@@ -7094,6 +7109,8 @@ SCR.saleFeed = function () {
 SCR.saleFeed.after = function () { $('#sfd').onchange = function (e) { S.v.sfDate = e.target.value; refresh(); }; var b = $('#sfb'); if (b) b.onchange = function () { S.v.sfBr = b.value; refresh(); }; };
 POLL.saleFeed = 1;
 
+// เปิดผ่าน http:// กล้อง/ตำแหน่งจะใช้ไม่ได้ → เด้งไป https อัตโนมัติ (เฉพาะเว็บจริง ไม่ใช่ไฟล์ทดสอบ)
+if (location.protocol === 'http:' && /github\.io$/.test(location.hostname)) location.replace('https://' + location.host + location.pathname + location.search);
 /* เริ่มระบบ */
 (function () {
   var tok = LS.sget('hs_tok'), u = LS.sget('hs_user');

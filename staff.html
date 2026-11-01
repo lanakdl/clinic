@@ -1573,7 +1573,7 @@ function makeCore(store) {
   PERM.supplyFix = ['account']; PERM.supplyFixList = ['account', 'manager']; WRITES.supplyFix = 1;
   A.stockPendingList = function (p, u) {
     var since = addDays(today(), -30), vs = {}; rows('Visits').forEach(function (v) { if (v.branch === u.branch) vs[v.vn] = v; });
-    return rows('Orders').filter(function (o) { return on(o.stockPending) && vs[o.vn] && String(o.doneAt).slice(0, 10) >= since; }).map(function (o) { var v = vs[o.vn]; return { id: o.id, vn: o.vn, name: o.name, hn: v.hn, patient: v.name, doctor: staffName(o.doctor), doneAt: o.doneAt }; }).reverse();
+    return rows('Orders').filter(function (o) { return on(o.stockPending) && vs[o.vn] && String(o.doneAt).slice(0, 10) >= since; }).map(function (o) { var v = vs[o.vn]; return { id: o.id, vn: o.vn, name: o.name, hn: v.hn, patient: v.name, doctor: staffName(o.doctor), doneAt: o.doneAt, doneAtFull: o.doneAt, opNote: '', bom: rows('BOM').filter(function (x) { return String(x.item) === String(o.item); }).map(function (x) { return { stock: x.stock, qty: num(x.qty) }; }) }; }).reverse();
   };
   PERM.recordSupplies = STOCKR; PERM.stockPendingList = STOCKV; WRITES.recordSupplies = 1;
 
@@ -3648,6 +3648,7 @@ var TILES = [
   { k: 'sched', t: 'ตารางนัด', s: 'ห้อง · เตียง · ทั้งวัน', ic: 'grid', r: FRONT.concat(CLINS).concat(['sales']) },
   { k: 'doctor', t: 'ห้องแพทย์', s: 'คนไข้รอตรวจ · บันทึก OPD', ic: 'steth', r: ['doctor'], hero: 1 },
   { k: 'or', t: 'ห้องทรีตเมนต์ / หัตถการ', s: 'รับงาน · ทายาชา · เบิกของ', ic: 'bed', r: CLINS, hero: 1 },
+  { k: 'pendStock', t: 'ยังไม่ได้บันทึกของ', s: 'ทำเสร็จแล้วแต่ยังไม่ตัดของ · มาเคลียร์ตอนคนไข้น้อย', ic: 'box', r: ['nurse', 'assistant', 'therapist', 'doctor', 'manager'], b: 'stockPending', stock: 1 },
   { k: 'search', t: 'ค้นหาคนไข้', s: 'ประวัติ · คอร์สคงเหลือ · ขาย', ic: 'search', r: FRONT.concat(CLINS, ['sales']) },
   { k: 'stock', t: 'สต้อกสาขา / เบิกของ', s: 'คงเหลือ · ขอเบิกจากคลังกลาง', ic: 'box', r: ['nurse', 'assistant', 'therapist', 'doctor', 'manager'], b: 'low', stock: 1 },
   { k: 'central', t: 'คลังกลาง', s: 'อนุมัติใบเบิก · รับของเข้า', ic: 'wh', r: ['central'], hero: 1, b: 'reqs' },
@@ -3677,7 +3678,7 @@ SCR.home = function () {
 SCR.home.after = function () {
   call('homeStats').then(function (s) {
     var st = s.stages || {};
-    var map = { booked: s.booked, due: s.due, leads: s.leads, low: s.low, reqs: s.reqs };
+    var map = { booked: s.booked, due: s.due, leads: s.leads, low: s.low, reqs: s.reqs, stockPending: s.stockPending };
     $$('[data-b]').forEach(function (b) { var v = map[b.dataset.b]; if (v) { b.textContent = v; b.hidden = false; } });
     var al = [];
     if (stk && has(['manager']) && s.countDue) al.push('<div class="note w row"><span class="sp">ถึงรอบนับสต้อกประจำสัปดาห์แล้ว</span><button class="btn sm w" data-go="stock" data-arg="count">นับสต้อก</button></div>');
