@@ -2365,7 +2365,7 @@ function makeCore(store) {
 
   A.addLegacyCourse = function (p, u) {
     var pt = find('Patients', 'hn', p.hn); if (!pt) err('ไม่พบคนไข้');
-    var it = itemByCode(p.item); if (!it) err('ไม่พบรายการ');
+    var it = itemByCode(p.item) || (p.itemName ? find('Items', 'name', txt(p.itemName)) : null); if (!it) err('ไม่พบรายการ — กดรีเฟรชหน้าแล้วลองใหม่');
     var left = Math.round(num(p.left)); if (left <= 0) err('ใส่จำนวนครั้งที่เหลือ');
     var mgr = rows('Staff').filter(function (s) { var h = store.hash('pin:' + String(p.approvePin || '')); return on(s.active) && (String(s.pin) === h || String(s.pin) === String(p.approvePin)) && rolesOf(s).some(function (r) { return ['manager', 'admin', 'owner'].indexOf(r) >= 0; }); })[0];
     if (!mgr) err('รหัสผู้จัดการไม่ถูกต้อง');
@@ -5419,7 +5419,8 @@ ACT.reviewDlg = function () {
     mount: function (b) { pads = mountSigs(b); b.querySelector('#lv').onclick = function (e) { var x = e.target.closest('[data-v]'); if (!x) return; lv = x.dataset.v; $$('#lv button', b).forEach(function (y) { y.classList.toggle('on', y === x); }); }; },
     onOk: function () { need(lv, 'เลือกระดับการอนุญาต'); return call('reviewConsent', { hn: S.v.pt.patient.hn, level: lv, sign: pads.s1.get() }, { write: true }).then(function () { toast('บันทึกแล้ว'); refresh(); }); } });
 };
-ACT.legacyDlg = function () {
+ACT.legacyDlg = function () { return freshBoot().then(legacyDlg); };
+function legacyDlg() {
   var img = '', its = S.boot.items.filter(function (i) { return i.type === 'proc' || i.type === 'service'; });
   dialog({ title: 'ยกคอร์สคงเหลือเดิม', ok: 'บันทึกคอร์ส',
     body: '<div class="note small">ใช้ตอนคนไข้เก่ามา visit ครั้งแรกในระบบ — ดูยอดจากบัตรคอร์ส หรือ "รายการฝาก" ในบิล LINE ล่าสุด · ต้องให้ผู้จัดการอนุมัติด้วยรหัส</div><label>บริการ<select id="it">' + opts(its.map(function (i) { return [i.code, i.name]; }), '', '— เลือก —') + '</select></label>' +
@@ -5427,8 +5428,8 @@ ACT.legacyDlg = function () {
       '<label class="btn" style="flex-direction:row">' + ic('cam', 18) + ' ถ่ายรูปบัตรคอร์ส / บิลเดิม (ถ้ามี)<input type="file" accept="image/*" capture="environment" id="lp" hidden></label><img id="lpi" class="idimg" hidden alt="">' +
       '<label>รหัสผู้จัดการ (อนุมัติ)<input id="mp" type="password" inputmode="numeric" autocomplete="off"></label>',
     mount: function (b) { selSearch(b.querySelector('#it')); var f = b.querySelector('#lp'); f.onchange = function () { readImg(f.files[0]).then(function (d) { img = d; var i = b.querySelector('#lpi'); i.src = d; i.hidden = false; }); }; },
-    onOk: function (b) { return call('addLegacyCourse', { hn: S.v.pt.patient.hn, item: need(b.querySelector('#it').value, 'เลือกบริการ'), left: b.querySelector('#lf').value, perVal: b.querySelector('#pv').value, expire: b.querySelector('#ex').value, approvePin: b.querySelector('#mp').value, img: img }, { write: true }).then(function () { toast('เพิ่มคอร์สแล้ว'); refresh(); }); } });
-};
+    onOk: function (b) { return call('addLegacyCourse', { hn: S.v.pt.patient.hn, item: need(b.querySelector('#it').value, 'เลือกบริการ'), itemName: (b.querySelector('#it').selectedOptions[0] || {}).text || '', left: b.querySelector('#lf').value, perVal: b.querySelector('#pv').value, expire: b.querySelector('#ex').value, approvePin: b.querySelector('#mp').value, img: img }, { write: true }).then(function () { toast('เพิ่มคอร์สแล้ว'); refresh(); }); } });
+}
 ACT.photos = function () {
   var p = S.v.pt.patient, o = S.v.pt.open;
   call('photoList', { hn: p.hn }, { spin: true }).then(function (ph) {
