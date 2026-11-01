@@ -366,6 +366,9 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:
 .lx-cal .st-OK,.lx-cal .st-APPROVED{border-color:var(--good);background:var(--good-soft);color:var(--good);opacity:1}
 .lx-cal .st-PENDING{border-color:var(--warn);background:var(--warn-soft);color:var(--warn);opacity:1}
 .lx-cal button[disabled]{cursor:default}
+.lx-cal.team a{justify-content:flex-start;padding-top:.3rem;min-height:56px}
+.lx-cal.team i.nm{font-weight:500;font-size:.6rem;width:100%}
+.lx-cal.team i.pd{opacity:.6}
 .lx-cal.team a.has{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
 .lx-cal .tk{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
 .lx-cal .tk.sel{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
@@ -4023,7 +4026,7 @@ function teamCal() {
     L.calMon = c.month; var by = {}; c.list.forEach(function (x) { (by[x.date] = by[x.date] || []).push(x); });
     var md = monDays(c.month), days = Object.keys(by).sort();
     var grid = '<div class="lx-cal team">' + TH_DS.map(function (d, i) { return '<b class="' + (i === 0 || i === 6 ? 'we' : '') + '">' + d + '</b>'; }).join('') + new Array(md.first + 1).join('<span></span>') +
-      md.days.map(function (d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(), n = (by[d] || []).length, hd = c.hol && c.hol[d]; return '<a href="#od' + d + '" class="' + (w === 0 || w === 6 || (hd && hd.closed) ? 'we ' : '') + (n ? 'has' : '') + '">' + +d.slice(8) + (hd && hd.closed ? '<i>ปิด🎌</i>' : n ? '<i>' + n + ' คน</i>' : hd ? '<i>🎌</i>' : '') + '</a>'; }).join('') + '</div>';
+      md.days.map(function (d) { var w = new Date(d + 'T00:00:00Z').getUTCDay(), n = (by[d] || []).length, hd = c.hol && c.hol[d]; return '<a href="#od' + d + '" class="' + (w === 0 || w === 6 || (hd && hd.closed) ? 'we ' : '') + (n ? 'has' : '') + '">' + +d.slice(8) + (hd && hd.closed ? '<i>ปิด🎌</i>' : n ? (by[d].slice(0, 3).map(function (x) { return '<i class="nm' + (x.status === 'PENDING' ? ' pd' : '') + '">' + esc(String(x.name).split(/\s+/)[0]) + '</i>'; }).join('') + (n > 3 ? '<i>+' + (n - 3) + '</i>' : '')) : hd ? '<i>🎌</i>' : '') + '</a>'; }).join('') + '</div>';
     return '<div class="card stack"><div class="row"><button class="btn sm" data-cm="-1">‹</button><b class="sp" style="text-align:center">' + monTh(c.month) + '</b><button class="btn sm" data-cm="1">›</button></div>' +
       (c.canAll ? '<select id="cbr"><option value=""' + (c.branch ? '' : ' selected') + '>ทุกสาขา</option>' + c.branches.map(function (b) { return '<option value="' + esc(b.code) + '"' + (b.code === c.branch ? ' selected' : '') + '>' + esc(b.name) + '</option>'; }).join('') + '</select>' : '<div class="small muted">สาขาของคุณ</div>') + grid + '</div>' +
       '<div class="card stack"><h2>ใครหยุดวันไหน</h2>' + (days.length ? '<div class="list">' + days.map(function (d) { return '<div class="li" id="od' + d + '"><div class="qn" style="font-size:.95rem">' + +d.slice(8) + '</div><div class="main"><div class="t">' + esc(thDate(d, 1)) + '</div><div class="s">' + by[d].map(function (x) { return esc(x.name) + (x.vac ? ' 🏖️' : '') + (c.branch ? '' : ' (' + esc(x.branch) + ')') + (x.status === 'PENDING' ? ' <span class="pill w">รออนุมัติ</span>' : ''); }).join(' · ') + '</div></div></div>'; }).join('') + '</div>' : '<div class="empty">ยังไม่มีใครลงวันหยุดเดือนนี้</div>') + '</div>';
