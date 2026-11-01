@@ -2374,7 +2374,7 @@ function makeCore(store) {
   function earnings(from, to, branchFilter) {
     var vs = {}; rows('Visits').forEach(function (v) { vs[v.vn] = v; });
     var people = {}, items = [];
-    function P(code) { return people[code] = people[code] || { code: code, name: staffName(code), df: 0, fee: 0, comm: 0, sales: 0, cases: 0, upsell: 0, mgmt: 0, salary: 0 }; }
+    function P(code) { return people[code] = people[code] || { code: code, name: staffName(code), df: 0, fee: 0, comm: 0, sales: 0, salesSkin: 0, salesSurg: 0, cases: 0, upsell: 0, mgmt: 0, salary: 0 }; }
     // เคสผ่าตัดที่มีออฟชั่น: ค่ามือ Scrub/Circ คิดจากรายการหลัก ตามขั้นราคา "รวมออฟชั่น" ในบิลเดียวกัน (ออฟชั่นได้ค่ามือของตัวเองเพิ่ม ปกติ 0)
     var grp = {}, mainOf = {}, inGrp = {};
     rows('Orders').forEach(function (o) { if (o.status !== 'DONE' || o.voidOf === 'x') return; var it = itemByCode(o.item); if (!it || !String(it.feeGroup || '').trim()) return;
@@ -2440,11 +2440,11 @@ function makeCore(store) {
     });
     var perBill = adminTiers().length ? 1 : num(setting('adminPerBill', 0));   // >0 = แอดมินคิดต่อบิล (ขั้นเรท หรือเรทเดียว)
     sl.forEach(function (x) {
-      if (x.kind === 'admin' && perBill > 0) { if (x.inR) { var pa = P(x.code); pa.sales = r2(pa.sales + x.base); } return; }   // แอดมินคิดต่อบิล: ยอดไว้ดูเฉยๆ
+      if (x.kind === 'admin' && perBill > 0) { if (x.inR) { var pa = P(x.code); pa.sales = r2(pa.sales + x.base); if (x.surg) pa.salesSurg = r2(pa.salesSurg + x.base); else pa.salesSkin = r2(pa.salesSkin + x.base); } return; }   // แอดมินคิดต่อบิล: ยอดไว้ดูเฉยๆ
       var m = mon[x.code + '|' + x.mo], ps = P(x.code), pct = x.kind === 'admin' ? (x.st && num(x.st.commPct) ? num(x.st.commPct) : num(setting('adminCommPct', 5))) : x.surg ? m.surgPct : m.skinPct;
       if (!x.inR) return;
       var c = r2(x.base * pct / 100);
-      ps.sales = r2(ps.sales + x.base); ps.comm = r2(ps.comm + c); if (on(x.o.upsell)) ps.upsell = r2(ps.upsell + x.base);
+      ps.sales = r2(ps.sales + x.base); if (x.surg) ps.salesSurg = r2(ps.salesSurg + x.base); else ps.salesSkin = r2(ps.salesSkin + x.base); ps.comm = r2(ps.comm + c); if (on(x.o.upsell)) ps.upsell = r2(ps.upsell + x.base);
       items.push({ who: x.code, kind: x.kind === 'admin' ? 'ค่าคอมแอดมิน (ปิดจากเพจ)' : x.chat ? 'ค่าคอม (ปิดในแชท)' + (x.surg ? ' (ศัลยกรรม)' : '') : 'ค่าคอม' + (x.surg ? ' (ศัลยกรรม)' : '') + (num(x.o.adminShare) > 0 ? ' · ส่วนเกินดีลแอดมิน' : ''), date: x.d, branch: x.pay.branch, hn: x.pay.hn, name: shortName(x.pay.name), item: x.o.name + (x.split ? ' (' + x.split + '%)' : ''), base: x.base, pct: pct, amount: c, receipt: x.o.receipt });
     });
     Object.keys(mon).forEach(function (k) { var m = mon[k]; if (m.month >= from.slice(0, 7)) { var ps = P(m.code); (ps.months = ps.months || []).push(m); } });
@@ -3986,7 +3986,7 @@ function slipView() {
       '<div class="small b">รายได้</div>' + (inc.length ? inc.map(function (x) { return R(esc(x[0]), bt(x[1])); }).join('') : '<div class="xs muted">— ไม่มีรายได้เดือนนี้ —</div>') + R('<b>รวมรายได้</b>', bt(gross)) +
       '<hr style="border:0;border-top:1px dashed var(--line);margin:.2rem 0"><div class="small b">รายการหัก</div>' + (ded.length ? ded.map(function (x) { return R(esc(x[0]), '−' + bt(x[1]), 'dn'); }).join('') : '<div class="xs muted">— ไม่มีรายการหัก —</div>') + R('<b>รวมหัก</b>', '−' + bt(dsum), 'dn') +
       '<div class="lx-total" style="border-top:2px solid var(--line);padding-top:.5rem"><div class="l">รับสุทธิ</div><div class="lx-amt">' + bt(gross - dsum) + '</div></div>' +
-      '<div class="row xs muted"><span>ทำงาน ' + e.days + ' วัน · ' + hmDur(e.hours) + '</span>' + (sm.cases ? '<span>· ' + sm.cases + ' เคส</span>' : '') + (sm.sales ? '<span>· ยอดขาย ' + bt(sm.sales) + '</span>' : '') + '</div></div>' +
+      '<div class="row xs muted"><span>ทำงาน ' + e.days + ' วัน · ' + hmDur(e.hours) + '</span>' + (sm.cases ? '<span>· ' + sm.cases + ' เคส</span>' : '') + (sm.sales ? '<span>· ยอดขาย Skin ' + bt(sm.salesSkin || 0) + ' · ศัลยกรรม ' + bt(sm.salesSurg || 0) + '</span>' : '') + '</div></div>' +
       lineComm(sm) +
       '<p class="xs muted">สลิปนี้คำนวณจากระบบ (ค่าคอม/ค่ามือ/ลงเวลา) · ยอดที่โอนจริงตามที่บัญชีสรุป ถ้าตัวเลขไม่ตรงแจ้งบัญชีได้เลย · ดูรายการละเอียดได้ที่ปุ่ม "เดือนนี้/เดือนก่อน"</p>';
   });
@@ -4001,7 +4001,7 @@ function payTab() {
       '<div class="card stack lx-total"><div class="small muted">' + esc(thDate(e.from)) + (e.to !== e.from ? ' – ' + esc(thDate(e.to)) : '') + '</div><div class="l">' + (sm.deduct ? 'รับสุทธิ (หลังหัก)' : 'รวมที่ได้') + '</div><div class="lx-amt">' + bt(tot) + '</div>' +
       (parts.length ? '<div class="lx-split">' + parts.map(function (x) { return '<div><span class="xs muted">' + x[0] + '</span><b>' + bt(x[1]) + '</b></div>'; }).join('') + '</div>' : '') +
       (sm.deduct ? '<div class="lx-split lx-ded">' + [['ประกันสังคม', sm.sso], ['หักมาสาย', sm.lateDed], ['ลากิจไม่รับค่าจ้าง', sm.leaveDed], ['หยุดเสาร์–อาทิตย์', sm.weekendDed]].filter(function (x) { return x[1]; }).map(function (x) { return '<div><span class="xs muted">' + x[0] + '</span><b class="dn">−' + bt(x[1]) + '</b></div>'; }).join('') + '</div><div class="xs muted">รายได้ก่อนหัก ' + bt(gross) + ' · รายละเอียดการหักอยู่ในรายการด้านล่าง</div>' : '') +
-      '<div class="row small muted"><span>' + (sm.cases || 0) + ' เคส</span>' + (sm.sales ? '<span>· ยอดขาย ' + bt(sm.sales) + '</span>' : '') + '<span>· ทำงาน ' + e.days + ' วัน ' + hmDur(e.hours) + '</span></div></div>' +
+      '<div class="row small muted"><span>' + (sm.cases || 0) + ' เคส</span>' + (sm.sales ? '<span>· ยอดขาย Skin ' + bt(sm.salesSkin || 0) + ' · ศัลยกรรม ' + bt(sm.salesSurg || 0) + '</span>' : '') + '<span>· ทำงาน ' + e.days + ' วัน ' + hmDur(e.hours) + '</span></div></div>' +
       lineComm(sm) +
       (e.leads ? '<div class="card row small"><span class="sp">ลีด ' + e.leads.total + ' · นัดได้ ' + e.leads.booked + ' · ซื้อ ' + e.leads.bought + '</span><b>' + bt(e.leads.value) + '</b></div>' : '') +
       '<div class="card stack"><div class="sec"><h2>รายการ</h2><span class="pill">' + e.items.length + '</span></div>' +
