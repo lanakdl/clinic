@@ -4903,7 +4903,7 @@ function loginScreen(step) {
 }
 function start() {
   applyBrand(S.user && S.user.brand); S.stack = []; S.cur = { name: 'home' };
-  call('boot', {}, { spin: true }).then(function (b) { S.boot = b; S.stock = null; show();
+  call('boot', {}, { spin: true }).then(function (b) { S.boot = b; S.bootAt = Date.now(); S.stock = null; show();
     var bq = (location.search.match(/[?&]beam=([^&#]+)/) || [])[1]; if (bq && typeof beamWait === 'function') { try { history.replaceState(null, '', location.pathname); } catch (e) {} beamWait(decodeURIComponent(bq)); }
   }).catch(function (e) { fail(e); logout(true); });
 }
@@ -5054,6 +5054,8 @@ function selSearch(sel, ph) {
     sel.size = q && hit.length > 1 ? Math.min(8, hit.length + 1) : 0; };
   sel.addEventListener('change', function () { sel.size = 0; });
 }
+// รายการ/ราคาที่เพิ่มในชีต Items ระหว่างวัน → ดึงใหม่อัตโนมัติเมื่อเปิดหน้าขาย/ลงนัด/ลงลีด (ถ้าเกิน 1 นาที) ไม่ต้องออกแล้วเข้าใหม่
+function freshBoot() { if (DEMO || !S.boot || Date.now() - (S.bootAt || 0) < 60000) return Promise.resolve(S.boot); return call('boot', {}).then(function (b) { S.boot = b; S.bootAt = Date.now(); return b; }).catch(function () { return S.boot; }); }
 
 /* =====================================================================
  * หน้าร้าน: ค้นหา/ลงทะเบียน · หน้าคนไข้ · ขาย · เก็บเงิน · คิว
@@ -5451,7 +5453,7 @@ SCR.pos = function (arg) {
   var hn = typeof arg === 'object' ? arg.hn : arg, ret = typeof arg === 'object' ? arg.ret : null;
   var P = S.v.pos = S.v.pos && S.v.pos.hn === hn ? S.v.pos : { hn: hn, cart: [], cat: 'โปร', q: '', sellers: [{ name: S.user.name, pct: 100 }], ret: ret };
   P.ret = ret;
-  return call('patientPage', { hn: hn }).then(function (d) { P.pt = d.patient; P.seen = d.seenDoctor; return posHtml(); });
+  return Promise.all([call('patientPage', { hn: hn }), freshBoot()]).then(function (r) { var d = r[0]; P.pt = d.patient; P.seen = d.seenDoctor; return posHtml(); });
 };
 function posCats() { var c = {}; S.boot.items.forEach(function (i) { if (i.code !== 'SV01' || true) c[i.category] = 1; }); return (S.boot.promos.length ? ['โปร'] : []).concat(Object.keys(c)); }
 function posHtml() {
@@ -6339,7 +6341,7 @@ SCR.bookNew = function (arg) {
   if (arg && typeof arg === 'object') { B.hn = arg.hn || ''; B.leadId = arg.leadId || ''; B.moveId = arg.moveId || ''; }
   var pre = B.moveId ? call('apptGet', { id: B.moveId }).then(function (a) { B.moveItem = a.item; B.hn = a.hn; B.date = a.date >= today() ? a.date : today(); B.noConsult = a.noConsult === 'ใช่' || a.noConsult === true; B.moveInfo = a; return null; }) : Promise.resolve(null);
   var ptP = B.hn ? call('patientPage', { hn: B.hn }) : Promise.resolve(null);
-  return Promise.all([ptP, pre]).then(function (r) {
+  return Promise.all([ptP, pre, freshBoot()]).then(function (r) {
     B.pt = r[0];
     return '<div class="split"><div class="stack">' +
       (B.moveId ? '<div class="note">ย้ายนัด ' + esc(B.moveId) + (B.moveInfo ? ' · ' + esc(B.moveInfo.name + ' · ' + B.moveInfo.itemName + ' (เดิม ' + thDate(B.moveInfo.date, 1) + ' ' + B.moveInfo.start + ')') : '') + ' — เลือกวันและเวลาใหม่</div>' : '<div class="card stack"><h3>1. คนไข้</h3><div id="bp">' + bookPt() + '</div></div>' +
@@ -6451,7 +6453,8 @@ ACT.leadBook = function (el) {
   }).catch(fail);
 };
 TITLES.lead = 'ลงลีด + นัด';
-SCR.lead = function () {
+SCR.lead = function () { return freshBoot().then(leadHtml); };
+function leadHtml() {
   var brs = S.boot.branches;
   return '<form class="stack" id="lf" style="max-width:720px;margin:0 auto"><div class="card stack"><div class="row"><h2 class="sp">ลูกค้าจากแชท</h2>' + (DEMO || has(['admin', 'owner']) ? '<button type="button" class="btn w sm" data-a="leadFake">🎲 กรอกข้อมูลทดสอบ</button>' : '') + '</div><p class="small muted" style="margin:0">ลอกจากที่แอดมินส่งมาใน LINE · ลงครั้งเดียวได้ทั้ง ลีด + นัด + นัดรายวัน</p>' +
     '<div class="g2"><label>สาขาที่จะมา<select name="branch">' + opts(brs.map(function (b) { return [b.code, b.name]; }), S.user.branch) + '</select></label>' +
