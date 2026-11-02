@@ -1633,6 +1633,7 @@ var SCHEMA = {
   Promos:     [['code','รหัสโปร'],['name','ชื่อโปร'],['p_DTCM','ราคา Dr.tan เชียงใหม่'],['p_TCPY','ราคา Tan พัทยา'],['p_JBCM','ราคา Jungbin เชียงใหม่'],['p_JBMS','ราคา Jungbin แม่สอด'],
                ['start','วันเริ่ม'],['end','วันหมด'],['part','รายการในชุด'],['item','รหัสรายการ'],['qty','จำนวน','n'],['fullPrice','ราคาเต็ม','n'],['free','ของแถม'],['choice','ตัวเลือก'],['buffetDF','บุฟเฟต์ DF บาท/ครั้ง','n']],
   BOM:        [['item','รหัสรายการ'],['stock','รหัสของ'],['qty','จำนวนต่อครั้ง','n']],
+  FeeConfirm: [['branch','สาขา'],['date','วันที่'],['kind','ประเภท (df=แพทย์ · fee=พนักงาน)'],['status','สถานะ'],['by','ยืนยันโดย'],['at','ยืนยันเมื่อ','t'],['note','หมายเหตุ']],
   BranchFees: [['branch','สาขา'],['item','รหัสรายการ'],['name','ชื่อรายการ'],['staffFee','ค่ามือพนักงาน (บาท/ครั้ง)','n'],['prepFee','ค่ามือตอนเตรียมให้หมอ (บาท/ครั้ง)','n'],['feeNext','ค่ามือหน่วยถัดไป','n'],['feeTiers','ค่ามือตามจำนวน'],['why','ที่มา']],
   Stock:      [['branch','สาขา (CENTRAL=คลังกลาง)'],['code','รหัสของ'],['name','ชื่อ'],['category','หมวด'],['unit','หน่วย'],['qty','คงเหลือ (หน่วยเล็กสุด)','n'],['cost','ต้นทุน/หน่วย','n'],['pack','ขนาดบรรจุ (หน่วยต่อขวด/กล่อง)','n'],['packName','ชื่อหน่วยใหญ่ (ขวด/กล่อง/ปากกา)'],['openDays','อายุหลังเปิดขวด (วัน · ว่าง=แบ่งไม่ได้)','n'],['min','จุดสั่งซื้อ','n'],['lot','Lot'],['expire','หมดอายุ']],
   StockMoves: [['time','เวลา','t'],['branch','สาขา'],['stock','รหัสของ'],['name','ชื่อ'],['qty','จำนวน(+/-)','n'],['type','ประเภท'],['ref','อ้างอิง'],['by','ผู้ทำรายการ'],['balance','คงเหลือหลังทำ','n']],
@@ -1812,14 +1813,14 @@ function makeCore(store) {
     leadCreate: ['adminpage', 'front', 'manager'], leadList: ['adminpage', 'front', 'manager', 'marketing'], ads: ALL,
     exportAudience: ['account', 'marketing'], exportConversions: ['account', 'marketing'],
     clock: ALL, myDay: ALL, myEarnings: ALL,
-    ownerReport: ['account', 'manager'], feesReport: ['account', 'manager'],
+    ownerReport: ['account', 'manager'], feesReport: ['account', 'manager'], feeDays: ['account', 'manager'], feeDay: ['account', 'manager'], feeConfirm: ['manager'], feeReopen: ['manager'], feeEdit: ['manager'],
     stockList: STOCKV, reqSuggest: STOCKR, reqCreate: STOCKR, reqList: STOCKV, reqApprove: ['central'], reqReceive: STOCKR, centralReceive: ['central'],
     countSheet: ['manager'], countSubmit: ['manager']
   };
   var STOCK_ACTIONS = ['roomIssue', 'stockWaste', 'vialOpen', 'vialDiscard', 'reqCreate', 'reqReceive', 'countSubmit', 'countSheet', 'recordSupplies', 'reqSuggest'];
   var WRITES = { registerPatient: 1, patientConsent: 1, setPhoto: 1, addLegacyCourse: 1, apptCreate: 1, apptCancel: 1, apptMove: 1, apptArrive: 1, apptNoShow: 1, createVisit: 1, cancelVisit: 1,
     callDoctor: 1, saveOPD: 1, startNumb: 1, claim: 1, moveRoom: 1, completeOrder: 1, sendBack: 1, saleCommit: 1, useCourse: 1, removeOrder: 1, pay: 1, reviewConsent: 1,
-    leadCreate: 1, clock: 1, reqCreate: 1, reqApprove: 1, reqReceive: 1, centralReceive: 1, countSubmit: 1 };
+    leadCreate: 1, clock: 1, feeConfirm: 1, feeReopen: 1, feeEdit: 1, reqCreate: 1, reqApprove: 1, reqReceive: 1, centralReceive: 1, countSubmit: 1 };
 
   /* ---------- LINE OA (พนักงานเช็คอิน/ดูค่ามือของตัวเอง ผ่าน LIFF) ---------- */
   var LINE_ACTIONS = ['leaveBook', 'leavePhoto', 'lineQueue', 'lineVisits', 'photoAdd', 'saleFeed', 'lineMe', 'clock', 'myDay', 'myEarnings', 'lineUnbind', 'offInfo', 'offBook', 'vacBook', 'offCancel', 'offPending', 'offDecide', 'offCalendar', 'myTasks', 'otInfo', 'otRequest', 'otCancel', 'otPending', 'otDecide', 'otPhoto', 'countSheet', 'countPreview', 'countSubmit'], LINE_ONLY = ['clock', 'myEarnings'];
@@ -3616,11 +3617,11 @@ function makeCore(store) {
         var ftr = fit ? String(ffe.feeTiers || '').trim() : '';
         if (ftr) { var tf = 0; ftr.split(',').forEach(function (x) { var q = x.split(':'); if (num(o.qty) >= num(q[0])) tf = num(q[1]); }); fee = tf; }   // เช่น Thermage ขายทีละ 100 ช็อต: 1:30,3:60,8:90,12:110
         else if (fnx >= 0 && num(o.qty) > 1 && fee > 0) fee = r2((prep ? num(o.prepFee) : num(o.staffFee)) + fnx * (num(o.qty) - 1));   // เช่น Filler cc แรก 30 · cc ถัดไปละ 5 · ใส่ 0 = เหมาต่อครั้ง ไม่คูณจำนวน
-        if (o.doctor) { var pd = P(o.doctor); pd.df = r2(pd.df + df); pd.cases++; items.push({ who: o.doctor, kind: 'DF', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: per, pct: num(o.dfPct), amount: df, estimated: !o.receipt && !o.courseRef }); }
+        if (o.doctor) { var pd = P(o.doctor); pd.df = r2(pd.df + df); pd.cases++; items.push({ who: o.doctor, kind: 'DF', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: per, pct: num(o.dfPct), amount: df, oid: o.id, estimated: !o.receipt && !o.courseRef }); }
         var gm = mainOf[o.id], gIn = inGrp[o.id] && grp[inGrp[o.id]].main && !gm;   // อยู่ในเคสเดียวกับรายการหลัก = รวมในค่ามือรายการหลักแล้ว
         [['scrub', 'scrubFee', 'Scrub'], ['circ', 'circFee', 'Circulating']].forEach(function (k) { var ls = String(o[k[0]] || '').split(' ').filter(String), tot = gIn ? 0 : gm ? (gm.total > num(gm.it.tierAt) && num(gm.it[k[0] + 'Hi']) > 0 ? num(gm.it[k[0] + 'Hi']) : num(o[k[1]])) : r2(num(o[k[1]]) * num(o.qty)); if (!ls.length || !(tot > 0)) return;
-          ls.forEach(function (s) { var ps = P(s), share = r2(tot / ls.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: 'ค่ามือ ' + k[2], date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share }); }); });
-        staffs.forEach(function (s) { var ps = P(s), share = r2(fee / staffs.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: prep ? 'ค่ามือ (เตรียมให้หมอ)' : 'ค่ามือ', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share }); });
+          ls.forEach(function (s) { var ps = P(s), share = r2(tot / ls.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: 'ค่ามือ ' + k[2], date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share, oid: o.id }); }); });
+        staffs.forEach(function (s) { var ps = P(s), share = r2(fee / staffs.length); ps.fee = r2(ps.fee + share); ps.cases++; items.push({ who: s, kind: prep ? 'ค่ามือ (เตรียมให้หมอ)' : 'ค่ามือ', date: d, branch: v.branch, hn: v.hn, name: shortName(v.name), item: o.name, base: 0, pct: 0, amount: share, oid: o.id }); });
       }
     });
     /* ---- ค่าคอมเซล / ผู้จัดการ / ค่าบริหาร (คิดรายเดือน) ---- */
@@ -3791,14 +3792,84 @@ function makeCore(store) {
 
   A.myEarnings = function (p, u) {
     var from = isDate(p.from) ? p.from : today(), to = isDate(p.to) ? p.to : today();
-    var e = earnings(from, to, null), me = e.people[u.code] || { df: 0, fee: 0, comm: 0, sales: 0, cases: 0, upsell: 0, salary: 0 };
+    var e = earnings(from, to, null), me0 = e.people[u.code] || { df: 0, fee: 0, comm: 0, sales: 0, cases: 0, upsell: 0, salary: 0 }, me = {}, wait = 0;
+    for (var mk in me0) me[mk] = me0[mk];
+    var mine = e.items.filter(function (i) { if (i.who !== u.code) return false; var k = feeKindOf(i); if (!k || feeConfirmed(i.branch, i.date, k)) return true; wait++; return false; });   // ค่ามือ/DF ที่ผู้จัดการยังไม่กดยืนยัน = ยังไม่โชว์
+    me.df = sum(mine.filter(function (i) { return i.kind === 'DF'; }), function (i) { return i.amount; }); me.fee = sum(mine.filter(function (i) { return feeKindOf(i) === 'fee'; }), function (i) { return i.amount; });
     var att = rows('Attendance').filter(function (a) { return a.staff === u.code && a.date >= from && a.date <= to; }).map(clean);
     var hours = sum(att, function (a) { return a.out ? (toMin(a.out) - toMin(a.in)) / 60 : 0; });
     var leads = has(u, ['adminpage']) ? rows('Leads').filter(function (l) { return l.admin === u.name && l.date >= from && l.date <= to; }) : [];
     return { from: from, to: to, sum: me, hours: hours, days: att.length, lates: att.filter(function (a) { return num(a.late) > 0; }).length, attendance: att.reverse(),
-      items: e.items.filter(function (i) { return i.who === u.code; }).sort(function (a, b) { return a.date < b.date ? 1 : -1; }),
+      feeWaiting: wait, items: mine.sort(function (a, b) { return a.date < b.date ? 1 : -1; }),
       leads: leads.length ? { total: leads.length, booked: leads.filter(function (l) { return ['BOOKED', 'ARRIVED', 'BOUGHT', 'NOSHOW'].indexOf(l.status) >= 0; }).length,
         bought: leads.filter(function (l) { return l.status === 'BOUGHT'; }).length, value: sum(leads.filter(function (l) { return l.status === 'BOUGHT'; }), function (l) { return l.actual; }) } : null };
+  };
+
+  /* ---------- ยืนยันค่ามือรายวัน (แพทย์ / พนักงาน) — ผู้จัดการตรวจแล้วกดยืนยัน ถึงจะขึ้นในมือถือหมอ/ผู้ช่วย ---------- */
+  function feeKindOf(i) { return i.kind === 'DF' ? 'df' : String(i.kind).indexOf('ค่ามือ') === 0 ? 'fee' : ''; }
+  function feeFrom() { var v = String(setting('feeConfirmFrom', '2026-11-02')).trim(); return isDate(v) ? v : '2026-11-02'; }
+  function feeConf(b, d, k) { var a = rows('FeeConfirm'); for (var i = a.length - 1; i >= 0; i--) if (a[i].branch === b && String(a[i].date).slice(0, 10) === d && a[i].kind === k) return a[i]; return null; }
+  function feeConfirmed(b, d, k) { if (d < feeFrom()) return true; var r = feeConf(b, d, k); return !!r && r.status === 'CONFIRMED'; }
+  function feeBranch(p, u) { var b = txt(p.branch); return b && has(u, ['owner', 'admin', 'account']) ? b : u.branch; }
+  function feeK(p) { return p.kind === 'df' ? 'df' : 'fee'; }
+  A.feeDays = function (p, u) {
+    var k = feeK(p), b = feeBranch(p, u), to = today(), from = addDays(to, -Math.min(92, num(p.days) || 35)), by = {};
+    if (from < feeFrom()) from = feeFrom();
+    if (from <= to) earnings(from, to, function (x) { return x === b; }).items.forEach(function (i) {
+      if (feeKindOf(i) !== k) return; var g = by[i.date] = by[i.date] || { date: i.date, total: 0, n: 0, ppl: {} };
+      g.total = r2(g.total + num(i.amount)); g.n++; var nm = staffName(i.who); g.ppl[nm] = r2((g.ppl[nm] || 0) + num(i.amount)); });
+    return { branch: b, kind: k, from: feeFrom(), days: Object.keys(by).sort().reverse().map(function (d) {
+      var g = by[d], c = feeConf(b, d, k);
+      return { date: d, total: g.total, n: g.n, status: c ? c.status : 'OPEN', by: c ? String(c.by || '') : '', at: c ? String(c.at || '') : '', people: Object.keys(g.ppl).map(function (n) { return { name: n, amount: g.ppl[n] }; }) }; }) };
+  };
+  A.feeDay = function (p, u) {
+    var k = feeK(p), b = feeBranch(p, u), d = isDate(p.date) ? p.date : today(), c = feeConf(b, d, k), ords = {};
+    rows('Orders').forEach(function (o) { ords[o.id] = o; });
+    var items = earnings(d, d, function (x) { return x === b; }).items.filter(function (i) { return feeKindOf(i) === k; }).map(function (i) {
+      var o = ords[i.oid] || {};
+      return { oid: i.oid || '', who: i.who, whoName: staffName(i.who), kind: i.kind, hn: i.hn, name: i.name, item: i.item, base: i.base, pct: i.pct, amount: i.amount, estimated: !!i.estimated,
+        qty: num(o.qty) || 1, doctor: String(o.doctor || ''), staffs: String(o.staffs || '').split(' ').filter(String), dfPct: num(o.dfPct), dfFixed: num(o.dfFixed),
+        fee: o.doctor && !blank(o.prepFee) ? num(o.prepFee) : num(o.staffFee), prep: !!(o.doctor && !blank(o.prepFee)) }; });
+    var staff = rows('Staff').filter(function (s) { return on(s.active) && canBranch(s, b); }).map(function (s) { return { code: String(s.code), name: String(s.nick || s.name), doctor: rolesOf(s).indexOf('doctor') >= 0 }; });
+    var key = b + ' ' + d + ' ' + k, hist = rows('Log').filter(function (l) { return /^fee(Edit|Confirm|Reopen)$/.test(String(l.action)) && String(l.detail).indexOf(key) === 0; }).slice(-40).reverse()
+      .map(function (l) { return { time: String(l.time), user: String(l.user).split(' ').slice(2).join(' ') || String(l.user), action: String(l.action), detail: String(l.detail).slice(key.length + 1) }; });
+    return { branch: b, kind: k, date: d, from: feeFrom(), status: d < feeFrom() ? 'OLD' : c ? c.status : 'OPEN', by: c ? String(c.by || '') : '', at: c ? String(c.at || '') : '', note: c ? String(c.note || '') : '',
+      total: sum(items, function (i) { return i.amount; }), items: items, staff: staff, history: hist, canEdit: has(u, ['manager']) };
+  };
+  A.feeConfirm = function (p, u) {
+    var k = feeK(p), b = feeBranch(p, u), d = p.date; if (!isDate(d)) err('วันที่ไม่ถูกต้อง'); if (d > today()) err('ยังไม่ถึงวันนั้น'); if (d < feeFrom()) err('วันก่อน ' + feeFrom() + ' ไม่ต้องยืนยัน');
+    var c = feeConf(b, d, k); if (c && c.status === 'CONFIRMED') err('วันนี้ยืนยันไปแล้ว');
+    var tot = sum(earnings(d, d, function (x) { return x === b; }).items.filter(function (i) { return feeKindOf(i) === k; }), function (i) { return i.amount; });
+    var o = { status: 'CONFIRMED', by: u.name, at: stamp(), note: txt(p.note, 200) };
+    if (c) upd('FeeConfirm', c, o); else { o.branch = b; o.date = d; o.kind = k; add('FeeConfirm', o); }
+    log(u, 'feeConfirm', b + ' ' + d + ' ' + k + ' ยืนยัน รวม ' + tot + ' บาท'); return { total: tot };
+  };
+  A.feeReopen = function (p, u) {
+    var k = feeK(p), b = feeBranch(p, u), d = p.date, why = txt(p.reason, 200); if (!isDate(d)) err('วันที่ไม่ถูกต้อง'); if (!why) err('ใส่เหตุผลที่เปิดแก้');
+    var c = feeConf(b, d, k); if (!c || c.status !== 'CONFIRMED') err('วันนี้ยังไม่ได้ยืนยัน แก้ได้เลย');
+    upd('FeeConfirm', c, { status: 'OPEN', note: why }); log(u, 'feeReopen', b + ' ' + d + ' ' + k + ' เปิดแก้ · ' + why); return true;
+  };
+  A.feeEdit = function (p, u) {
+    var k = feeK(p), o = find('Orders', 'id', p.oid); if (!o) err('ไม่พบรายการ'); if (o.status !== 'DONE') err('รายการนี้ยังไม่ได้ทำ');
+    var v = find('Visits', 'vn', o.vn); if (!v) err('ไม่พบเคส'); var b = v.branch, d = String(o.doneAt).slice(0, 10);
+    if (b !== u.branch && !has(u, ['owner', 'admin'])) err('รายการนี้ไม่ใช่สาขาของคุณ');
+    if (d >= feeFrom() && feeConfirmed(b, d, k)) err('วันนี้ยืนยันแล้ว — กด "เปิดแก้" ก่อน');
+    var ch = {}, okCode = function (c) { var s = find('Staff', 'code', c); if (!s) err('ไม่พบพนักงาน ' + c); return s; };
+    if (k === 'df') {
+      var doc = txt(p.doctor); if (doc) { if (rolesOf(okCode(doc)).indexOf('doctor') < 0) err('คนที่เลือกไม่ใช่แพทย์'); }
+      if (doc !== String(o.doctor || '')) ch.doctor = doc;
+      var fx = num(p.dfFixed), pc = num(p.dfPct); if (fx < 0 || pc < 0 || pc > 100) err('DF ไม่ถูกต้อง');
+      if (fx > 0) { if (fx !== num(o.dfFixed)) ch.dfFixed = fx; } else { if (num(o.dfFixed)) ch.dfFixed = 0; if (pc !== num(o.dfPct)) ch.dfPct = pc; }
+    } else {
+      var ss = (p.staffs || []).map(String).filter(String); ss.forEach(okCode);
+      if (ss.join(' ') !== String(o.staffs || '')) ch.staffs = ss.join(' ');
+      var fee = num(p.fee); if (fee < 0) err('ค่ามือไม่ถูกต้อง');
+      var prep = !!(o.doctor && !blank(o.prepFee)); if (fee !== (prep ? num(o.prepFee) : num(o.staffFee))) ch[prep ? 'prepFee' : 'staffFee'] = fee;
+    }
+    if (!Object.keys(ch).length) return { changed: false };
+    var before = {}; Object.keys(ch).forEach(function (x) { before[x] = o[x]; });
+    upd('Orders', o, ch); log(u, 'feeEdit', b + ' ' + d + ' ' + k + ' ' + o.id + ' ' + (v.hn || '') + ' ' + o.name + ' · ' + JSON.stringify(before) + ' → ' + JSON.stringify(ch));
+    return { changed: true };
   };
 
   /* ---------- Owner / บัญชี ---------- */
@@ -4936,6 +5007,8 @@ var TILES = [
   { k: 'att', t: 'เข้า-ออกงาน', s: 'ใครมาแล้ว · สาย · ลืมเช็คเอาท์', ic: 'user', r: ['account', 'manager'] },
   { k: 'adm', t: 'บิลแอดมิน', s: 'ปิดได้กี่บิล · มาจริง · แยกสาขา · ยกมาจากเดือนก่อน', ic: 'chat', r: ['account', 'manager'] },
   { k: 'otApprove', t: 'อนุมัติ OT', s: 'คำขอ OT จากพนักงาน · อนุมัติแล้วบวกเงินเดือน', ic: 'user', r: ['account'] },
+  { k: 'feeConfDf', t: 'ยืนยันค่ามือแพทย์', s: 'DF รายวัน · ตรวจแล้วกดยืนยัน ถึงขึ้นในมือถือหมอ', ic: 'steth', r: ['manager', 'account'] },
+  { k: 'feeConfFee', t: 'ยืนยันค่ามือพนักงาน', s: 'ค่ามือรายวัน · ตรวจแล้วกดยืนยัน ถึงขึ้นในมือถือผู้ช่วย', ic: 'coin', r: ['manager', 'account'] },
   { k: 'fees', t: 'จ่ายพนักงาน', s: 'เงินเดือน · DF · ค่ามือ · ค่าคอม', ic: 'coin', r: ['account', 'manager'] },
   { k: 'promos', t: 'จัดการโปร', s: 'โปรรายเดือน S/M/L · ราคาแต่ละสาขา', ic: 'mega', r: ['marketing', 'manager'] },
   { k: 'gallery', t: 'รูปรีวิว', s: 'เฉพาะคนไข้ที่อนุญาต', ic: 'img', r: ['marketing'] },
@@ -7206,6 +7279,81 @@ SCR.saleFeed = function () {
 };
 SCR.saleFeed.after = function () { $('#sfd').onchange = function (e) { S.v.sfDate = e.target.value; refresh(); }; var b = $('#sfb'); if (b) b.onchange = function () { S.v.sfBr = b.value; refresh(); }; };
 POLL.saleFeed = 1;
+
+/* ---------- ยืนยันค่ามือรายวัน: แพทย์ (DF) / พนักงาน (ค่ามือ) — ผู้จัดการตรวจ → กดยืนยัน → ขึ้นในมือถือ ---------- */
+TITLES.feeConfDf = 'ยืนยันค่ามือแพทย์'; TITLES.feeConfFee = 'ยืนยันค่ามือพนักงาน'; TITLES.feeDayV = 'ตรวจค่ามือรายวัน';
+function feeKName(k) { return k === 'df' ? 'ค่ามือแพทย์ (DF)' : 'ค่ามือพนักงาน'; }
+function feeStPill(st) { return st === 'CONFIRMED' ? '<span class="pill g">ยืนยันแล้ว ✓</span>' : st === 'OLD' ? '<span class="pill">ก่อนเริ่มระบบยืนยัน</span>' : '<span class="pill w">รอยืนยัน</span>'; }
+function feeBrSel(id) {
+  if (!has(['owner', 'admin', 'account'])) return '';
+  return '<select id="' + id + '" style="width:auto">' + opts((S.boot.branches || []).map(function (b) { return [b.code, b.name]; }), S.v.feeBr || S.user.branch) + '</select>';
+}
+function feeConfList(k) {
+  return call('feeDays', { kind: k, branch: S.v.feeBr || '' }).then(function (r) {
+    var wait = r.days.filter(function (d) { return d.status !== 'CONFIRMED'; }).length;
+    return '<div class="stack"><div class="row">' + feeBrSel('fbr') + '<span class="sp small muted">' + esc(feeKName(k)) + ' · ยืนยันแล้วถึงขึ้นในมือถือ' + (k === 'df' ? 'แพทย์' : 'พนักงาน') + ' · เริ่มใช้ ' + thDate(r.from) + '</span>' +
+      (wait ? '<span class="pill w">รอยืนยัน ' + wait + ' วัน</span>' : '') + '</div>' +
+      (r.days.length ? '<div class="card"><div class="list">' + r.days.map(function (d) {
+        return '<button class="li" style="text-align:left;width:100%" data-go="feeDayV" data-arg="' + k + '|' + d.date + '"><div class="main"><div class="t">' + thDate(d.date, 1) + ' · ' + bt(d.total) + ' <span class="small muted">(' + d.n + ' รายการ)</span></div>' +
+          '<div class="s">' + esc(d.people.map(function (x) { return x.name + ' ' + fm(x.amount); }).join(' · ')) + (d.by ? ' · ยืนยันโดย ' + esc(d.by) : '') + '</div></div>' + feeStPill(d.status) + '</button>';
+      }).join('') + '</div></div>' : '<div class="card"><div class="empty">ยังไม่มีค่ามือในช่วงนี้</div></div>') + '</div>';
+  });
+}
+SCR.feeConfDf = function () { return feeConfList('df'); };
+SCR.feeConfFee = function () { return feeConfList('fee'); };
+SCR.feeConfDf.after = SCR.feeConfFee.after = function () { var s = $('#fbr'); if (s) s.onchange = function () { S.v.feeBr = s.value; refresh(); }; };
+SCR.feeDayV = function (arg) {
+  var a = String(arg).split('|'), k = a[0], d = a[1];
+  return call('feeDay', { kind: k, date: d, branch: S.v.feeBr || '' }).then(function (r) {
+    S.v.feeDay = r; var open = r.status === 'OPEN', edit = open && r.canEdit, by = {};
+    r.items.forEach(function (i) { (by[i.who] = by[i.who] || { name: i.whoName, items: [], total: 0 }).items.push(i); by[i.who].total += i.amount; });
+    var ppl = Object.keys(by).map(function (c) { return by[c]; }).sort(function (x, y) { return y.total - x.total; });
+    var head = '<div class="card stack"><div class="row"><div class="sp"><div class="small muted">' + esc(feeKName(k)) + ' · ' + esc(r.branch) + '</div><h2>' + thDate(d, 1) + '</h2></div>' + feeStPill(r.status) + '</div>' +
+      '<div class="row"><b class="sp">รวม ' + bt(r.total) + '</b><span class="small muted">' + r.items.length + ' รายการ · ' + ppl.length + ' คน</span></div>' +
+      (r.status === 'CONFIRMED' ? '<div class="small muted">ยืนยันโดย ' + esc(r.by) + ' · ' + esc(r.at) + ' — ขึ้นในมือถือแล้ว</div>' : r.status === 'OPEN' ? '<div class="note w small">ยังไม่ขึ้นในมือถือ' + (k === 'df' ? 'แพทย์' : 'พนักงาน') + ' — ตรวจทีละรายการ ถ้าถูกแล้วกด "ยืนยัน"' + (r.note ? '<br>เปิดแก้เพราะ: ' + esc(r.note) : '') + '</div>' : '') +
+      (edit ? '<button class="btn p lg" style="width:100%" data-a="feeOk">ยืนยัน ' + bt(r.total) + ' → ส่งขึ้นมือถือ</button>' : '') +
+      (r.status === 'CONFIRMED' && r.canEdit ? '<button class="btn" data-a="feeReopen">เปิดแก้</button>' : '') + '</div>';
+    var body = ppl.map(function (p) {
+      return '<div class="card stack"><div class="sec"><h2>' + esc(p.name) + '</h2><b>' + bt(p.total) + '</b></div><div class="list">' + p.items.map(function (i) {
+        var how = k === 'df' ? (i.base ? fm(i.base) + ' × ' + i.pct + '%' : 'DF คงที่') + (i.estimated ? ' · ประมาณ (ยังไม่จ่ายเงิน)' : '') : esc(i.kind) + (i.qty > 1 ? ' · ' + i.qty + ' หน่วย' : '');
+        return '<div class="li"><div class="main"><div class="t">' + esc(i.item) + '</div><div class="s">' + esc(i.hn + ' ' + i.name) + ' · ' + how + '</div></div><b>' + bt(i.amount) + '</b>' +
+          (edit && i.oid ? '<button class="btn sm q" data-a="feeFix" data-id="' + esc(i.oid) + '" data-who="' + esc(i.who) + '">แก้</button>' : '') + '</div>';
+      }).join('') + '</div></div>';
+    }).join('');
+    var hist = r.history.length ? '<details class="card"><summary class="small">ประวัติการแก้ / ยืนยัน (' + r.history.length + ')</summary><div class="list small">' + r.history.map(function (h) {
+      return '<div class="li"><div class="main"><div class="t">' + esc({ feeEdit: 'แก้', feeConfirm: 'ยืนยัน', feeReopen: 'เปิดแก้' }[h.action] || h.action) + ' · ' + esc(h.user) + '</div><div class="s">' + esc(h.time + ' · ' + h.detail) + '</div></div></div>'; }).join('') + '</div></details>' : '';
+    return '<div class="stack">' + head + (body || '<div class="card"><div class="empty">ไม่มีรายการ</div></div>') + hist + '</div>';
+  });
+};
+ACT.feeOk = function () {
+  var r = S.v.feeDay;
+  ask('ยืนยัน' + feeKName(r.kind), thDate(r.date, 1) + ' · รวม <b>' + bt(r.total) + '</b> (' + r.items.length + ' รายการ)<br>ยืนยันแล้วจะขึ้นในมือถือ' + (r.kind === 'df' ? 'แพทย์' : 'พนักงาน') + 'ทันที · ถ้าผิดทีหลังกด "เปิดแก้" ได้', 'ยืนยัน ส่งขึ้นมือถือ').then(function (ok) {
+    if (!ok) return; call('feeConfirm', { kind: r.kind, date: r.date, branch: r.branch }, { write: true }).then(function () { toast('ยืนยันแล้ว · ขึ้นในมือถือแล้ว'); refresh(); }).catch(fail); });
+};
+ACT.feeReopen = function () {
+  var r = S.v.feeDay;
+  dialog({ title: 'เปิดแก้' + feeKName(r.kind), ok: 'เปิดแก้', body: '<p class="small">' + thDate(r.date, 1) + ' — ระหว่างเปิดแก้ รายการวันนี้จะหายจากมือถือจนกว่าจะกดยืนยันใหม่</p><label>เหตุผล *<input id="frw" placeholder="เช่น ค่ามือ Pcell ผิด / ใส่ผู้ช่วยผิดคน"></label>',
+    onOk: function (b) { return call('feeReopen', { kind: r.kind, date: r.date, branch: r.branch, reason: need(b.querySelector('#frw').value.trim(), 'ใส่เหตุผล') }, { write: true }).then(function () { toast('เปิดแก้แล้ว'); refresh(); }); } });
+};
+ACT.feeFix = function (el) {
+  var r = S.v.feeDay, i = r.items.filter(function (x) { return x.oid === el.dataset.id && x.who === el.dataset.who; })[0] || r.items.filter(function (x) { return x.oid === el.dataset.id; })[0];
+  var docs = r.staff.filter(function (s) { return s.doctor; }), sel = i.staffs.slice();
+  var body = '<div class="card flat small"><b>' + esc(i.item) + '</b><br>' + esc(i.hn + ' ' + i.name) + '</div>' + (r.kind === 'df'
+    ? '<label>แพทย์ผู้ทำ<select id="ffd">' + opts(docs.map(function (s) { return [s.code, s.name]; }), i.doctor, '— ไม่มี —') + '</select></label>' +
+      '<div class="g2"><label>DF %<input id="ffp" type="number" inputmode="decimal" min="0" max="100" step="0.5" value="' + (i.dfFixed ? '' : i.dfPct) + '"></label>' +
+      '<label>หรือ DF บาท/ครั้ง (แทน %)<input id="fff" type="number" inputmode="decimal" min="0" value="' + (i.dfFixed || '') + '"></label></div><p class="small muted">ฐานคิด DF: ' + bt(i.base) + (i.qty > 1 ? ' × ' + i.qty : '') + '</p>'
+    : '<label>ผู้ทำ / ผู้เตรียม (เลือกได้หลายคน · หารเท่ากัน)</label><div class="chips" id="ffs">' + r.staff.filter(function (s) { return !s.doctor; }).map(function (s) {
+        return '<button type="button" data-c="' + esc(s.code) + '" class="' + (sel.indexOf(s.code) >= 0 ? 'on' : '') + '">' + esc(s.name) + '</button>'; }).join('') + '</div>' +
+      '<label>' + (i.prep ? 'ค่ามือตอนเตรียมให้หมอ' : 'ค่ามือ') + ' (บาท/ครั้ง)<input id="ffm" type="number" inputmode="decimal" min="0" value="' + i.fee + '"></label>' +
+      (i.qty > 1 ? '<p class="small muted">รายการนี้ ' + i.qty + ' หน่วย — ระบบคูณ/คิดหน่วยถัดไปให้ตามกติกาค่ามือ</p>' : ''));
+  dialog({ title: 'แก้' + (r.kind === 'df' ? ' DF แพทย์' : 'ค่ามือ'), ok: 'บันทึก', body: body, noFocus: true,
+    mount: function (b) { var c = b.querySelector('#ffs'); if (c) c.onclick = function (e) { var x = e.target.closest('[data-c]'); if (!x) return; var j = sel.indexOf(x.dataset.c); if (j >= 0) sel.splice(j, 1); else sel.push(x.dataset.c); x.classList.toggle('on', j < 0); }; },
+    onOk: function (b) {
+      var p = r.kind === 'df' ? { doctor: b.querySelector('#ffd').value, dfPct: b.querySelector('#ffp').value, dfFixed: b.querySelector('#fff').value } : { staffs: sel, fee: b.querySelector('#ffm').value };
+      p.kind = r.kind; p.oid = i.oid;
+      return call('feeEdit', p, { write: true }).then(function (x) { toast(x && x.changed ? 'แก้แล้ว · บันทึกประวัติไว้' : 'ไม่มีอะไรเปลี่ยน'); refresh(); });
+    } });
+};
 
 // เปิดผ่าน http:// กล้อง/ตำแหน่งจะใช้ไม่ได้ → เด้งไป https อัตโนมัติ (เฉพาะเว็บจริง ไม่ใช่ไฟล์ทดสอบ)
 if (location.protocol === 'http:' && /github\.io$/.test(location.hostname)) location.replace('https://' + location.host + location.pathname + location.search);
