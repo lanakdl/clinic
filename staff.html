@@ -1587,9 +1587,11 @@ function makeCore(store) {
   A.supplyFix = function (p, u) {
     var o = find('Orders', 'id', p.id); if (!o) err('ไม่พบรายการ'); var v = visitOf(o.vn, u);
     if (o.status !== 'DONE' || on(o.stockPending)) err('รายการนี้ยังไม่ได้บันทึกของ ให้ใช้ปุ่ม "บันทึกของที่ใช้"');
-    var days = num(setting('supplyFixDays', 7)); if (String(o.doneAt).slice(0, 10) < addDays(today(), -days)) err('เกิน ' + days + ' วันแล้ว แก้ย้อนหลังไม่ได้ — ให้นับสต้อกแล้วปรับยอดแทน');
+    var boss = has(u, ['account']), days = num(setting('supplyFixDays', 7));
+    if (!boss && String(o.doneAt).slice(0, 10) !== today()) err('พนักงานแก้ได้เฉพาะเคสของวันนี้ — เคสวันก่อนให้ฝ่ายบัญชีแก้');
+    if (String(o.doneAt).slice(0, 10) < addDays(today(), -days)) err('เกิน ' + days + ' วันแล้ว แก้ย้อนหลังไม่ได้ — ให้นับสต้อกแล้วปรับยอดแทน');
     var why = txt(p.reason, 200); if (!why) err('ใส่เหตุผลที่แก้');
-    var who = { code: u.code, name: 'บัญชี ' + u.name };
+    var who = boss ? { code: u.code, name: 'บัญชี ' + u.name } : byPin(p, u);
     var addQ = {}, ret = {}; (p.add || []).forEach(function (x) { if (x.stock && num(x.qty) > 0) addQ[x.stock] = r2((addQ[x.stock] || 0) + num(x.qty)); });
     (p.ret || []).forEach(function (x) { if (x.stock && num(x.qty) > 0) ret[x.stock] = r2((ret[x.stock] || 0) + num(x.qty)); });
     if (!Object.keys(addQ).length && !Object.keys(ret).length) err('ยังไม่ได้ใส่ของที่จะเพิ่มหรือคืน');
@@ -1597,17 +1599,30 @@ function makeCore(store) {
     Object.keys(ret).forEach(function (c) { if (ret[c] > (used[c] || 0)) err('คืนเกินที่ตัดไป (' + c + ' ตัดไป ' + (used[c] || 0) + ')'); var srow = stockRow(u.branch, c); if (!srow) err('ไม่พบ ' + c); if (splittable(srow)) err(srow.name + ' เป็นขวดแบ่งใช้ คืนเข้าสต้อกไม่ได้ — ถ้าเหลือทิ้งให้บันทึก "ทิ้ง/เสีย"'); });
     var ref = o.vn + ' ' + o.id + ' (แก้ย้อนหลัง)';
     var overF = Object.keys(addQ).length ? controlUse(o, addQ, u.branch, { overReason: why }) : [];
-    if (Object.keys(addQ).length) { flagOver(overF, o, u.branch, { overReason: 'บัญชีแก้ย้อนหลัง: ' + why }, who); issue(u.branch, addQ, 'ใช้ในหัตถการ (บันทึกเพิ่มย้อนหลัง)', ref, u, who); Object.keys(addQ).forEach(function (c) { ch.push('+' + addQ[c] + ' ' + ((stockRow(u.branch, c) || {}).name || c)); }); }
+    if (Object.keys(addQ).length) { flagOver(overF, o, u.branch, { overReason: who.name + ' แก้ย้อนหลัง: ' + why }, who); issue(u.branch, addQ, 'ใช้ในหัตถการ (บันทึกเพิ่มย้อนหลัง)', ref, u, who); Object.keys(addQ).forEach(function (c) { ch.push('+' + addQ[c] + ' ' + ((stockRow(u.branch, c) || {}).name || c)); }); }
     Object.keys(ret).forEach(function (c) { var srow = stockRow(u.branch, c); upd('Stock', srow, { qty: r2(num(srow.qty) + ret[c]) });
       add('StockMoves', { time: stamp(), branch: u.branch, stock: c, name: srow.name, qty: ret[c], type: 'คืนจากหัตถการ (แก้ย้อนหลัง)', ref: ref, by: who.name + ' (' + who.code + ')', balance: num(srow.qty) }); ch.push('−' + ret[c] + ' ' + srow.name); });
-    add('SupplyEdits', { time: stamp(), branch: u.branch, order: o.id, vn: o.vn, hn: v.hn, item: o.name, doneAt: o.doneAt, change: ch.join(', '), reason: why, staff: '-', by: u.name });
+    add('SupplyEdits', { time: stamp(), branch: u.branch, order: o.id, vn: o.vn, hn: v.hn, item: o.name, doneAt: o.doneAt, change: ch.join(', '), reason: why, staff: boss ? '-' : who.name + ' (' + who.code + ')', by: u.name });
     log(u, 'supplyFix', o.id + ' ' + ch.join(', ') + ' · ' + why); return { change: ch };
   };
   A.supplyFixList = function (p, u) {
     var from = isDate(p.from) ? p.from : addDays(today(), -30), inB = scopeFn(p.scope, u);
     return rows('SupplyEdits').filter(function (e) { return inB(e.branch) && String(e.time).slice(0, 10) >= from; }).map(clean).reverse();
   };
-  PERM.supplyFix = ['account']; PERM.supplyFixList = ['account', 'manager']; WRITES.supplyFix = 1;
+  // รายการที่ยังแก้ของย้อนหลังได้ (ทำเสร็จภายใน supplyFixDays วัน · ส่งกลับ/จ่ายเงินแล้วก็แก้ได้)
+  A.supplyFixCands = function (p, u) {
+    var from = has(u, ['account']) ? addDays(today(), -num(setting('supplyFixDays', 7))) : today(), inB = function (b) { return b === u.branch; }, q = String(p.q || '').trim().toLowerCase(), vs = {};
+    rows('Visits').forEach(function (v) { if (inB(String(v.branch))) vs[v.vn] = v; });
+    return rows('Orders').filter(function (o) { return o.status === 'DONE' && !on(o.stockPending) && vs[o.vn] && String(o.doneAt).slice(0, 10) >= from && (o.type === 'proc' || o.type === 'course' || !o.type); })
+      .map(function (o) {
+        var v = vs[o.vn], pt = find('Patients', 'hn', v.hn) || {}, nick = String(pt.nickname || shortName(pt.name));
+        return { id: String(o.id), vn: String(o.vn), hn: String(v.hn), patient: nick, branch: String(v.branch), name: String(o.name), doneAt: String(o.doneAt), doctor: String(o.doctor || ''), staffs: String(o.staffs || ''),
+          used: usedOf(o), fixes: rows('SupplyEdits').filter(function (e) { return e.order === o.id; }).map(clean) };
+      })
+      .filter(function (x) { return !q || (x.hn + ' ' + x.patient + ' ' + x.name).toLowerCase().indexOf(q) >= 0; })
+      .sort(function (a, b) { return a.doneAt < b.doneAt ? 1 : -1; }).slice(0, 150);
+  };
+  PERM.supplyFix = STOCKR.concat(['account', 'owner']); PERM.supplyFixList = ['account', 'manager', 'owner']; PERM.supplyFixCands = STOCKR.concat(['account', 'owner']); WRITES.supplyFix = 1;
   A.stockPendingList = function (p, u) {
     var since = addDays(today(), -30), vs = {}; rows('Visits').forEach(function (v) { if (v.branch === u.branch) vs[v.vn] = v; });
     return rows('Orders').filter(function (o) { return on(o.stockPending) && vs[o.vn] && String(o.doneAt).slice(0, 10) >= since; }).map(function (o) { var v = vs[o.vn]; return { id: o.id, vn: o.vn, name: o.name, hn: v.hn, patient: v.name, doctor: staffName(o.doctor), doneAt: o.doneAt, doneAtFull: o.doneAt, opNote: '', bom: rows('BOM').filter(function (x) { return String(x.item) === String(o.item); }).map(function (x) { return { stock: x.stock, qty: num(x.qty) }; }) }; }).reverse();
@@ -3590,9 +3605,9 @@ function post(body) {
     .then(function (r) { return r.json(); });
 }
 /* ---------- รหัสผู้เบิก / แพทย์เซ็น: เด้งแป้นตัวเลขขึ้นมาให้กด แทนช่องพิมพ์ ---------- */
-var PIN_ALWAYS = ['roomIssue', 'stockWaste', 'vialOpen', 'vialDiscard', 'reqCreate', 'reqReceive', 'supplyFix'];
+var PIN_ALWAYS = ['roomIssue', 'stockWaste', 'vialOpen', 'vialDiscard', 'reqCreate', 'reqReceive'];
 function pinTitle(action, msg) { return /แพทย์/.test(msg || '') || action === 'saveOPD' ? 'แพทย์ใส่รหัส (PIN) ของตัวเอง เพื่อเซ็น' : 'ผู้เบิกของ: ใส่รหัสพนักงานของตัวเอง'; }
-function pinPre(action, p) { return PIN_ALWAYS.indexOf(action) >= 0 || (action === 'saveOPD' && S.user && S.user.roles.indexOf('doctor') < 0) || (!p.stockLater && (p.supplies || []).some(function (x) { return x && x.stock && Number(x.qty) > 0; })); }
+function pinPre(action, p) { return PIN_ALWAYS.indexOf(action) >= 0 || (action === 'supplyFix' && !has(['account'])) || (action === 'saveOPD' && S.user && S.user.roles.indexOf('doctor') < 0) || (!p.stockLater && (p.supplies || []).some(function (x) { return x && x.stock && Number(x.qty) > 0; })); }
 function pinAsk(title, errMsg) {
   return new Promise(function (resolve) {
     if (!document.getElementById('pinStyle')) { var st = document.createElement('style'); st.id = 'pinStyle';
@@ -3828,6 +3843,7 @@ var TILES = [
   { k: 'central', t: 'คลังกลาง', s: 'อนุมัติใบเบิก · รับของเข้า', ic: 'wh', r: ['central'], hero: 1, b: 'reqs' },
   { k: 'myleads', t: 'ลีดของฉัน', s: 'ใครมาแล้ว ซื้อเท่าไร', ic: 'list', r: ['adminpage', 'marketing'] },
   { k: 'owner', t: 'ภาพรวมธุรกิจ', s: 'ยอดขาย · กำไร · เทียบช่วงก่อน', ic: 'chart', r: ['account', 'manager'], hero: 1 },
+  { k: 'supFixes', t: 'แก้ของที่ใช้ / ลืมเบิก', s: 'เบิกผิด · ลืมบันทึก · บันทึกเกิน', ic: 'box', r: ['account', 'owner', 'nurse', 'assistant', 'therapist', 'doctor', 'manager'] },
   { k: 'income', t: 'รายรับ', s: 'วัน · เดือน · ปี · แยกช่องทาง · แก้รายการคีผิด', ic: 'cash', r: ['account', 'manager'] },
   { k: 'att', t: 'เข้า-ออกงาน', s: 'ใครมาแล้ว · สาย · ลืมเช็คเอาท์', ic: 'user', r: ['account', 'manager'] },
   { k: 'adm', t: 'บิลแอดมิน', s: 'ปิดได้กี่บิล · มาจริง · แยกสาขา · ยกมาจากเดือนก่อน', ic: 'chat', r: ['account', 'manager'] },

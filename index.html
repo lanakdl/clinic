@@ -2805,9 +2805,11 @@ function makeCore(store) {
   A.supplyFix = function (p, u) {
     var o = find('Orders', 'id', p.id); if (!o) err('ไม่พบรายการ'); var v = visitOf(o.vn, u);
     if (o.status !== 'DONE' || on(o.stockPending)) err('รายการนี้ยังไม่ได้บันทึกของ ให้ใช้ปุ่ม "บันทึกของที่ใช้"');
-    var days = num(setting('supplyFixDays', 7)); if (String(o.doneAt).slice(0, 10) < addDays(today(), -days)) err('เกิน ' + days + ' วันแล้ว แก้ย้อนหลังไม่ได้ — ให้นับสต้อกแล้วปรับยอดแทน');
+    var boss = has(u, ['account']), days = num(setting('supplyFixDays', 7));
+    if (!boss && String(o.doneAt).slice(0, 10) !== today()) err('พนักงานแก้ได้เฉพาะเคสของวันนี้ — เคสวันก่อนให้ฝ่ายบัญชีแก้');
+    if (String(o.doneAt).slice(0, 10) < addDays(today(), -days)) err('เกิน ' + days + ' วันแล้ว แก้ย้อนหลังไม่ได้ — ให้นับสต้อกแล้วปรับยอดแทน');
     var why = txt(p.reason, 200); if (!why) err('ใส่เหตุผลที่แก้');
-    var who = { code: u.code, name: 'บัญชี ' + u.name };
+    var who = boss ? { code: u.code, name: 'บัญชี ' + u.name } : byPin(p, u);
     var addQ = {}, ret = {}; (p.add || []).forEach(function (x) { if (x.stock && num(x.qty) > 0) addQ[x.stock] = r2((addQ[x.stock] || 0) + num(x.qty)); });
     (p.ret || []).forEach(function (x) { if (x.stock && num(x.qty) > 0) ret[x.stock] = r2((ret[x.stock] || 0) + num(x.qty)); });
     if (!Object.keys(addQ).length && !Object.keys(ret).length) err('ยังไม่ได้ใส่ของที่จะเพิ่มหรือคืน');
@@ -2815,17 +2817,30 @@ function makeCore(store) {
     Object.keys(ret).forEach(function (c) { if (ret[c] > (used[c] || 0)) err('คืนเกินที่ตัดไป (' + c + ' ตัดไป ' + (used[c] || 0) + ')'); var srow = stockRow(u.branch, c); if (!srow) err('ไม่พบ ' + c); if (splittable(srow)) err(srow.name + ' เป็นขวดแบ่งใช้ คืนเข้าสต้อกไม่ได้ — ถ้าเหลือทิ้งให้บันทึก "ทิ้ง/เสีย"'); });
     var ref = o.vn + ' ' + o.id + ' (แก้ย้อนหลัง)';
     var overF = Object.keys(addQ).length ? controlUse(o, addQ, u.branch, { overReason: why }) : [];
-    if (Object.keys(addQ).length) { flagOver(overF, o, u.branch, { overReason: 'บัญชีแก้ย้อนหลัง: ' + why }, who); issue(u.branch, addQ, 'ใช้ในหัตถการ (บันทึกเพิ่มย้อนหลัง)', ref, u, who); Object.keys(addQ).forEach(function (c) { ch.push('+' + addQ[c] + ' ' + ((stockRow(u.branch, c) || {}).name || c)); }); }
+    if (Object.keys(addQ).length) { flagOver(overF, o, u.branch, { overReason: who.name + ' แก้ย้อนหลัง: ' + why }, who); issue(u.branch, addQ, 'ใช้ในหัตถการ (บันทึกเพิ่มย้อนหลัง)', ref, u, who); Object.keys(addQ).forEach(function (c) { ch.push('+' + addQ[c] + ' ' + ((stockRow(u.branch, c) || {}).name || c)); }); }
     Object.keys(ret).forEach(function (c) { var srow = stockRow(u.branch, c); upd('Stock', srow, { qty: r2(num(srow.qty) + ret[c]) });
       add('StockMoves', { time: stamp(), branch: u.branch, stock: c, name: srow.name, qty: ret[c], type: 'คืนจากหัตถการ (แก้ย้อนหลัง)', ref: ref, by: who.name + ' (' + who.code + ')', balance: num(srow.qty) }); ch.push('−' + ret[c] + ' ' + srow.name); });
-    add('SupplyEdits', { time: stamp(), branch: u.branch, order: o.id, vn: o.vn, hn: v.hn, item: o.name, doneAt: o.doneAt, change: ch.join(', '), reason: why, staff: '-', by: u.name });
+    add('SupplyEdits', { time: stamp(), branch: u.branch, order: o.id, vn: o.vn, hn: v.hn, item: o.name, doneAt: o.doneAt, change: ch.join(', '), reason: why, staff: boss ? '-' : who.name + ' (' + who.code + ')', by: u.name });
     log(u, 'supplyFix', o.id + ' ' + ch.join(', ') + ' · ' + why); return { change: ch };
   };
   A.supplyFixList = function (p, u) {
     var from = isDate(p.from) ? p.from : addDays(today(), -30), inB = scopeFn(p.scope, u);
     return rows('SupplyEdits').filter(function (e) { return inB(e.branch) && String(e.time).slice(0, 10) >= from; }).map(clean).reverse();
   };
-  PERM.supplyFix = ['account']; PERM.supplyFixList = ['account', 'manager']; WRITES.supplyFix = 1;
+  // รายการที่ยังแก้ของย้อนหลังได้ (ทำเสร็จภายใน supplyFixDays วัน · ส่งกลับ/จ่ายเงินแล้วก็แก้ได้)
+  A.supplyFixCands = function (p, u) {
+    var from = has(u, ['account']) ? addDays(today(), -num(setting('supplyFixDays', 7))) : today(), inB = function (b) { return b === u.branch; }, q = String(p.q || '').trim().toLowerCase(), vs = {};
+    rows('Visits').forEach(function (v) { if (inB(String(v.branch))) vs[v.vn] = v; });
+    return rows('Orders').filter(function (o) { return o.status === 'DONE' && !on(o.stockPending) && vs[o.vn] && String(o.doneAt).slice(0, 10) >= from && (o.type === 'proc' || o.type === 'course' || !o.type); })
+      .map(function (o) {
+        var v = vs[o.vn], pt = find('Patients', 'hn', v.hn) || {}, nick = String(pt.nickname || shortName(pt.name));
+        return { id: String(o.id), vn: String(o.vn), hn: String(v.hn), patient: nick, branch: String(v.branch), name: String(o.name), doneAt: String(o.doneAt), doctor: String(o.doctor || ''), staffs: String(o.staffs || ''),
+          used: usedOf(o), fixes: rows('SupplyEdits').filter(function (e) { return e.order === o.id; }).map(clean) };
+      })
+      .filter(function (x) { return !q || (x.hn + ' ' + x.patient + ' ' + x.name).toLowerCase().indexOf(q) >= 0; })
+      .sort(function (a, b) { return a.doneAt < b.doneAt ? 1 : -1; }).slice(0, 150);
+  };
+  PERM.supplyFix = STOCKR.concat(['account', 'owner']); PERM.supplyFixList = ['account', 'manager', 'owner']; PERM.supplyFixCands = STOCKR.concat(['account', 'owner']); WRITES.supplyFix = 1;
   A.stockPendingList = function (p, u) {
     var since = addDays(today(), -30), vs = {}; rows('Visits').forEach(function (v) { if (v.branch === u.branch) vs[v.vn] = v; });
     return rows('Orders').filter(function (o) { return on(o.stockPending) && vs[o.vn] && String(o.doneAt).slice(0, 10) >= since; }).map(function (o) { var v = vs[o.vn]; return { id: o.id, vn: o.vn, name: o.name, hn: v.hn, patient: v.name, doctor: staffName(o.doctor), doneAt: o.doneAt, doneAtFull: o.doneAt, opNote: '', bom: rows('BOM').filter(function (x) { return String(x.item) === String(o.item); }).map(function (x) { return { stock: x.stock, qty: num(x.qty) }; }) }; }).reverse();
@@ -4808,9 +4823,9 @@ function post(body) {
     .then(function (r) { return r.json(); });
 }
 /* ---------- รหัสผู้เบิก / แพทย์เซ็น: เด้งแป้นตัวเลขขึ้นมาให้กด แทนช่องพิมพ์ ---------- */
-var PIN_ALWAYS = ['roomIssue', 'stockWaste', 'vialOpen', 'vialDiscard', 'reqCreate', 'reqReceive', 'supplyFix'];
+var PIN_ALWAYS = ['roomIssue', 'stockWaste', 'vialOpen', 'vialDiscard', 'reqCreate', 'reqReceive'];
 function pinTitle(action, msg) { return /แพทย์/.test(msg || '') || action === 'saveOPD' ? 'แพทย์ใส่รหัส (PIN) ของตัวเอง เพื่อเซ็น' : 'ผู้เบิกของ: ใส่รหัสพนักงานของตัวเอง'; }
-function pinPre(action, p) { return PIN_ALWAYS.indexOf(action) >= 0 || (action === 'saveOPD' && S.user && S.user.roles.indexOf('doctor') < 0) || (!p.stockLater && (p.supplies || []).some(function (x) { return x && x.stock && Number(x.qty) > 0; })); }
+function pinPre(action, p) { return PIN_ALWAYS.indexOf(action) >= 0 || (action === 'supplyFix' && !has(['account'])) || (action === 'saveOPD' && S.user && S.user.roles.indexOf('doctor') < 0) || (!p.stockLater && (p.supplies || []).some(function (x) { return x && x.stock && Number(x.qty) > 0; })); }
 function pinAsk(title, errMsg) {
   return new Promise(function (resolve) {
     if (!document.getElementById('pinStyle')) { var st = document.createElement('style'); st.id = 'pinStyle';
@@ -5046,6 +5061,7 @@ var TILES = [
   { k: 'central', t: 'คลังกลาง', s: 'อนุมัติใบเบิก · รับของเข้า', ic: 'wh', r: ['central'], hero: 1, b: 'reqs' },
   { k: 'myleads', t: 'ลีดของฉัน', s: 'ใครมาแล้ว ซื้อเท่าไร', ic: 'list', r: ['adminpage', 'marketing'] },
   { k: 'owner', t: 'ภาพรวมธุรกิจ', s: 'ยอดขาย · กำไร · เทียบช่วงก่อน', ic: 'chart', r: ['account', 'manager'], hero: 1 },
+  { k: 'supFixes', t: 'แก้ของที่ใช้ / ลืมเบิก', s: 'เบิกผิด · ลืมบันทึก · บันทึกเกิน', ic: 'box', r: ['account', 'owner', 'nurse', 'assistant', 'therapist', 'doctor', 'manager'] },
   { k: 'income', t: 'รายรับ', s: 'วัน · เดือน · ปี · แยกช่องทาง · แก้รายการคีผิด', ic: 'cash', r: ['account', 'manager'] },
   { k: 'att', t: 'เข้า-ออกงาน', s: 'ใครมาแล้ว · สาย · ลืมเช็คเอาท์', ic: 'user', r: ['account', 'manager'] },
   { k: 'adm', t: 'บิลแอดมิน', s: 'ปิดได้กี่บิล · มาจริง · แยกสาขา · ยกมาจากเดือนก่อน', ic: 'chat', r: ['account', 'manager'] },
@@ -6275,7 +6291,7 @@ SCR.tx = function (vn) {
           '<button class="btn sm" data-a="consent" data-id="' + esc(o.id) + '">ใบยินยอม</button><button class="btn p" data-a="complete" data-id="' + esc(o.id) + '">ทำเสร็จ</button></div>';
       }).join('') + '</div>' : '<div class="empty">ไม่มีรายการรอทำ</div>') +
       (done.length ? '<div class="small muted">ทำแล้ว: ' + esc(done.map(function (o) { return o.name; }).join(', ')) + '</div>' : '') +
-      done.filter(function (o) { return !o.stockPending && o.fixable && has(['account']); }).map(function (o) { return '<div class="row small" style="border-top:1px dashed var(--line);padding-top:.4rem"><span class="sp"><b>' + esc(o.name) + '</b> · ใช้ ' + esc(o.used.map(function (x) { return x.name + ' ' + fm(x.qty); }).join(', ') || 'ไม่ได้ตัดของ') + (o.fixes.length ? ' · <span class="pill w">แก้ย้อนหลัง ' + o.fixes.length + ' ครั้ง</span>' : '') + '</span><button class="btn sm q" data-a="supFix" data-id="' + esc(o.id) + '">แก้ของที่ใช้ (ตกหล่น)</button></div>'; }).join('') +
+      done.filter(function (o) { return !o.stockPending && o.fixable && (has(['account']) || String(o.doneAt).slice(0, 10) === today()); }).map(function (o) { return '<div class="row small" style="border-top:1px dashed var(--line);padding-top:.4rem"><span class="sp"><b>' + esc(o.name) + '</b> · ใช้ ' + esc(o.used.map(function (x) { return x.name + ' ' + fm(x.qty); }).join(', ') || 'ไม่ได้ตัดของ') + (o.fixes.length ? ' · <span class="pill w">แก้ย้อนหลัง ' + o.fixes.length + ' ครั้ง</span>' : '') + '</span><button class="btn sm q" data-a="supFix" data-id="' + esc(o.id) + '">แก้ของที่ใช้ (ตกหล่น)</button></div>'; }).join('') +
       done.filter(function (o) { return o.stockPending; }).map(function (o) { return '<div class="note w row"><span class="sp">' + esc(o.name) + ' · รอบันทึกของที่ใช้</span>' + (S.user.stock ? '<button class="btn sm w" data-a="recSup" data-id="' + esc(o.id) + '">บันทึกของที่ใช้</button>' : '<span class="xs">ให้ผู้ช่วย/พยาบาลบันทึก</span>') + '</div>'; }).join('') + '</div></div>' +
       '<div class="stack">' + (d.courses && d.courses.length && ['DONE', 'CANCEL'].indexOf(v.stage) < 0 ? '<div class="card stack"><div class="sec"><h3>คอร์สที่คนไข้มีอยู่</h3><span class="xs muted">ใช้ได้เลย ไม่ต้องเรียกเซล</span></div><div class="list">' + d.courses.map(function (c) { return '<div class="li"><div class="qn" style="font-size:.8rem">' + esc(c.left) + '</div><div class="main"><div class="t">' + esc(c.itemName) + (c.choice ? ' · ' + esc(c.choice) : '') + '</div>' + (c.expire ? '<div class="s">หมดอายุ ' + esc(thDate(c.expire)) + '</div>' : '') + '</div><button class="btn sm p" data-a="txUseCourse" data-id="' + esc(c.id) + '" data-n="' + esc(c.itemName) + '">ใช้วันนี้</button></div>'; }).join('') + '</div></div>' : '') +
       '<button class="btn lg blk" data-go="pos" data-arg=\'' + esc(JSON.stringify({ hn: p.hn, ret: 1 })) + '\'>' + ic('plus', 20) + ' คนไข้ซื้อเพิ่ม (อัพเซล)</button>' +
@@ -6394,17 +6410,17 @@ ACT.recSup = function (el) {
   });
 };
 ACT.supFix = function (el) {
-  var o = S.v.tx.orders.filter(function (x) { return x.id === el.dataset.id; })[0], list = [], ret = {};
+  var o = ((S.v.tx && S.v.tx.orders) || []).concat(S.v.sfx || []).filter(function (x) { return x.id === el.dataset.id; })[0], list = [], ret = {}; if (!o) return;
   (S.stock ? Promise.resolve(S.stock) : call('stockList', {}).then(function (s) { S.stock = s; return s; })).then(function () {
     dialog({ title: 'แก้ของที่ใช้ย้อนหลัง · ' + o.name, ok: 'บันทึกการแก้ไข', wide: true, noFocus: true,
       body: '<div class="small muted">ทำเมื่อ ' + esc(o.doneAt || '') + ' · โดย ' + esc([o.doctor].concat(String(o.staffs || '').split(' ')).filter(Boolean).map(function (c) { var s = S.boot.staff.filter(function (x) { return x.code === c; })[0]; return s ? s.name : c; }).join(', ')) + '</div>' +
         '<div class="sec"><b>ของที่ใช้จริงแต่ลืมบันทึก</b></div><div id="sup" class="stack" style="gap:.4rem"></div><button type="button" class="btn q sm" id="addsup">+ เพิ่มรายการ</button>' +
         (o.used.length ? '<div class="sec"><b>บันทึกเกิน (คืนเข้าสต้อก)</b></div><div class="stack" style="gap:.35rem">' + o.used.map(function (x) { return '<label class="row" style="flex-direction:row;align-items:center"><span class="sp">' + esc(x.name) + ' <span class="xs muted">ตัดไป ' + fm(x.qty) + '</span></span><input data-ret="' + esc(x.stock) + '" type="number" inputmode="decimal" min="0" max="' + x.qty + '" placeholder="0" style="width:100px"></label>'; }).join('') + '</div>' : '') +
         '<label>เหตุผล *<input id="fr" placeholder="เช่น ใช้ Nabota เพิ่ม 10U แต่ลืมกด"></label>' +
-        '<p class="xs muted">เฉพาะฝ่ายบัญชี · แก้ได้ภายใน 7 วันหลังทำ · ทุกครั้งเก็บประวัติและแสดงในเคส</p>',
+        '<p class="xs muted">' + (has(['account']) ? 'ฝ่ายบัญชี · แก้ได้ภายใน 7 วันหลังทำ' : 'พนักงานแก้ได้เฉพาะเคสวันนี้ · ใส่รหัสผู้แก้') + ' · ทุกครั้งเก็บประวัติและแสดงในเคส</p>',
       mount: function (b) { bindSupplies(b, list); b.oninput = function (e) { var x = e.target; if (x.dataset.ret) ret[x.dataset.ret] = nz(x.value); }; },
       onOk: function (b) {
-        return call('supplyFix', { id: o.id, add: list.filter(function (s) { return s.stock; }), ret: Object.keys(ret).filter(function (k) { return ret[k] > 0; }).map(function (k) { return { stock: k, qty: ret[k] }; }), reason: b.querySelector('#fr').value.trim() }, { write: true })
+        return call('supplyFix', { pin: '', id: o.id, add: list.filter(function (s) { return s.stock; }), ret: Object.keys(ret).filter(function (k) { return ret[k] > 0; }).map(function (k) { return { stock: k, qty: ret[k] }; }), reason: b.querySelector('#fr').value.trim() }, { write: true })
           .then(function (r) { S.stock = null; toast('แก้แล้ว: ' + r.change.join(', ')); refresh(); });
       } });
   }).catch(fail);
@@ -6414,6 +6430,20 @@ ACT.txUseCourse = function (el) {
     if (ok) call('useCourse', { id: el.dataset.id }, { write: true }).then(function (r) { toast('ตัดคอร์สแล้ว · เหลือ ' + r.left + ' · เพิ่มในรายการที่ต้องทำแล้ว'); refresh(); }).catch(fail);
   });
 };
+TITLES.supFixes = 'แก้ของที่ใช้ / ลืมเบิก';
+SCR.supFixes = function () {
+  var q = S.v.sfxQ || '';
+  return call('supplyFixCands', { q: q }).then(function (ls) {
+    S.v.sfx = ls; var bn = function (c) { var b = (S.boot.branches || []).filter(function (x) { return x.code === c; })[0]; return b ? b.name : c; };
+    return '<div class="stack"><div class="note small">เบิกของผิด / ลืมบันทึก / บันทึกเกิน · แก้ได้แม้ส่งกลับเคาน์เตอร์หรือจ่ายเงินแล้ว · ' + (has(['account']) ? 'ภายใน ' + esc(String((S.boot.settings || {}).supplyFixDays || 7)) + ' วันหลังทำ' : 'พนักงานแก้ได้เฉพาะเคสวันนี้ (เคสเก่าให้บัญชีแก้)') + ' · ไม่เปลี่ยนเงินในบิล</div>' +
+      '<div class="row"><input id="sfq" class="sp" placeholder="ค้น HN / ชื่อ / หัตถการ" value="' + esc(q) + '"><button class="btn" data-a="sfxFind">ค้นหา</button></div>' +
+      (ls.length ? '<div class="list">' + ls.map(function (o) {
+        return '<div class="li"><div class="main"><div class="t">' + esc(o.hn + ' ' + o.patient) + ' · ' + esc(o.name) + (o.fixes.length ? ' <span class="pill w">แก้แล้ว ' + o.fixes.length + ' ครั้ง</span>' : '') + '</div><div class="s">' + esc(bn(o.branch) + ' · ทำ ' + o.doneAt) + ' · ใช้ ' + esc(o.used.map(function (x) { return x.name + ' ' + fm(x.qty); }).join(', ') || 'ไม่ได้ตัดของ') + '</div></div>' +
+          '<button class="btn sm p" data-a="supFix" data-id="' + esc(o.id) + '">แก้ของ</button></div>';
+      }).join('') + '</div>' : '<div class="empty">ไม่มีรายการในช่วงนี้</div>') + '</div>';
+  });
+};
+ACT.sfxFind = function () { var i = $('#sfq'); S.v.sfxQ = i ? i.value.trim() : ''; refresh(); };
 TITLES.pendStock = 'รอบันทึกของที่ใช้';
 SCR.pendStock = function () {
   return call('stockPendingList').then(function (ls) {
