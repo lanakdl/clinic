@@ -1823,15 +1823,15 @@ function makeCore(store) {
     clock: ALL, myDay: ALL, myEarnings: ALL,
     ownerReport: ['account', 'manager'], feesReport: ['account', 'manager'], feeDays: ['account', 'manager'], feeDay: ['account', 'manager'], feeConfirm: ['manager'], feeReopen: ['manager'], feeEdit: ['manager'],
     stockList: STOCKV.concat(['front']), reqSuggest: STOCKR, reqCreate: STOCKR, reqList: STOCKV, reqApprove: ['central'], reqReceive: STOCKR, centralReceive: ['central'],
-    countSheet: ['manager'], countSubmit: ['manager']
+    countSheet: ['manager'], countSubmit: ['manager'], countAddItem: ['manager']
   };
-  var STOCK_ACTIONS = ['roomIssue', 'stockWaste', 'vialOpen', 'vialDiscard', 'reqCreate', 'reqReceive', 'countSubmit', 'countSheet', 'recordSupplies', 'reqSuggest', 'branchReceive'];
+  var STOCK_ACTIONS = ['roomIssue', 'stockWaste', 'vialOpen', 'vialDiscard', 'reqCreate', 'reqReceive', 'countSubmit', 'countSheet', 'countAddItem', 'recordSupplies', 'reqSuggest', 'branchReceive'];
   var WRITES = { registerPatient: 1, patientConsent: 1, setPhoto: 1, addLegacyCourse: 1, apptCreate: 1, apptCancel: 1, apptMove: 1, apptArrive: 1, apptNoShow: 1, createVisit: 1, cancelVisit: 1,
     callDoctor: 1, saveOPD: 1, startNumb: 1, claim: 1, moveRoom: 1, completeOrder: 1, sendBack: 1, saleCommit: 1, useCourse: 1, removeOrder: 1, pay: 1, reviewConsent: 1,
-    leadCreate: 1, clock: 1, feeConfirm: 1, feeReopen: 1, feeEdit: 1, reqCreate: 1, reqApprove: 1, reqReceive: 1, centralReceive: 1, countSubmit: 1 };
+    leadCreate: 1, clock: 1, feeConfirm: 1, feeReopen: 1, feeEdit: 1, reqCreate: 1, reqApprove: 1, reqReceive: 1, centralReceive: 1, countSubmit: 1, countAddItem: 1 };
 
   /* ---------- LINE OA (พนักงานเช็คอิน/ดูค่ามือของตัวเอง ผ่าน LIFF) ---------- */
-  var LINE_ACTIONS = ['leaveBook', 'leavePhoto', 'lineQueue', 'lineVisits', 'photoAdd', 'saleFeed', 'lineMe', 'clock', 'myDay', 'myEarnings', 'lineUnbind', 'offInfo', 'offBook', 'vacBook', 'offCancel', 'offPending', 'offDecide', 'offCalendar', 'myTasks', 'otInfo', 'otRequest', 'otCancel', 'otPending', 'otDecide', 'otPhoto', 'countSheet', 'countPreview', 'countSubmit'], LINE_ONLY = ['clock', 'myEarnings'];
+  var LINE_ACTIONS = ['leaveBook', 'leavePhoto', 'lineQueue', 'lineVisits', 'photoAdd', 'saleFeed', 'lineMe', 'clock', 'myDay', 'myEarnings', 'lineUnbind', 'offInfo', 'offBook', 'vacBook', 'offCancel', 'offPending', 'offDecide', 'offCalendar', 'myTasks', 'otInfo', 'otRequest', 'otCancel', 'otPending', 'otDecide', 'otPhoto', 'countSheet', 'countPreview', 'countSubmit', 'countAddItem'], LINE_ONLY = ['clock', 'myEarnings'];
   function lineUser(st, prof) {
     var br = find('Branches', 'code', String(st.branch)) || rows('Branches')[0] || {}, roles = rolesOf(st);
     return { code: String(st.code), name: String(st.nick || st.name), fullName: String(st.name), roles: roles, branch: String(br.code || ''), branchName: String(br.name || ''), brand: String(br.brand || ''),
@@ -4296,7 +4296,25 @@ function makeCore(store) {
     var last = rows('Counts').filter(function (c) { return c.branch === u.branch; }).slice(-1)[0];
     var items = rows('Stock').filter(function (s) { return s.branch === u.branch; }).map(function (s) { return { code: s.code, name: s.name, category: s.category, unit: s.unit, value: num(s.cost), pack: num(s.pack) > 1 ? num(s.pack) : 0, packName: String(s.packName || ''), split: splittable(s) }; })   /* มีขนาดบรรจุ → นับเป็นขวด/หัว/กล่อง แล้วคูณให้ */
       .sort(function (a, b) { return b.value - a.value; });
-    return { items: items, last: clean(last), dueDay: setting('countDay', 'จันทร์') };
+    var here = {}, others = {}; items.forEach(function (s) { here[String(s.code)] = 1; });
+    rows('Stock').forEach(function (r) { var k = String(r.code); if (!here[k] && !others[k]) others[k] = { code: k, name: String(r.name), category: String(r.category || ''), unit: String(r.unit || ''), pack: num(r.pack) > 1 ? num(r.pack) : 0, packName: String(r.packName || '') }; });
+    var uniq = function (f) { var o = {}; rows('Stock').forEach(function (r) { var v = String(r[f] || '').trim(); if (v) o[v] = 1; }); return Object.keys(o).sort(); };
+    return { items: items, last: clean(last), dueDay: setting('countDay', 'จันทร์'), others: Object.keys(others).map(function (k) { return others[k]; }).sort(function (a, b) { return a.name < b.name ? -1 : 1; }), categories: uniq('category'), units: uniq('unit') };
+  };
+  // ผู้จัดการเพิ่มของที่ไม่มีในใบนับ (ยอดเริ่ม 0 · นับแล้วส่วนต่างรอบัญชีอนุมัติเหมือนเดิม)
+  A.countAddItem = function (p, u) {
+    var code = txt(p.stock, 20), src = code ? rows('Stock').filter(function (r) { return String(r.code) === code; })[0] : null;
+    if (code && !src) err('ไม่พบของรหัส ' + code);
+    if (!src) {
+      var nm = txt(p.name, 120), un = txt(p.unit, 20); if (nm.length < 2) err('ใส่ชื่อของ'); if (!un) err('ใส่หน่วยเล็กสุด เช่น เม็ด, ชิ้น, หลอด, cc');
+      var dup = rows('Stock').filter(function (r) { return String(r.name).trim().toLowerCase() === nm.toLowerCase(); })[0]; if (dup) err('มี "' + dup.name + '" อยู่แล้ว — เลือกจากรายการแทน');
+      var pk = num(p.pack), mx = 0; rows('Stock').forEach(function (r) { var m = String(r.code).match(/^S(\d+)$/); if (m) mx = Math.max(mx, +m[1]); }); code = 'S' + ('00' + (mx + 1)).slice(-3);
+      src = { code: code, name: nm, category: txt(p.category, 40) || 'อื่นๆ', unit: un, cost: 0, pack: pk > 1 ? pk : '', packName: pk > 1 ? (txt(p.packName, 20) || 'กล่อง') : '', openDays: '', min: 0 };
+    }
+    if (stockRow(u.branch, code)) err('"' + src.name + '" มีในใบนับของสาขานี้แล้ว');
+    add('Stock', { branch: u.branch, code: code, name: String(src.name), category: String(src.category || ''), unit: String(src.unit || ''), qty: 0, cost: num(src.cost), pack: src.pack || '', packName: String(src.packName || ''), openDays: src.openDays === undefined ? '' : src.openDays, min: num(src.min), lot: '', expire: '' });
+    log(u, 'countAddItem', u.branch + ' ' + code + ' ' + src.name);
+    return { code: code, name: String(src.name) };
   };
   A.countSubmit = function (p, u) {
     var lines = p.lines || []; if (!lines.length) err('ยังไม่ได้นับ');
@@ -5416,6 +5434,24 @@ ACT.demoAddPt = function () {
       toast('เพิ่มเข้าคิวแล้ว ' + added.length + ' คน'); refresh();
     } });
 };
+
+/* ---------- ใบนับสต้อก: ผู้จัดการเพิ่มของที่ไม่มีในใบ (ใช้ทั้งแท็บเล็ตและ LINE) ---------- */
+function cntAddDlg(c, done) {
+  var o = (c.others || []).map(function (x) { return '<option value="' + esc(x.code) + '">' + esc(x.name + ' · ' + (x.pack ? (x.packName || 'ขวด') + ' (' + x.pack + ' ' + x.unit + ')' : x.unit)) + '</option>'; }).join('');
+  var dl = function (id, xs) { return '<datalist id="' + id + '">' + (xs || []).map(function (v) { return '<option value="' + esc(v) + '">'; }).join('') + '</datalist>'; };
+  return dialog({ title: 'เพิ่มของที่ไม่มีในใบนับ', ok: 'เพิ่มเข้าใบนับ', noFocus: true,
+    body: '<label>เลือกของที่มีในระบบ (สาขาอื่น/คลังกลาง)<select id="ca-s"><option value="">— ของใหม่ ยังไม่เคยมีในระบบ —</option>' + o + '</select></label>' +
+      '<div id="ca-new" class="stack"><div class="g2"><label>ชื่อของ *<input id="ca-n" placeholder="เช่น Roacta 10mg"></label><label>หน่วยเล็กสุด *<input id="ca-u" list="ca-ul" placeholder="เม็ด / ชิ้น / หลอด / cc"></label></div>' +
+      '<label>หมวด<input id="ca-c" list="ca-cl" placeholder="เช่น ยา, สินค้า"></label>' +
+      '<div class="g2"><label>นับเป็นกล่อง/ขวด? 1 กล่องมีกี่หน่วย<input id="ca-p" type="number" inputmode="decimal" min="0" placeholder="ว่าง = นับทีละหน่วย"></label><label>ชื่อหน่วยใหญ่<input id="ca-pn" placeholder="กล่อง / ขวด / หัว"></label></div></div>' +
+      dl('ca-ul', c.units) + dl('ca-cl', c.categories) +
+      '<p class="xs muted">เพิ่มเข้าสต้อกสาขานี้ยอด 0 แล้วกรอกจำนวนที่นับได้ในใบ · ส่วนต่างรอบัญชีอนุมัติเหมือนรายการอื่น</p>',
+    mount: function (b) { var s = b.querySelector('#ca-s'), nw = b.querySelector('#ca-new'), tg = function () { nw.hidden = !!s.value; }; s.onchange = tg; tg(); if (typeof selSearch === 'function') selSearch(s, '🔍 ค้นหาของ'); },
+    onOk: function (b) {
+      var v = function (id) { var e = b.querySelector('#' + id); return e ? e.value.trim() : ''; };
+      return call('countAddItem', { stock: v('ca-s'), name: v('ca-n'), unit: v('ca-u'), category: v('ca-c'), pack: v('ca-p'), packName: v('ca-pn') }, { write: true }).then(function (r) { toast('เพิ่ม "' + r.name + '" เข้าใบนับแล้ว'); if (done) done(r); });
+    } });
+}
 
 /* =====================================================================
  * หน้าร้าน: ค้นหา/ลงทะเบียน · หน้าคนไข้ · ขาย · เก็บเงิน · คิว
@@ -7161,8 +7197,8 @@ SCR.stock = function (tab) {
   if (tab === 'count') body = call('countSheet').then(function (c) {
     S.v.cnt = c;
     return '<div class="stack"><div class="note small">นับประจำสัปดาห์ (ทุกวัน' + esc(c.dueDay) + ') · ของแบ่งใช้: นับเฉพาะขวดที่ยังไม่เปิด (หน่วยเล็กสุด) ขวดที่เปิดแล้วดูในแท็บ “ขวดที่เปิดอยู่” · ระบบจะไม่โชว์ยอดในระบบระหว่างนับ เพื่อให้นับจริง' + (c.last ? ' · ครั้งล่าสุด ' + esc(c.last.time) + ' ต่าง ' + bt(c.last.diffValue) : '') + '</div>' +
-      '<div class="card tbl"><table><thead><tr><th>รายการ (ของแพงก่อน)</th><th class="n">นับได้</th></tr></thead><tbody>' + c.items.map(function (s, i) { return '<tr><td>' + esc(s.name) + ' <span class="xs muted">' + (s.pack ? 'นับเป็น' + esc(s.packName || 'ขวด') + (s.split ? ' (เฉพาะที่ยังไม่เปิด)' : '') + ' · 1 ' + esc(s.packName || 'ขวด') + ' = ' + fm(s.pack) + ' ' + esc(s.unit) : esc(s.unit)) + '</span></td><td class="n"><input data-ct="' + i + '" type="number" inputmode="decimal" step="any" style="width:110px;min-height:38px"> <span class="xs muted">' + esc(s.pack ? (s.packName || 'ขวด') : '') + '</span></td></tr>'; }).join('') + '</tbody></table></div>' +
-      '<button class="btn p lg" data-a="countCheck">ตรวจยอดกับระบบ</button></div>';
+      '<div class="card tbl"><table><thead><tr><th>รายการ (ของแพงก่อน)</th><th class="n">นับได้</th></tr></thead><tbody>' + c.items.map(function (s, i) { var kv = (S.cntKeep || {})[s.code]; return '<tr' + (S.cntNew === s.code ? ' id="cnew"' : '') + '><td>' + esc(s.name) + (S.cntNew === s.code ? ' <span class="pill g">เพิ่งเพิ่ม</span>' : '') + ' <span class="xs muted">' + (s.pack ? 'นับเป็น' + esc(s.packName || 'ขวด') + (s.split ? ' (เฉพาะที่ยังไม่เปิด)' : '') + ' · 1 ' + esc(s.packName || 'ขวด') + ' = ' + fm(s.pack) + ' ' + esc(s.unit) : esc(s.unit)) + '</span></td><td class="n"><input data-ct="' + i + '" type="number" inputmode="decimal" step="any" value="' + esc(kv != null ? kv : '') + '" style="width:110px;min-height:38px"> <span class="xs muted">' + esc(s.pack ? (s.packName || 'ขวด') : '') + '</span></td></tr>'; }).join('') + '</tbody></table></div>' +
+      '<div class="row" style="flex-wrap:wrap"><button class="btn lg" data-a="countAdd">+ เพิ่มของที่ไม่มีในใบ</button><button class="btn p lg sp" data-a="countCheck">ตรวจยอดกับระบบ</button></div></div>';
   });
   return body.then(function (h) { return head + h; });
 };
@@ -7243,6 +7279,10 @@ ACT.wasteSave = function () {
   var r = [$('#wr').value, $('#wr2').value.trim()].filter(String).join(' · ');
   call('stockWaste', { stock: $('#ws').value, qty: $('#wq').value, lot: $('#wl').value, reason: r, pin: pinVal() }, { write: true }).then(function () { S.stock = null; toast('บันทึกแล้ว'); refresh(); }).catch(fail);
 };
+ACT.countAdd = function () {
+  var keep = {}; $$('[data-ct]').forEach(function (i) { if (i.value !== '') keep[S.v.cnt.items[+i.dataset.ct].code] = i.value; });
+  cntAddDlg(S.v.cnt, function (r) { S.cntKeep = keep; S.cntNew = r.code; Promise.resolve(refresh()).then(function () { setTimeout(function () { var e = $('#cnew'); if (e) { e.scrollIntoView({ block: 'center' }); var i = e.querySelector('input'); if (i) i.focus(); } }, 300); }); });
+};
 ACT.countCheck = function () {
   var c = S.v.cnt, lines = [];
   $$('[data-ct]').forEach(function (i) { if (i.value !== '') { var it = c.items[+i.dataset.ct]; lines.push({ stock: it.code, counted: Math.round(nz(i.value) * (it.pack || 1) * 100) / 100 }); } });   // นับเป็นขวด → แปลงเป็นหน่วยเล็กสุด
@@ -7254,7 +7294,7 @@ ACT.countCheck = function () {
         return '<tr><td>' + esc(x.name) + '</td><td class="n">' + fm(x.system) + '</td><td class="n">' + fm(x.counted) + '</td><td class="n ' + (x.diff < 0 ? 'dn' : 'up') + '">' + fm(x.diff) + '</td><td class="n">' + fm(x.value) + '</td><td><input data-rs="' + esc(x.stock) + '" placeholder="เช่น ลืมตัด/แตก" style="min-height:36px"></td></tr>'; }).join('') + '</tbody></table></div>' : '<div class="empty">ตรงกับระบบทุกรายการ 👍</div>') +
         '<p class="small muted">นับ ' + pv.length + ' รายการ · รวมส่วนต่าง ' + bt(pv.reduce(function (s, x) { return s + x.value; }, 0)) + ' · ยอดในระบบจะปรับเป็นยอดที่นับได้</p>',
       onOk: function (b) { var rs = {}; $$('[data-rs]', b).forEach(function (i) { rs[i.dataset.rs] = i.value.trim(); }); lines.forEach(function (l) { l.reason = rs[l.stock] || ''; });
-        return call('countSubmit', { lines: lines }, { write: true }).then(function (r) { toast(r.pending ? 'บันทึกการนับ ' + r.id + ' · ส่วนต่าง ' + bt(r.diffValue) + ' · รอบัญชีอนุมัติก่อนปรับสต้อก' : 'บันทึกการนับ ' + r.id + ' · ตรงทุกรายการ'); S.cur.arg = 'list'; refresh(); }); } });
+        return call('countSubmit', { lines: lines }, { write: true }).then(function (r) { S.cntKeep = null; S.cntNew = null; toast(r.pending ? 'บันทึกการนับ ' + r.id + ' · ส่วนต่าง ' + bt(r.diffValue) + ' · รอบัญชีอนุมัติก่อนปรับสต้อก' : 'บันทึกการนับ ' + r.id + ' · ตรงทุกรายการ'); S.cur.arg = 'list'; refresh(); }); } });
   }).catch(fail);
 };
 
