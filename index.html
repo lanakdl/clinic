@@ -1802,8 +1802,10 @@ function makeCore(store) {
     var v = token && store.cacheGet('s_' + token);
     if (!v && token && store.propGet) { try { var ps = JSON.parse(store.propGet('S_' + token) || 'null'); if (ps && ps.exp > store.now().getTime()) v = JSON.stringify(ps.u); } catch (e) {} }
     if (!v) err('AUTH');
+    var uu = JSON.parse(v), sx = find('Staff', 'code', uu.code);   // ลาออก/ปิดใช้งานในชีต Staff → หลุดทันทีทุกเครื่อง
+    if (!sx || !on(sx.active)) { try { store.propDel && store.propDel('S_' + token); store.cachePut('s_' + token, '', 1); } catch (e) {} err('AUTH'); }
     store.cachePut('s_' + token, v, 21600);
-    return JSON.parse(v);
+    return uu;
   }
 
   /* ---------- สิทธิ์ ---------- */
@@ -1965,9 +1967,12 @@ function makeCore(store) {
     return why;
   }
   function offBr(code) { var s = find('Staff', 'code', code); return s ? String(s.branch) : ''; }
+  // สาขาที่คนนี้ทำงานจริง = สาขาหลัก + สาขาที่ระบุชื่อในช่อง "สาขาที่เข้าได้" (ว่าง/ทุกสาขา = แค่สาขาหลัก) → วันหยุดขึ้นปฏิทินทุกสาขาที่ทำ
+  function workBrs(code) { var s = find('Staff', 'code', code); if (!s) return []; var a = [String(s.branch)], l = String(s.branches || '').trim();
+    if (l && l !== 'ทุกสาขา' && l.toUpperCase() !== 'ALL') l.split(/[\s,]+/).forEach(function (b) { if (b && a.indexOf(b) < 0) a.push(b); }); return a; }
   function offClash(code, d, br) {   // คนอื่นในสาขาเดียวกันที่ลงวันนี้ไว้ก่อน (ลงแล้ว/อนุมัติ/รออนุมัติ) — คนกดก่อนได้ก่อน
-    br = br || offBr(code);
-    return rows('DayOffs').filter(function (x) { return x.date === d && String(x.staff) !== String(code) && String(x.branch) === br && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'ลากิจรายชม.'; }).map(function (x) { return String(x.name); });
+    var mine = br ? [br] : workBrs(code);
+    return rows('DayOffs').filter(function (x) { return x.date === d && String(x.staff) !== String(code) && OFF_LIVE.indexOf(x.status) >= 0 && x.kind !== 'ลากิจรายชม.' && (mine.indexOf(String(x.branch)) >= 0 || workBrs(x.staff).some(function (b) { return mine.indexOf(b) >= 0; })); }).map(function (x) { return String(x.name); });
   }
   function offOut(x) { var o = clean(x); o.statusTh = OFF_TH[x.status] || x.status; o.weekend = wkEnd(String(x.date)) && !wkFree(x.staff); o.hasPhoto = !!x.photo; delete o.photo; return o; }
 
@@ -2098,7 +2103,7 @@ function makeCore(store) {
     offAutoMaybe();
     var mon = /^\d{4}-\d{2}$/.test(String(p.month || '')) ? String(p.month) : today().slice(0, 7), all = roleIn(u, ['admin', 'owner']);
     var br = all && p.branch ? String(p.branch) : all && p.branch === '' ? '' : u.branch;
-    var list = rows('DayOffs').filter(function (x) { return String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && (!br || String(x.branch) === br); })
+    var list = rows('DayOffs').filter(function (x) { return String(x.date).slice(0, 7) === mon && OFF_LIVE.indexOf(x.status) >= 0 && (!br || String(x.branch) === br || workBrs(x.staff).indexOf(br) >= 0); })
       .map(function (x) { return { date: String(x.date), name: String(x.name), branch: String(x.branch), status: x.status, vac: x.kind === 'พักร้อน', me: String(x.staff) === u.code }; });
     return { month: mon, branch: br, hol: holMap(br, [mon]), canAll: all, branches: all ? rows('Branches').filter(function (b) { return on(b.active); }).map(function (b) { return { code: String(b.code), name: String(b.name) }; }) : [], list: list };
   };
@@ -4289,7 +4294,7 @@ function makeCore(store) {
   };
   A.countSheet = function (p, u) {
     var last = rows('Counts').filter(function (c) { return c.branch === u.branch; }).slice(-1)[0];
-    var items = rows('Stock').filter(function (s) { return s.branch === u.branch; }).map(function (s) { return { code: s.code, name: s.name, category: s.category, unit: s.unit, value: num(s.cost) }; })
+    var items = rows('Stock').filter(function (s) { return s.branch === u.branch; }).map(function (s) { return { code: s.code, name: s.name, category: s.category, unit: s.unit, value: num(s.cost), pack: num(s.pack) > 1 ? num(s.pack) : 0, packName: String(s.packName || ''), split: splittable(s) }; })   /* มีขนาดบรรจุ → นับเป็นขวด/หัว/กล่อง แล้วคูณให้ */
       .sort(function (a, b) { return b.value - a.value; });
     return { items: items, last: clean(last), dueDay: setting('countDay', 'จันทร์') };
   };
@@ -7156,7 +7161,7 @@ SCR.stock = function (tab) {
   if (tab === 'count') body = call('countSheet').then(function (c) {
     S.v.cnt = c;
     return '<div class="stack"><div class="note small">นับประจำสัปดาห์ (ทุกวัน' + esc(c.dueDay) + ') · ของแบ่งใช้: นับเฉพาะขวดที่ยังไม่เปิด (หน่วยเล็กสุด) ขวดที่เปิดแล้วดูในแท็บ “ขวดที่เปิดอยู่” · ระบบจะไม่โชว์ยอดในระบบระหว่างนับ เพื่อให้นับจริง' + (c.last ? ' · ครั้งล่าสุด ' + esc(c.last.time) + ' ต่าง ' + bt(c.last.diffValue) : '') + '</div>' +
-      '<div class="card tbl"><table><thead><tr><th>รายการ (ของแพงก่อน)</th><th class="n">นับได้</th></tr></thead><tbody>' + c.items.map(function (s, i) { return '<tr><td>' + esc(s.name) + ' <span class="xs muted">' + esc(s.unit) + '</span></td><td class="n"><input data-ct="' + i + '" type="number" inputmode="decimal" step="any" style="width:110px;min-height:38px"></td></tr>'; }).join('') + '</tbody></table></div>' +
+      '<div class="card tbl"><table><thead><tr><th>รายการ (ของแพงก่อน)</th><th class="n">นับได้</th></tr></thead><tbody>' + c.items.map(function (s, i) { return '<tr><td>' + esc(s.name) + ' <span class="xs muted">' + (s.pack ? 'นับเป็น' + esc(s.packName || 'ขวด') + (s.split ? ' (เฉพาะที่ยังไม่เปิด)' : '') + ' · 1 ' + esc(s.packName || 'ขวด') + ' = ' + fm(s.pack) + ' ' + esc(s.unit) : esc(s.unit)) + '</span></td><td class="n"><input data-ct="' + i + '" type="number" inputmode="decimal" step="any" style="width:110px;min-height:38px"> <span class="xs muted">' + esc(s.pack ? (s.packName || 'ขวด') : '') + '</span></td></tr>'; }).join('') + '</tbody></table></div>' +
       '<button class="btn p lg" data-a="countCheck">ตรวจยอดกับระบบ</button></div>';
   });
   return body.then(function (h) { return head + h; });
@@ -7240,7 +7245,7 @@ ACT.wasteSave = function () {
 };
 ACT.countCheck = function () {
   var c = S.v.cnt, lines = [];
-  $$('[data-ct]').forEach(function (i) { if (i.value !== '') lines.push({ stock: c.items[+i.dataset.ct].code, counted: nz(i.value) }); });
+  $$('[data-ct]').forEach(function (i) { if (i.value !== '') { var it = c.items[+i.dataset.ct]; lines.push({ stock: it.code, counted: Math.round(nz(i.value) * (it.pack || 1) * 100) / 100 }); } });   // นับเป็นขวด → แปลงเป็นหน่วยเล็กสุด
   if (!lines.length) return toast('ยังไม่ได้กรอกยอดนับ', 1);
   call('countPreview', { lines: lines }, { spin: true }).then(function (pv) {
     var diff = pv.filter(function (x) { return x.diff !== 0; });
