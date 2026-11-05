@@ -1374,6 +1374,7 @@ function makeCore(store) {
       c.bom = (bomM[o.item] || []).map(function (b) { return { stock: b.stock, name: (st[b.stock] || {}).name || b.stock, unit: (st[b.stock] || {}).unit || '', qty: b.qty * num(o.qty) }; });
       c.used = usedOf(o); c.fixable = o.status === 'DONE' && !on(o.stockPending) && String(o.doneAt).slice(0, 10) >= addDays(today(), -num(setting('supplyFixDays', 7)));
       c.fixes = rows('SupplyEdits').filter(function (e) { return e.order === o.id; }).map(clean);
+      if (sellsCourse(o)) c.preParts = partsOf(o, v.branch).map(function (x) { return { item: String(x.item), name: String(x.name), qty: num(x.qty), buffet: !!x.buffet, used: preOrders(o, x.item).length, choice: String(x.choice || '') }; });
       return c;
     });
     var crs = rows('Courses').filter(function (c) { return c.hn === v.hn && c.status === 'ACTIVE' && (!c.expire || c.expire >= today()) && (on(c.buffet) || num(c.total) > num(c.used)); }).map(function (c) { return { id: c.id, itemName: c.itemName, choice: c.choice || '', left: on(c.buffet) ? 'บุฟเฟต์' : (num(c.total) - num(c.used)) + '/' + num(c.total), expire: c.expire || '' }; });
@@ -1779,6 +1780,19 @@ function makeCore(store) {
     return { vn: v.vn, queue: v.queue, queued: queued, left: buffet ? 'ไม่จำกัด' : num(c.total) - used, order: clean(o) };
   }
   A.useCourse = function (p, u) { var r = redeem(p.id, u, null); log(u, 'useCourse', p.id + ' → ' + r.vn); return r; };
+  // ซื้อคอร์ส/โปรระหว่างทำ (ยังไม่จ่าย) → ห้องทรีตเมนต์ทำครั้งแรกได้เลย ตอนจ่ายระบบเปิดคอร์สแล้วนับครั้งนี้เป็นครั้งที่ใช้
+  A.preUse = function (p, u) {
+    var o = find('Orders', 'id', txt(p.oid)); if (!o) err('ไม่พบรายการ'); var v = visitOf(o.vn, u);
+    if (!sellsCourse(o)) err(o.receipt ? 'จ่ายแล้ว — ใช้จาก "คอร์สที่คนไข้มีอยู่" แทน' : 'รายการนี้ไม่ใช่คอร์ส/โปร');
+    if (['DONE', 'CANCEL'].indexOf(v.stage) >= 0) err('เคสนี้ปิดแล้ว');
+    var x = partsOf(o, v.branch).filter(function (q) { return String(q.item) === String(p.item); })[0]; if (!x) err('ไม่พบรายการในคอร์ส');
+    var n = preOrders(o, x.item).length; if (!x.buffet && n >= num(x.qty)) err('ใช้ครบ ' + x.qty + ' ครั้งแล้ว');
+    var it = itemByCode(x.item) || { code: x.item, name: x.name, category: '', type: 'หัตถการ', dfPct: x.dfPct, staffFee: 0, performer: 'แพทย์' };
+    var no = addOrder(v, it, 1, u, { price: 0, name: 'ใช้คอร์ส: ' + x.name + (x.choice ? ' (' + x.choice + ')' : '') + ' (ยังไม่จ่าย)', type: 'redeem', courseRef: preKey(o, x.item), dfPct: num(x.dfPct), dfFixed: num(x.dfFixed), seller: '-', forceStatus: 'PENDING' });
+    if (isMJ(x.name) || isMJ(it.name)) addMjFee(v, no, u);
+    if (v.stage === 'SALE') setStage(v, 'WAIT_TX');
+    log(u, 'preUse', o.id + ' ' + x.item + ' → ' + no.id); return clean(no);
+  };
 
   A.removeOrder = function (p, u) {
     var o = find('Orders', 'id', p.id); if (!o) err('ไม่พบรายการ');
@@ -1786,6 +1800,9 @@ function makeCore(store) {
     if (o.status === 'DONE') err('ทำไปแล้ว ลบไม่ได้'); if (o.receipt) err('ชำระเงินแล้ว ลบไม่ได้');
     if (o.item === 'MJFEE' && find('Orders', 'id', String(o.choice).replace('ref:', ''))) err('ค่าบริการแพทย์ Mounjaro บังคับเก็บทุกครั้งที่ฉีด — ลบไม่ได้ (ถ้าไม่ฉีดแล้ว ให้ลบรายการฉีด/ใช้คอร์ส แล้ว 50 บาทจะหายเอง)');
     if (on(o.issueLater) && usedOf(o).length) err('ห้อง OR เบิกของรายการนี้ไปแล้ว — ให้แก้ของที่ใช้ (คืนของ) ก่อนลบ');
+    if (sellsCourse(o)) { var pres = ordersOf(o.vn).filter(function (x) { return String(x.courseRef).indexOf('pre:' + o.id + ':') === 0; });
+      if (pres.some(function (x) { return x.status === 'DONE'; })) err('ห้องทรีตเมนต์ทำไปแล้ว ' + pres.length + ' ครั้ง — ลบคอร์สนี้ไม่ได้');
+      pres.forEach(function (x) { store.remove('Orders', x); }); }
     if (o.courseRef) restoreCourse(o.courseRef);
     store.remove('Orders', o); log(u, 'removeOrder', o.vn + ' ' + o.name);
     ordersOf(o.vn).filter(function (x) { return String(x.choice) === 'ref:' + o.id && x.status !== 'DONE' && !x.receipt; }).forEach(function (x) { store.remove('Orders', x); });
@@ -1813,17 +1830,25 @@ function makeCore(store) {
 
   function promoParts(code) { return rows('Promos').filter(function (r) { return String(r.code) === String(code); }); }
 
-  function openCourses(o, v, u, rc) {
-    var opened = [], net = num(o.paidNet), it = itemByCode(o.item), parts = [];
+  // ส่วนประกอบของคอร์ส/โปร (ใช้ตอนเปิดคอร์สหลังจ่าย และตอน "ทำวันนี้ก่อนจ่าย")
+  function partsOf(o, br) {
+    var it = itemByCode(o.item), parts = [];
     if (o.type === 'promo') {
       promoParts(o.promo).forEach(function (r) { var pit = r.item ? itemByCode(r.item) : null; parts.push({ item: pit ? pit.code : String(o.promo) + ':' + (r.part || ''), name: r.part || (pit && pit.name) || '',
         qty: (num(r.qty) || 1) * num(o.qty), weight: num(r.fullPrice) * (num(r.qty) || 1), dfPct: pit ? num(pit.dfPct) : 0, buffet: /บุฟเฟต์|buffet/i.test(String(r.part)) || num(r.buffetDF) > 0, dfFixed: num(r.buffetDF), choice: o.choice || r.choice || '' }); });
     } else {
       var ci = rows('CourseItems').filter(function (c) { return String(c.course) === String(o.item); });
       if (ci.length) ci.forEach(function (c) { var cit = itemByCode(c.item); parts.push({ item: String(c.item), name: c.itemName || (cit && cit.name) || c.item, qty: num(c.sessions) * num(o.qty),
-        weight: num(priceAt(cit || {}, u.branch)) * num(c.sessions), dfPct: cit ? num(cit.dfPct) : 0, buffet: false, dfFixed: 0, choice: '' }); });
+        weight: num(priceAt(cit || {}, br)) * num(c.sessions), dfPct: cit ? num(cit.dfPct) : 0, buffet: false, dfFixed: 0, choice: '' }); });
       else parts.push({ item: String(o.item), name: String(o.name), qty: (num(it && it.sessions) || 1) * num(o.qty), weight: 1, dfPct: num(it && it.dfPct), buffet: typeOf(it || {}) === 'buffet', dfFixed: 0, choice: o.choice || '' });
     }
+    return parts;
+  }
+  function preKey(o, item) { return 'pre:' + o.id + ':' + item; }
+  function preOrders(o, item) { var k = preKey(o, item); return ordersOf(o.vn).filter(function (x) { return String(x.courseRef) === k; }); }
+  function sellsCourse(o) { return o && !o.receipt && ['promo', 'course', 'buffet'].indexOf(String(o.type)) >= 0; }
+  function openCourses(o, v, u, rc) {
+    var opened = [], net = num(o.paidNet), it = itemByCode(o.item), parts = partsOf(o, u.branch);
     if (parts.some(function (x) { return !(x.weight > 0); })) parts.forEach(function (x) { x.weight = Math.max(1, num(x.qty)); }); // ไม่มีราคาเต็ม → แบ่งมูลค่าตามจำนวนครั้ง
     var wsum = sum(parts, function (x) { return x.weight; }) || parts.length, acc = 0;
     var days = num(it && it.validDays) || (parts.some(function (x) { return x.buffet; }) ? 365 : 0);
@@ -1832,7 +1857,10 @@ function makeCore(store) {
       var alloc = i === parts.length - 1 ? r2(net - acc) : r2(net * (x.weight || 1) / wsum); acc = r2(acc + alloc);
       var c = add('Courses', { id: nextId('CS', 'seq_CS'), hn: v.hn, name: v.name, src: o.promo || o.item, srcName: o.name, item: x.item, itemName: x.name, total: x.buffet ? 9999 : x.qty, used: 0,
         perVal: x.buffet ? 0 : r2(alloc / Math.max(1, x.qty)), dfPct: x.dfPct, dfFixed: x.dfFixed, expire: exp, status: 'ACTIVE', receipt: rc, branch: u.branch, created: stamp(), buffet: x.buffet, choice: x.choice, legacy: false, photo: '' });
-      opened.push(c.itemName + (x.buffet ? ' บุฟเฟต์' : ' ' + c.total + ' ครั้ง'));
+      var pre = preOrders(o, x.item);   // ทำไปแล้วก่อนจ่าย → ผูกเข้าคอร์สที่เพิ่งเปิด และนับเป็นครั้งที่ใช้
+      if (pre.length) { pre.forEach(function (po) { upd('Orders', po, { courseRef: c.id, perVal: num(c.perVal), name: String(po.name).replace(' (ยังไม่จ่าย)', '') }); });
+        var u2 = Math.min(num(c.total), pre.length); upd('Courses', c, { used: u2, status: !x.buffet && u2 >= num(c.total) ? 'USED' : 'ACTIVE' }); }
+      opened.push(c.itemName + (x.buffet ? ' บุฟเฟต์' : ' ' + c.total + ' ครั้ง') + (pre.length ? ' (ใช้แล้ว ' + pre.length + ')' : ''));
     });
     return opened;
   }
@@ -2214,6 +2242,7 @@ function makeCore(store) {
   };
   PERM.payLinkCreate = FRONTISH.concat(['sales']); PERM.payLinks = FRONTISH.concat(['sales']); PERM.payLinkCancel = FRONTISH.concat(['sales']); WRITES.payLinkCreate = 1; WRITES.payLinkCancel = 1;
   PERM.beamCreate = FRONTISH.concat(['sales']); PERM.beamStatus = FRONTISH.concat(['sales']); PERM.beamCancel = FRONTISH.concat(['sales']); WRITES.beamCreate = 1; WRITES.beamCancel = 1;
+  PERM.preUse = SELLERS; WRITES.preUse = 1;
   PERM.courseToCredit = FRONTISH; PERM.walletHistory = ALL; PERM.walletAdjust = FRONTISH;
   WRITES.courseToCredit = 1; WRITES.walletAdjust = 1;
 
