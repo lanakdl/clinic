@@ -5535,7 +5535,7 @@ function regHtml(arg, cp) {
     (paper ? '<label>HN เดิม (จากแฟ้มกระดาษ) *<input name="oldHn" required placeholder="เช่น 10234"></label>' : '') +
     '<div class="g3"><label>คำนำหน้า<select name="title">' + opts(['', 'นาย', 'นาง', 'นางสาว', 'Mr.', 'Mrs.', 'Ms.'], f.title || '') + '</select></label><label style="grid-column:span 2">ชื่อ-สกุล *<input name="name" required value="' + esc(f.name || '') + '"></label></div>' +
     '<div class="g3"><label>ชื่อเล่น<input name="nickname"' + V('nickname') + '></label><label style="grid-column:span 2">ชื่อภาษาอังกฤษ<input name="nameEn"' + V('nameEn') + '></label></div>' +
-    '<div class="g3"><label>เลขบัตร/พาสปอร์ต<input name="idcard" inputmode="numeric"' + V('idcard') + '></label><label>วันเกิด<input type="date" name="dob"' + V('dob') + '></label><label>เพศ<select name="gender">' + opts(['', 'หญิง', 'ชาย', 'อื่นๆ'], f.gender || '') + '</select></label></div>' +
+    '<div class="g3"><label>เลขบัตร/พาสปอร์ต<input name="idcard" inputmode="text" autocapitalize="characters" autocomplete="off" placeholder="เลข 13 หลัก หรือ เลขพาสปอร์ต เช่น AB1234567"' + V('idcard') + '></label><label>วันเกิด<input type="date" name="dob"' + V('dob') + '></label><label>เพศ<select name="gender">' + opts(['', 'หญิง', 'ชาย', 'อื่นๆ'], f.gender || '') + '</select></label></div>' +
     '<div class="g2"><label>เบอร์โทร * <span class="xs">(ใช้ยิงแอด)</span><input name="phone" type="tel" inputmode="tel" required value="' + esc(f.phone || '') + '"></label><label>อีเมล * <span class="xs">(ใช้ยิงแอด)</span><input name="email" type="email" inputmode="email"' + V('email') + '></label></div>' +
     '<label class="ck"><input type="checkbox" name="noEmail"' + (pre || (cp && !cp.email) ? ' checked' : '') + '> คนไข้ไม่มีอีเมล</label>' +
     '<div class="g2"><label>อาชีพ<input name="occupation"' + V('occupation') + '></label><label>รู้จักคลินิกจาก<select name="channel">' + opts(CHANNELS, f.channel || 'Walk-in') + '</select></label></div>' +
@@ -6608,7 +6608,7 @@ ACT.opdAdd = function () { var a = $('#of [name=addendum]').value.trim(); if (!a
 TITLES.or = 'ห้องทรีตเมนต์ / หัตถการ';
 SCR.or = function () {
   return Promise.all([call('queue'), S.user.stock ? call('stockPendingList').catch(function () { return []; }) : Promise.resolve(null)]).then(function (rr) { var q = rr[0], pl = rr[1];
-    var cols = [['รอทำ', ['DR_DONE', 'WAIT_TX']], ['ทายาชา', ['NUMB']], ['กำลังทำ', ['IN_TX']], ['รอแพทย์ / ส่งกลับแล้ว', ['WAIT_DR', 'IN_DR', 'BACK']]];
+    var cols = [['รอทำ', ['DR_DONE', 'WAIT_TX']], ['ทายาชา', ['NUMB']], ['กำลังทำ', ['IN_TX']], ['รอแพทย์', ['WAIT_DR', 'IN_DR']]];
     qaCheck('or', q.filter(function (v) { return v.stage === 'DR_DONE' || v.stage === 'WAIT_TX'; }), 'ห้องทรีตเมนต์');
     return '<div class="stack">' + qaBox('or') + '<div class="row" style="flex-wrap:wrap"><span class="sp muted small" style="min-width:14rem">แตะการ์ดเพื่อรับงาน · เลือกห้อง · บันทึกของที่ใช้</span><button class="btn sm" data-go="sched">ตารางห้อง</button>' + (S.user.stock ? '<button class="btn sm" data-go="stock" data-arg="room">เบิกของเข้าห้อง</button>' : '') +
       (pl ? (pl.length ? '<button class="btn sm w" data-go="pendStock">📦 ยังไม่ได้บันทึกของ · ' + pl.length + ' รายการ</button>' : '<span class="pill g">บันทึกของครบ ✓</span>') : '') + '</div><div class="board">' + cols.map(function (c) {
