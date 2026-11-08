@@ -4469,7 +4469,8 @@ function makeCore(store) {
   PERM.branchReceive = STOCKR.concat(['front']); WRITES.branchReceive = 1;   // หน้าร้านรับของที่บริษัทมาส่งได้
   /* ---------- เพิ่มรายการของในสต้อก (ผู้ดูแลระบบ/Owner/คลังกลาง) · เลือกสาขาได้หลายสาขา · ยอดเริ่ม 0 แล้วใช้ "รับของ" เติม ---------- */
   A.stockMeta = function (p, u) {
-    var by = {}; rows('Stock').forEach(function (r) { var k = String(r.code); var x = by[k] = by[k] || { code: k, name: String(r.name), category: String(r.category || ''), unit: String(r.unit || ''), pack: num(r.pack), packName: String(r.packName || ''), openDays: r.openDays === '' ? '' : num(r.openDays), min: num(r.min), cost: num(r.cost), branches: [] }; if (x.branches.indexOf(String(r.branch)) < 0) x.branches.push(String(r.branch)); });
+    var by = {}; rows('Stock').forEach(function (r) { var k = String(r.code); var x = by[k] = by[k] || { code: k, name: String(r.name), category: String(r.category || ''), unit: String(r.unit || ''), pack: num(r.pack), packName: String(r.packName || ''), openDays: r.openDays === '' ? '' : num(r.openDays), min: num(r.min), cost: num(r.cost), branches: [], qtys: {}, open: {} }; if (x.branches.indexOf(String(r.branch)) < 0) x.branches.push(String(r.branch)); x.qtys[String(r.branch)] = num(r.qty); if (splittable(r)) x.open[String(r.branch)] = openLeft(String(r.branch), k); });
+    var bomN = {}; rows('BOM').forEach(function (b) { bomN[String(b.stock)] = (bomN[String(b.stock)] || 0) + 1; }); Object.keys(by).forEach(function (k) { by[k].bom = bomN[k] || 0; });
     var uniq = function (f) { var o = {}; rows('Stock').forEach(function (r) { var v = String(r[f] || '').trim(); if (v) o[v] = 1; }); return Object.keys(o).sort(); };
     return { items: Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return a.name < b.name ? -1 : 1; }), categories: uniq('category'), units: uniq('unit'),
       branches: rows('Branches').filter(function (b) { return on(b.active === '' ? true : b.active); }).map(function (b) { return { code: String(b.code), name: String(b.name) }; }).concat([{ code: 'CENTRAL', name: 'คลังกลาง' }]) };
@@ -4523,6 +4524,45 @@ function makeCore(store) {
   };
   PERM.bomInfo = ALL; PERM.bomLink = ALL; WRITES.bomLink = 1;
   PERM.stockMeta = ['admin', 'central']; PERM.stockItemAdd = ['admin', 'central']; WRITES.stockItemAdd = 1;
+  /* ---------- Owner จัดการรายการของเอง: แก้ข้อมูล · ปรับยอด · แปลงหน่วย · ลบ (ทุกครั้งบันทึกประวัติ) ---------- */
+  A.stockManage = function (p, u) {
+    var code = txt(p.code, 20), all = rows('Stock').filter(function (r) { return String(r.code) === code; }); if (!all.length) err('ไม่พบรายการ ' + code);
+    var nm = String(all[0].name), why = txt(p.reason, 120);
+    if (p.op === 'edit') {
+      var f = p.set || {}, ch = {};
+      if (f.name !== undefined) { var n2 = txt(f.name, 120); if (n2.length < 2) err('ใส่ชื่อ'); ch.name = n2; }
+      ['category', 'unit', 'packName'].forEach(function (k) { if (f[k] !== undefined) ch[k] = txt(f[k], 40); });
+      if (ch.unit === '') err('ใส่หน่วยเล็กสุด');
+      ['pack', 'openDays', 'min', 'cost'].forEach(function (k) { if (f[k] !== undefined) ch[k] = f[k] === '' || f[k] === null ? '' : r2(num(f[k])); });
+      if (ch.pack !== undefined && !(num(ch.pack) > 1)) ch.pack = '';
+      var cv = num(p.conv);   // แปลงหน่วย: 1 หน่วยเดิม = cv หน่วยใหม่ (เช่น ขวด → cc ×8) · คูณยอดทุกสาขา/จุดสั่ง/BOM ให้ หารต้นทุน
+      all.forEach(function (r) { var c2 = {}; for (var k in ch) c2[k] = ch[k];
+        if (cv > 0 && cv !== 1) { c2.qty = r2(num(r.qty) * cv); c2.min = r2(num(c2.min !== undefined ? c2.min : r.min) * (c2.min !== undefined ? 1 : cv)); c2.cost = r2(num(c2.cost !== undefined && c2.cost !== '' ? c2.cost : r.cost) / (c2.cost !== undefined && c2.cost !== '' ? 1 : cv)); }
+        upd('Stock', r, c2); });
+      if (cv > 0 && cv !== 1) { rows('BOM').filter(function (b) { return String(b.stock) === code; }).forEach(function (b) { upd('BOM', b, { qty: r2(num(b.qty) * cv) }); });
+        rows('OpenVials').filter(function (v) { return String(v.stock) === code && v.status === 'OPEN'; }).forEach(function (v) { upd('OpenVials', v, { size: r2(num(v.size) * cv), left: r2(num(v.left) * cv), unit: ch.unit || v.unit }); }); }
+      log(u, 'stockManage', 'แก้ ' + code + ' ' + nm + ' ' + JSON.stringify(ch) + (cv && cv !== 1 ? ' แปลงหน่วย ×' + cv : '')); return { changed: Object.keys(ch).length + (cv && cv !== 1 ? 1 : 0) };
+    }
+    if (p.op === 'qty') {   // ตั้งยอดคงเหลือ (ปิดผนึก) ของแต่ละสาขา
+      if (!why) err('ใส่เหตุผลที่ปรับยอด');
+      var out = []; (p.qtys ? Object.keys(p.qtys) : []).forEach(function (b) { var r = all.filter(function (x) { return x.branch === b; })[0]; if (!r || p.qtys[b] === '' || p.qtys[b] === null) return;
+        var nq = r2(num(p.qtys[b])), d = r2(nq - num(r.qty)); if (nq < 0) err('ยอดติดลบไม่ได้'); if (!d) return;
+        upd('Stock', r, { qty: nq }); add('StockMoves', { time: stamp(), branch: b, stock: code, name: nm, qty: d, type: 'ปรับยอด (Owner)', ref: why, by: u.name, balance: r2(nq + (splittable(r) ? openLeft(b, code) : 0)) }); out.push(b + ' ' + (d > 0 ? '+' : '') + d); });
+      log(u, 'stockManage', 'ปรับยอด ' + code + ' ' + nm + ' ' + out.join(', ') + ' · ' + why); return { changed: out.length, detail: out };
+    }
+    if (p.op === 'del') {
+      var brs = (p.branches || []).map(String), rm = all.filter(function (r) { return brs.indexOf(String(r.branch)) >= 0; }); if (!rm.length) err('เลือกสาขาที่จะลบ');
+      rm.forEach(function (r) { var b = String(r.branch), left = r2(num(r.qty) + (splittable(r) ? openLeft(b, code) : 0));
+        rows('OpenVials').filter(function (v) { return v.branch === b && String(v.stock) === code && v.status === 'OPEN'; }).forEach(function (v) { upd('OpenVials', v, { status: 'DISCARDED', left: 0, closedBy: u.name + ' ลบรายการ ' + stamp() }); });
+        if (left) add('StockMoves', { time: stamp(), branch: b, stock: code, name: nm, qty: -left, type: 'ลบรายการ (Owner)', ref: why || '-', by: u.name, balance: 0 });
+        store.remove('Stock', r); });
+      var gone = rows('Stock').every(function (r) { return String(r.code) !== code; }), bomDel = 0;
+      if (gone) rows('BOM').filter(function (b) { return String(b.stock) === code; }).slice().forEach(function (b) { store.remove('BOM', b); bomDel++; });
+      log(u, 'stockManage', 'ลบ ' + code + ' ' + nm + ' สาขา ' + brs.join(',') + (bomDel ? ' · ตัดการผูกรายการขาย ' + bomDel : '') + (why ? ' · ' + why : '')); return { removed: rm.length, bomDel: bomDel };
+    }
+    err('คำสั่งไม่ถูกต้อง');
+  };
+  PERM.stockManage = ['owner', 'admin']; WRITES.stockManage = 1;
   A.roomIssueLog = function (p, u) {
     var since = addDays(today(), -num(p.days || 14));
     return rows('StockMoves').filter(function (m) { return m.branch === u.branch && String(m.type).indexOf('เบิกใช้ในห้อง') === 0 && String(m.time).slice(0, 10) >= since; }).slice(-80).reverse().map(clean);
@@ -7221,7 +7261,7 @@ var STAB = [['list', 'คงเหลือ'], ['vials', 'ขวดที่เ�
 function packTxt(s, q) { q = q == null ? s.qty : q; return s.pack > 1 ? fm(q) + ' ' + esc(s.unit) + ' <span class="xs muted">(≈' + fm(q / s.pack, 1) + ' ' + esc(s.packName || '') + ')</span>' : fm(q) + ' ' + esc(s.unit); }
 SCR.stock = function (tab) {
   tab = tab || 'list'; S.v.stab = tab;
-  var tabs = STAB.filter(function (t) { return (t[0] !== 'count' || has(['manager'])) && (S.user.stock || t[0] === 'list' || t[0] === 'recv'); }).concat(has(['admin', 'central']) ? [['add', '+ เพิ่มรายการของ']] : []);
+  var tabs = STAB.filter(function (t) { return (t[0] !== 'count' || has(['manager'])) && (S.user.stock || t[0] === 'list' || t[0] === 'recv'); }).concat(has(['admin', 'central']) ? [['add', '+ เพิ่มรายการของ']] : []).concat(has(['owner']) ? [['manage', '✏️ จัดการรายการ']] : []);
   var head = '<div class="tabs" style="margin-bottom:.8rem">' + tabs.map(function (t) { return '<button class="' + (t[0] === tab ? 'on' : '') + '" data-a="stab" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>';
   var body;
   if (tab === 'list') body = stockCache(true).then(function (st) {
@@ -7270,6 +7310,11 @@ SCR.stock = function (tab) {
       '<label>รายการ<select id="ws">' + opts(st.map(function (s) { return [s.code, s.name + ' (เหลือ ' + fm(s.qty) + ' ' + s.unit + ')']; }), '', '— เลือก —') + '</select></label><div class="g2"><label>จำนวน (หน่วยเล็กสุด)<input id="wq" type="number" inputmode="decimal" step="any"></label><label>Lot<input id="wl"></label></div>' +
       '<label>เหตุผล *<select id="wr">' + opts(['', 'หมดอายุหลังผสม/เปิดขวด', 'ขวด/หลอดแตก', 'หมดอายุ', 'ปนเปื้อน', 'อื่นๆ']) + '</select></label><input id="wr2" placeholder="รายละเอียดเพิ่มเติม">' + pinField('ผู้บันทึก: รหัสพนักงาน *') + '<button class="btn d lg" data-a="wasteSave">บันทึกทิ้ง/เสีย</button></div>';
   });
+  if (tab === 'manage') body = call('stockMeta').then(function (m) {
+    S.v.sm = m;
+    return '<div class="stack"><div class="note small">แก้ชื่อ/หน่วย/ขนาดบรรจุ/อายุหลังเปิด · ปรับยอดคงเหลือแต่ละสาขา · ลบรายการ — ทุกครั้งบันทึกประวัติว่าใครทำ · ยอดในตาราง = ปิดผนึก (+ ที่เปิดอยู่)</div>' +
+      '<input id="smq" type="search" placeholder="🔍 ค้นหาชื่อ/รหัส" autocomplete="off"><div id="sml" class="stack" style="gap:.5rem">' + smRows(m.items, '') + '</div></div>';
+  });
   if (tab === 'add') body = call('stockMeta').then(function (m) {
     S.v.sm = m; var bx = function (b) { return '<label class="ck"><input type="checkbox" data-br="' + esc(b.code) + '"' + (b.code === S.user.branch ? ' checked' : '') + '> ' + esc(b.name) + '</label>'; };
     return '<div class="card stack" style="max-width:640px"><h2>เพิ่มรายการของในสต้อก</h2>' +
@@ -7294,6 +7339,7 @@ SCR.stock = function (tab) {
 function riChips(st, q) { q = String(q || '').toLowerCase().replace(/\s+/g, ''); var xs = st.filter(function (s) { return !q || (s.name + s.code + (s.category || '')).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
   return xs.slice(0, q ? 40 : 16).map(function (s) { return '<button data-s="' + esc(s.code) + '">' + esc(s.name) + '<br><span class="xs muted">เหลือ ' + fm(s.qty) + ' ' + esc(s.unit) + '</span></button>'; }).join('') || '<span class="small muted">ไม่เจอ</span>'; }
 SCR.stock.after = function (tab) {
+  var smq = $('#smq'); if (smq) smq.oninput = function () { $('#sml').innerHTML = smRows(S.v.sm.items, smq.value); };
   var rq = $('#rigq'); if (rq) rq.oninput = function () { $('#rig').innerHTML = riChips(S.v.ri.all || [], rq.value); };
   ['#ws', '#vo', '#rvs'].forEach(function (k) { var s = $(k); if (s) selSearch(s, '🔍 ค้นหาของ'); });
   if (S.v.stab === 'recv') { var rv = $('#rvs'), rq2 = $('#rvq'), hint = function () { var s0 = (S.v.recvSt || []).filter(function (x) { return x.code === rv.value; })[0], n = nz(rq2.value); if (!s0) { $('#rvu').textContent = 'จำนวน'; $('#rvh').textContent = ''; return; } var big = s0.pack > 1; $('#rvu').textContent = 'จำนวนที่รับ (' + (big ? (s0.packName || 'แพ็ค') : s0.unit) + ')'; $('#rvh').textContent = 'ตอนนี้เหลือ ' + fm(s0.qty) + ' ' + s0.unit + (n > 0 ? ' → รับแล้วเป็น ' + fm(s0.qty + n * (big ? s0.pack : 1)) + ' ' + s0.unit + (big ? ' (1 ' + (s0.packName || 'แพ็ค') + ' = ' + fm(s0.pack) + ' ' + s0.unit + ')' : '') : ''); }; rv.addEventListener('change', hint); rq2.oninput = hint; }
@@ -7928,6 +7974,52 @@ ACT.feeFix = function (el) {
         return call('feeEdit', { kind: 'fee', oid: i.oid, staffs: sel, fee: sel.length ? fm2 : i.fee }, { write: true }).then(function (y) { return { changed: (x && x.changed) || (y && y.changed), staff: true }; });
       }).then(function (x) { toast(x && x.changed ? 'แก้แล้ว · บันทึกประวัติไว้' + (x.staff ? ' · ค่ามือผู้ช่วยไปขึ้นที่หน้าค่ามือพนักงาน (ต้องยืนยันวันนั้นด้วย)' : '') : 'ไม่มีอะไรเปลี่ยน'); refresh(); });
     } });
+};
+
+/* ---------- Owner: จัดการรายการของ ---------- */
+function smRows(items, q) {
+  q = String(q || '').toLowerCase().replace(/\s+/g, '');
+  var xs = items.filter(function (x) { return !q || (x.name + x.code + x.category).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
+  return xs.slice(0, q ? 80 : 40).map(function (x) {
+    var info = esc(x.unit) + (x.pack > 1 ? ' · ' + esc(x.packName || 'ขวด') + 'ละ ' + fm(x.pack) + ' ' + esc(x.unit) : '') + (x.openDays !== '' && x.openDays > 0 ? ' · เปิดแล้วใช้ได้ ' + (x.openDays >= 3650 ? 'ไม่หมดอายุ' : x.openDays + ' วัน') : '') + (x.bom ? ' · ผูกรายการขาย ' + x.bom : '');
+    return '<div class="card flat row" style="flex-wrap:wrap;gap:.5rem"><div class="sp" style="min-width:12rem"><b>' + esc(x.name) + '</b> <span class="xs muted">' + esc(x.code) + ' · ' + esc(x.category || '-') + '</span><div class="xs muted">' + info + '</div>' +
+      '<div class="chips" style="margin-top:.3rem">' + x.branches.map(function (b) { return '<span class="pill">' + esc(b) + ' ' + fm(x.qtys[b] || 0) + (x.open[b] ? ' +เปิด ' + fm(x.open[b]) : '') + '</span>'; }).join('') + '</div></div>' +
+      '<button class="btn sm" data-a="smEdit" data-c="' + esc(x.code) + '">แก้</button><button class="btn sm" data-a="smQty" data-c="' + esc(x.code) + '">ปรับยอด</button><button class="btn sm d" data-a="smDel" data-c="' + esc(x.code) + '">ลบ</button></div>';
+  }).join('') || '<div class="empty">ไม่เจอ</div>';
+}
+function smOf(c) { return S.v.sm.items.filter(function (x) { return x.code === c; })[0]; }
+function smDone(msg) { S.stock = null; toast(msg); refresh(); }
+ACT.smEdit = function (el) {
+  var x = smOf(el.dataset.c), m = S.v.sm, V = function (v) { return ' value="' + esc(v === undefined || v === null ? '' : v) + '"'; };
+  dialog({ title: 'แก้รายการ · ' + x.name, ok: 'บันทึก', wide: true,
+    body: '<div class="g2"><label>ชื่อ<input id="se-n"' + V(x.name) + '></label><label>หมวด<input id="se-c" list="se-cl"' + V(x.category) + '></label></div>' +
+      '<div class="g3"><label>หน่วยเล็กสุด<input id="se-u" list="se-ul"' + V(x.unit) + '></label><label>1 ขวด/กล่อง = กี่หน่วย<input id="se-p" type="number" inputmode="decimal" step="any"' + V(x.pack > 1 ? x.pack : '') + ' placeholder="ว่าง = นับทีละหน่วย"></label><label>ชื่อหน่วยใหญ่<input id="se-pn"' + V(x.packName) + ' placeholder="ขวด / กล่อง / หัว"></label></div>' +
+      '<div class="g3"><label>เปิดแล้วใช้ได้กี่วัน<input id="se-o" type="number" inputmode="numeric"' + V(x.openDays) + ' placeholder="ว่าง = ไม่แบ่งใช้ · 3650 = ไม่หมดอายุ"></label><label>จุดสั่งซื้อ<input id="se-m" type="number" inputmode="decimal"' + V(x.min) + '></label><label>ต้นทุน/หน่วยเล็กสุด<input id="se-co" type="number" inputmode="decimal" step="any"' + V(x.cost) + '></label></div>' +
+      '<details><summary class="small b">แปลงหน่วย (เช่น เดิมนับเป็นขวด จะเปลี่ยนเป็น cc)</summary><label>1 หน่วยเดิม = กี่หน่วยใหม่<input id="se-cv" type="number" inputmode="decimal" step="any" placeholder="เช่น 8"></label><p class="xs muted">ระบบคูณยอดคงเหลือทุกสาขา จุดสั่งซื้อ และจำนวนที่ตัดตอนขาย (BOM) ให้ · หารต้นทุนให้ — อย่าลืมแก้ "หน่วยเล็กสุด" ด้านบนเป็นหน่วยใหม่</p></details>' +
+      '<datalist id="se-cl">' + m.categories.map(function (c) { return '<option value="' + esc(c) + '">'; }).join('') + '</datalist><datalist id="se-ul">' + m.units.map(function (c) { return '<option value="' + esc(c) + '">'; }).join('') + '</datalist>',
+    onOk: function (b) { var g = function (id) { return b.querySelector('#' + id).value.trim(); }, o = g('se-o');
+      if (o && !(Number(g('se-p')) > 1)) throw new Error('ของแบ่งใช้ต้องใส่ "1 ขวด = กี่หน่วย" (มากกว่า 1)');
+      var set = { name: g('se-n'), category: g('se-c'), unit: g('se-u'), pack: g('se-p'), packName: g('se-pn'), openDays: o, min: g('se-m'), cost: g('se-co') };
+      if (Number(g('se-cv')) > 0) { if (Number(set.min) === Number(x.min)) delete set.min; if (Number(set.cost) === Number(x.cost)) delete set.cost; }   // แปลงหน่วย: ให้ระบบคูณ/หารจุดสั่งและต้นทุนเอง
+      return call('stockManage', { op: 'edit', code: x.code, set: set, conv: g('se-cv') }, { write: true }).then(function () { smDone('บันทึกแล้ว · ' + x.name); }); } });
+};
+ACT.smQty = function (el) {
+  var x = smOf(el.dataset.c);
+  dialog({ title: 'ปรับยอด · ' + x.name, ok: 'บันทึกยอด',
+    body: '<p class="small muted">ใส่ยอดที่มีจริง (' + esc(x.unit) + (x.pack > 1 ? ' · เฉพาะที่ยังไม่เปิด' : '') + ') · ช่องที่ไม่แก้ = ไม่เปลี่ยน</p>' + x.branches.map(function (b) { return '<label>' + esc(b) + (x.open[b] ? ' <span class="xs muted">(เปิดอยู่อีก ' + fm(x.open[b]) + ')</span>' : '') + '<input data-qb="' + esc(b) + '" type="number" inputmode="decimal" step="any" min="0" value="' + (x.qtys[b] || 0) + '"></label>'; }).join('') +
+      '<label>เหตุผล *<input id="sq-r" placeholder="เช่น นับจริงได้เท่านี้ / คีย์ผิด"></label>',
+    onOk: function (b) { var q = {}; $$('[data-qb]', b).forEach(function (i) { if (Number(i.value) !== Number(x.qtys[i.dataset.qb] || 0)) q[i.dataset.qb] = i.value; });
+      if (!Object.keys(q).length) throw new Error('ยังไม่ได้แก้ตัวเลข');
+      return call('stockManage', { op: 'qty', code: x.code, qtys: q, reason: b.querySelector('#sq-r').value.trim() }, { write: true }).then(function (r) { smDone('ปรับยอดแล้ว ' + r.detail.join(', ')); }); } });
+};
+ACT.smDel = function (el) {
+  var x = smOf(el.dataset.c);
+  dialog({ title: 'ลบรายการ · ' + x.name, ok: 'ลบ', danger: true,
+    body: '<div class="small b">ลบจากสาขา</div><div class="row" style="flex-wrap:wrap;gap:.3rem 1rem" id="sdb">' + x.branches.map(function (b) { return '<label class="ck"><input type="checkbox" value="' + esc(b) + '" checked> ' + esc(b) + ' (' + fm(x.qtys[b] || 0) + ')</label>'; }).join('') + '</div>' +
+      (x.bom ? '<div class="note w small">รายการนี้ผูกกับรายการขาย ' + x.bom + ' รายการ — ถ้าลบครบทุกสาขา ขายแล้วจะไม่ตัดสต้อก (ผูกใหม่ได้ที่ปุ่ม "ผูกสต้อก" ตอนขาย)</div>' : '') +
+      '<label>เหตุผล<input id="sd-r" placeholder="เช่น รายการซ้ำ / เลิกใช้"></label><p class="xs muted">ยอดที่เหลือจะถูกตัดออก (บันทึกประวัติไว้)</p>',
+    onOk: function (b) { var brs = $$('#sdb input:checked', b).map(function (i) { return i.value; }); if (!brs.length) throw new Error('เลือกสาขา');
+      return call('stockManage', { op: 'del', code: x.code, branches: brs, reason: b.querySelector('#sd-r').value.trim() }, { write: true }).then(function (r) { smDone('ลบแล้ว ' + r.removed + ' สาขา' + (r.bomDel ? ' · ตัดการผูกรายการขาย ' + r.bomDel : '')); }); } });
 };
 
 // เปิดผ่าน http:// กล้อง/ตำแหน่งจะใช้ไม่ได้ → เด้งไป https อัตโนมัติ (เฉพาะเว็บจริง ไม่ใช่ไฟล์ทดสอบ)

@@ -3251,7 +3251,8 @@ function makeCore(store) {
   PERM.branchReceive = STOCKR.concat(['front']); WRITES.branchReceive = 1;   // หน้าร้านรับของที่บริษัทมาส่งได้
   /* ---------- เพิ่มรายการของในสต้อก (ผู้ดูแลระบบ/Owner/คลังกลาง) · เลือกสาขาได้หลายสาขา · ยอดเริ่ม 0 แล้วใช้ "รับของ" เติม ---------- */
   A.stockMeta = function (p, u) {
-    var by = {}; rows('Stock').forEach(function (r) { var k = String(r.code); var x = by[k] = by[k] || { code: k, name: String(r.name), category: String(r.category || ''), unit: String(r.unit || ''), pack: num(r.pack), packName: String(r.packName || ''), openDays: r.openDays === '' ? '' : num(r.openDays), min: num(r.min), cost: num(r.cost), branches: [] }; if (x.branches.indexOf(String(r.branch)) < 0) x.branches.push(String(r.branch)); });
+    var by = {}; rows('Stock').forEach(function (r) { var k = String(r.code); var x = by[k] = by[k] || { code: k, name: String(r.name), category: String(r.category || ''), unit: String(r.unit || ''), pack: num(r.pack), packName: String(r.packName || ''), openDays: r.openDays === '' ? '' : num(r.openDays), min: num(r.min), cost: num(r.cost), branches: [], qtys: {}, open: {} }; if (x.branches.indexOf(String(r.branch)) < 0) x.branches.push(String(r.branch)); x.qtys[String(r.branch)] = num(r.qty); if (splittable(r)) x.open[String(r.branch)] = openLeft(String(r.branch), k); });
+    var bomN = {}; rows('BOM').forEach(function (b) { bomN[String(b.stock)] = (bomN[String(b.stock)] || 0) + 1; }); Object.keys(by).forEach(function (k) { by[k].bom = bomN[k] || 0; });
     var uniq = function (f) { var o = {}; rows('Stock').forEach(function (r) { var v = String(r[f] || '').trim(); if (v) o[v] = 1; }); return Object.keys(o).sort(); };
     return { items: Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return a.name < b.name ? -1 : 1; }), categories: uniq('category'), units: uniq('unit'),
       branches: rows('Branches').filter(function (b) { return on(b.active === '' ? true : b.active); }).map(function (b) { return { code: String(b.code), name: String(b.name) }; }).concat([{ code: 'CENTRAL', name: 'คลังกลาง' }]) };
@@ -3305,6 +3306,45 @@ function makeCore(store) {
   };
   PERM.bomInfo = ALL; PERM.bomLink = ALL; WRITES.bomLink = 1;
   PERM.stockMeta = ['admin', 'central']; PERM.stockItemAdd = ['admin', 'central']; WRITES.stockItemAdd = 1;
+  /* ---------- Owner จัดการรายการของเอง: แก้ข้อมูล · ปรับยอด · แปลงหน่วย · ลบ (ทุกครั้งบันทึกประวัติ) ---------- */
+  A.stockManage = function (p, u) {
+    var code = txt(p.code, 20), all = rows('Stock').filter(function (r) { return String(r.code) === code; }); if (!all.length) err('ไม่พบรายการ ' + code);
+    var nm = String(all[0].name), why = txt(p.reason, 120);
+    if (p.op === 'edit') {
+      var f = p.set || {}, ch = {};
+      if (f.name !== undefined) { var n2 = txt(f.name, 120); if (n2.length < 2) err('ใส่ชื่อ'); ch.name = n2; }
+      ['category', 'unit', 'packName'].forEach(function (k) { if (f[k] !== undefined) ch[k] = txt(f[k], 40); });
+      if (ch.unit === '') err('ใส่หน่วยเล็กสุด');
+      ['pack', 'openDays', 'min', 'cost'].forEach(function (k) { if (f[k] !== undefined) ch[k] = f[k] === '' || f[k] === null ? '' : r2(num(f[k])); });
+      if (ch.pack !== undefined && !(num(ch.pack) > 1)) ch.pack = '';
+      var cv = num(p.conv);   // แปลงหน่วย: 1 หน่วยเดิม = cv หน่วยใหม่ (เช่น ขวด → cc ×8) · คูณยอดทุกสาขา/จุดสั่ง/BOM ให้ หารต้นทุน
+      all.forEach(function (r) { var c2 = {}; for (var k in ch) c2[k] = ch[k];
+        if (cv > 0 && cv !== 1) { c2.qty = r2(num(r.qty) * cv); c2.min = r2(num(c2.min !== undefined ? c2.min : r.min) * (c2.min !== undefined ? 1 : cv)); c2.cost = r2(num(c2.cost !== undefined && c2.cost !== '' ? c2.cost : r.cost) / (c2.cost !== undefined && c2.cost !== '' ? 1 : cv)); }
+        upd('Stock', r, c2); });
+      if (cv > 0 && cv !== 1) { rows('BOM').filter(function (b) { return String(b.stock) === code; }).forEach(function (b) { upd('BOM', b, { qty: r2(num(b.qty) * cv) }); });
+        rows('OpenVials').filter(function (v) { return String(v.stock) === code && v.status === 'OPEN'; }).forEach(function (v) { upd('OpenVials', v, { size: r2(num(v.size) * cv), left: r2(num(v.left) * cv), unit: ch.unit || v.unit }); }); }
+      log(u, 'stockManage', 'แก้ ' + code + ' ' + nm + ' ' + JSON.stringify(ch) + (cv && cv !== 1 ? ' แปลงหน่วย ×' + cv : '')); return { changed: Object.keys(ch).length + (cv && cv !== 1 ? 1 : 0) };
+    }
+    if (p.op === 'qty') {   // ตั้งยอดคงเหลือ (ปิดผนึก) ของแต่ละสาขา
+      if (!why) err('ใส่เหตุผลที่ปรับยอด');
+      var out = []; (p.qtys ? Object.keys(p.qtys) : []).forEach(function (b) { var r = all.filter(function (x) { return x.branch === b; })[0]; if (!r || p.qtys[b] === '' || p.qtys[b] === null) return;
+        var nq = r2(num(p.qtys[b])), d = r2(nq - num(r.qty)); if (nq < 0) err('ยอดติดลบไม่ได้'); if (!d) return;
+        upd('Stock', r, { qty: nq }); add('StockMoves', { time: stamp(), branch: b, stock: code, name: nm, qty: d, type: 'ปรับยอด (Owner)', ref: why, by: u.name, balance: r2(nq + (splittable(r) ? openLeft(b, code) : 0)) }); out.push(b + ' ' + (d > 0 ? '+' : '') + d); });
+      log(u, 'stockManage', 'ปรับยอด ' + code + ' ' + nm + ' ' + out.join(', ') + ' · ' + why); return { changed: out.length, detail: out };
+    }
+    if (p.op === 'del') {
+      var brs = (p.branches || []).map(String), rm = all.filter(function (r) { return brs.indexOf(String(r.branch)) >= 0; }); if (!rm.length) err('เลือกสาขาที่จะลบ');
+      rm.forEach(function (r) { var b = String(r.branch), left = r2(num(r.qty) + (splittable(r) ? openLeft(b, code) : 0));
+        rows('OpenVials').filter(function (v) { return v.branch === b && String(v.stock) === code && v.status === 'OPEN'; }).forEach(function (v) { upd('OpenVials', v, { status: 'DISCARDED', left: 0, closedBy: u.name + ' ลบรายการ ' + stamp() }); });
+        if (left) add('StockMoves', { time: stamp(), branch: b, stock: code, name: nm, qty: -left, type: 'ลบรายการ (Owner)', ref: why || '-', by: u.name, balance: 0 });
+        store.remove('Stock', r); });
+      var gone = rows('Stock').every(function (r) { return String(r.code) !== code; }), bomDel = 0;
+      if (gone) rows('BOM').filter(function (b) { return String(b.stock) === code; }).slice().forEach(function (b) { store.remove('BOM', b); bomDel++; });
+      log(u, 'stockManage', 'ลบ ' + code + ' ' + nm + ' สาขา ' + brs.join(',') + (bomDel ? ' · ตัดการผูกรายการขาย ' + bomDel : '') + (why ? ' · ' + why : '')); return { removed: rm.length, bomDel: bomDel };
+    }
+    err('คำสั่งไม่ถูกต้อง');
+  };
+  PERM.stockManage = ['owner', 'admin']; WRITES.stockManage = 1;
   A.roomIssueLog = function (p, u) {
     var since = addDays(today(), -num(p.days || 14));
     return rows('StockMoves').filter(function (m) { return m.branch === u.branch && String(m.type).indexOf('เบิกใช้ในห้อง') === 0 && String(m.time).slice(0, 10) >= since; }).slice(-80).reverse().map(clean);
