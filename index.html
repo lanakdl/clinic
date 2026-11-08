@@ -335,6 +335,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:
 .qflash{animation:qpulse 1.2s ease-in-out infinite;box-shadow:0 0 0 3px var(--warn,#d97706)}
 @keyframes qpulse{50%{box-shadow:0 0 0 6px rgba(217,119,6,.35)}}
 @media (prefers-reduced-motion:reduce){.qflash,.qabox.has{animation:none}}
+.bdbar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;justify-content:space-between;background:var(--warn-soft);color:var(--ink);border-top:2px solid var(--warn);padding:.45rem 16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.95rem}
 
 </style>
 </head>
@@ -1718,7 +1719,8 @@ function makeCore(store) {
   function pad(n, l) { n = String(n); while (n.length < l) n = '0' + n; return n; }
   function r2(n) { return Math.round(n * 100) / 100; }
   function on(v) { return v === true || ['true', 'y', 'yes', '1', 'ใช่', 'ใช้'].indexOf(String(v).trim().toLowerCase()) >= 0; }
-  function bkk(d) { return new Date((d || store.now()).getTime() + 7 * 3600e3); }
+  var BDOFF = 0;   // โหมดลงย้อนหลัง: เลื่อน "วันนี้" ของคำสั่งนี้ไปวันที่เลือก (เวลาในวันยังเป็นเวลาจริง)
+  function bkk(d) { return new Date((d || store.now()).getTime() + (d ? 0 : BDOFF) + 7 * 3600e3); }
   function today() { return bkk().toISOString().slice(0, 10); }
   function stamp(d) { var x = bkk(d).toISOString(); return x.slice(0, 10) + ' ' + x.slice(11, 16); }
   function hm() { return bkk().toISOString().slice(11, 16); }
@@ -1736,7 +1738,7 @@ function makeCore(store) {
   function setting(k, def) { var r = find('Settings', 'key', k); return r && !blank(r.value) ? r.value : def; }
   function sum(a, f) { var s = 0; for (var i = 0; i < a.length; i++) s += num(f ? f(a[i]) : a[i]); return r2(s); }
   function err(m) { throw new Error(m); }
-  function log(u, a, d) { try { add('Log', { time: stamp(), user: (u.branch || '') + ' ' + u.code + ' ' + u.name, action: a, detail: String(d || '').slice(0, 500) }); } catch (e) {} }
+  function log(u, a, d) { try { add('Log', { time: stamp(), user: (u.branch || '') + ' ' + u.code + ' ' + u.name, action: a, detail: String(d || '').slice(0, 460) + (BDOFF ? ' [ลงย้อนหลัง · ทำจริง ' + stamp(store.now()) + ']' : '') }); } catch (e) {} }
   function roleOf(v) { var k = String(v || '').replace(/\s+/g, ' ').trim(); return ROLE_MAP[k.toLowerCase()] || ROLE_MAP[k] || ''; }
   function rolesOf(st) { var a = [roleOf(st.role), roleOf(st.role2)].filter(String); return a; }
   function canBranch(st, b) { var s = String(st.branches || '').trim(); if (!s || s === 'ทุกสาขา' || s.toUpperCase() === 'ALL') return true; return s.split(/[\s,]+/).indexOf(b) >= 0 || String(st.branch) === b; }
@@ -2195,6 +2197,16 @@ function makeCore(store) {
     if (!u.line && LINE_ONLY.indexOf(action) >= 0 && !on(setting('tabletMe', 'ไม่'))) err('เช็คอินและดูค่ามือ/ค่าคอม ทำใน LINE OA ของคลินิก (เมนู "พนักงาน")');
     if (u.partTime && STOCK_ACTIONS.indexOf(action) >= 0) err('แพทย์ Part-time ไม่ต้องทำสต้อก — ให้ผู้ช่วย/พยาบาลบันทึก');
     p = p || {};
+    var bdt = p.__bd; if (bdt !== undefined) { var cp = {}; for (var k in p) if (k !== '__bd') cp[k] = p[k]; p = cp; }   // ไม่แก้ object เดิม (Worker อาจรันซ้ำ)
+    if (bdt && action !== 'backdateOn' && action !== 'logout') {
+      var bd = null; try { bd = JSON.parse(store.cacheGet('bd_' + bdt) || 'null'); } catch (e) {}
+      if (!bd || bd.by !== u.code) err('BDEXP');
+      var real = today(); BDOFF = Math.round((Date.parse(bd.d) - Date.parse(real)) / 864e5) * 864e5;
+      try { return run1(action, p, u, rid); } finally { BDOFF = 0; }
+    }
+    return run1(action, p, u, rid);
+  }
+  function run1(action, p, u, rid) {
     if (!WRITES[action]) return A[action](p, u);
     // กันกดซ้ำ: คำสั่งเขียนที่มีรหัสเดิมจะได้ผลเดิม ไม่บันทึกซ้ำ
     return store.lock(function () {
@@ -2692,24 +2704,31 @@ function makeCore(store) {
   function vialOk(v) { return v.status === 'OPEN' && num(v.left) > 0 && (!v.expireAt || String(v.expireAt) >= stamp()); }
   function openVialsOf(b, c) { return rows('OpenVials').filter(function (v) { return v.branch === b && String(v.stock) === String(c) && vialOk(v); }); }
   function openLeft(b, c) { return sum(openVialsOf(b, c), function (v) { return v.left; }); }
-  function openVial(s, u, who, lot) {
-    var size = Math.min(num(s.pack), num(s.qty)); if (size <= 0) err(s.name + ' ไม่มีขวดเต็มเหลือ');
-    upd('Stock', s, { qty: r2(num(s.qty) - size) });
+  function openVial(s, u, who, lot, cc) {
+    var take = Math.min(num(s.pack), num(s.qty)); if (take <= 0) err(s.name + ' ไม่มีขวดเต็มเหลือ');
+    var size = num(cc) > 0 ? r2(num(cc)) : take; if (size > num(s.pack) * 5) err('ขวดละ ' + size + ' ' + s.unit + ' มากผิดปกติ ตรวจอีกครั้ง');   // ผสมแล้วได้กี่ cc ใส่เองได้ (ไม่ใส่ = ตามขนาดบรรจุ)
+    upd('Stock', s, { qty: r2(num(s.qty) - take) });
     var d = new Date(store.now().getTime() + num(s.openDays) * 864e5);
     var v = add('OpenVials', { id: nextId('VL', 'seq_VL', 5), branch: s.branch, stock: s.code, name: s.name, unit: s.unit, size: size, left: size, lot: txt(lot) || s.lot || '', openedAt: stamp(),
       expireAt: stamp(d), openedBy: who ? who.name + ' (' + who.code + ')' : u.name, status: 'OPEN', closedBy: '' });
-    add('StockMoves', { time: stamp(), branch: s.branch, stock: s.code, name: s.name, qty: 0, type: 'เปิดขวด', ref: v.id + ' ' + size + ' ' + s.unit, by: v.openedBy, balance: r2(num(s.qty) + openLeft(s.branch, s.code)) });
+    add('StockMoves', { time: stamp(), branch: s.branch, stock: s.code, name: s.name, qty: r2(size - take), type: 'เปิดขวด', ref: v.id + ' ' + size + ' ' + s.unit + (size !== take ? ' (ขวดละ ' + take + ' → ผสม/ได้จริง ' + size + ')' : ''), by: v.openedBy, balance: r2(num(s.qty) + openLeft(s.branch, s.code)) });
     return v;
   }
+  var VPREF = {};   // ตัวเลือกขวดต่อรายการของ (ตั้งจาก supplies ก่อนเรียก issue แล้วล้าง)
+  function vpref(sup) { var o = {}; (sup || []).forEach(function (x) { if (!x || !x.stock || !x.src) return; o[x.stock] = x.src === 'new' ? { open: true, size: num(x.size), lot: txt(x.lot) } : { vial: String(x.src) }; }); return o; }
+  function issueP(sup, b, need, type, ref, u, who) { VPREF = vpref(sup); try { return issue(b, need, type, ref, u, who); } finally { VPREF = {}; } }
   function issue(b, need, type, ref, u, who) {
     var codes = Object.keys(need).filter(function (c) { return need[c] > 0; }), short = [], lots = [];
     codes.forEach(function (c) { var s = stockRow(b, c); if (!s) { short.push(c + ' (ไม่มีในสต้อกสาขานี้)'); return; }
-      var avail = r2(num(s.qty) + (splittable(s) ? openLeft(b, c) : 0)); if (avail < need[c]) short.push(s.name + ' เหลือ ' + avail + ' ต้องใช้ ' + need[c]); });
+      var pf0 = VPREF[c], avail = r2(num(s.qty) + (splittable(s) ? openLeft(b, c) + (pf0 && pf0.open && num(pf0.size) > 0 ? num(pf0.size) - Math.min(num(s.pack), num(s.qty)) : 0) : 0)); if (avail < need[c]) short.push(s.name + ' เหลือ ' + avail + ' ต้องใช้ ' + need[c]); });
     if (short.length) err('ของไม่พอ: ' + short.join(', '));
     codes.forEach(function (c) {
       var s = stockRow(b, c), q = need[c], used = [];
       if (splittable(s)) {
-        var vs = openVialsOf(b, c).sort(function (x, y) { return String(x.openedAt) < String(y.openedAt) ? -1 : 1; }), guard = 0, pk = num(s.pack), whole = 0;
+        var vs = openVialsOf(b, c).sort(function (x, y) { return String(x.openedAt) < String(y.openedAt) ? -1 : 1; }), guard = 0, pk = num(s.pack), whole = 0, pf = VPREF[c];
+        // เลือกเองตอนเบิก: เปิดขวดใหม่มาแบ่ง (ใส่ cc) / ใช้จากขวดที่เปิดอยู่ขวดไหน
+        if (pf && pf.open) { vs.unshift(openVial(s, u, who, pf.lot, pf.size)); guard = 50; }
+        else if (pf && pf.vial) { var pv = vs.filter(function (x) { return x.id === pf.vial; })[0]; if (!pv) err('ขวด ' + pf.vial + ' หมดหรือหมดอายุแล้ว — เลือกขวดอื่น'); vs.splice(vs.indexOf(pv), 1); vs.unshift(pv); guard = 50; }
         // ขายเหมาขวด (ใช้ครบขวด) → หยิบขวดปิดผนึกทั้งขวด ไม่ไปกินขวดที่เปิดแบ่งค้างไว้
         while (q >= pk - 0.0001 && num(s.qty) >= pk - 0.0001 && guard++ < 50) { upd('Stock', s, { qty: r2(num(s.qty) - pk) }); q = r2(q - pk); whole++; }
         if (whole) { used.push('ขวดเต็ม×' + whole); if (s.lot && lots.indexOf(s.lot) < 0) lots.push(s.lot); }
@@ -2731,7 +2750,7 @@ function makeCore(store) {
   };
   A.vialOpen = function (p, u) {
     var s = stockRow(u.branch, p.stock); if (!splittable(s)) err('รายการนี้ไม่ได้ตั้งเป็นขวดแบ่งใช้ (ใส่ "อายุหลังเปิดขวด" ในชีต Stock)');
-    var who = byPin(p, u), v = openVial(s, u, who, p.lot); log(u, 'vialOpen', v.id); return clean(v);
+    var who = byPin(p, u), v = openVial(s, u, who, p.lot, p.size); log(u, 'vialOpen', v.id + ' ' + v.size + ' ' + v.unit); return clean(v);
   };
   A.vialDiscard = function (p, u) {
     var v = find('OpenVials', 'id', p.id); if (!v || v.branch !== u.branch) err('ไม่พบขวด'); if (v.status !== 'OPEN') err('ขวดนี้ปิดไปแล้ว');
@@ -2796,7 +2815,7 @@ function makeCore(store) {
     var hasBom = rows('BOM').some(function (b) { return String(b.item) === String(o.item); });
     var over = controlUse(o, need, u.branch, p);
     var who = Object.keys(need).length ? byPin(p, u) : null;
-    var lots = issue(u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
+    var lots = issueP(later ? [] : p.supplies, u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
     upd('Orders', o, { stockPending: later && hasBom, status: 'DONE', doctor: doc, staffs: staffs.join(' '), opNote: txt(p.opNote, 2000), lot: txt(p.lot, 120) || lots.join(', '), doneAt: stamp(),
       dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(feeOf(it, u.branch).staffFee) : num(o.staffFee), prepFee: it && !blank(feeOf(it, u.branch).prepFee) ? num(feeOf(it, u.branch).prepFee) : '', scrub: scrub.join(' '), circ: circ.join(' '), scrubFee: num(it && it.scrubFee), circFee: num(it && it.circFee) });
     var ff = freeFee(u.branch); if (on(o.free) && ff != null) upd('Orders', o, { staffFee: ff, prepFee: ff });
@@ -2812,7 +2831,7 @@ function makeCore(store) {
     var o = find('Orders', 'id', p.id); if (!o) err('ไม่พบรายการ'); visitOf(o.vn, u);
     if (!on(o.stockPending) || (o.status !== 'DONE' && !on(o.issueLater))) err('รายการนี้บันทึกของไปแล้ว');
     var need = {}; (p.supplies || []).forEach(function (s) { if (s.stock && num(s.qty) > 0) need[s.stock] = r2((need[s.stock] || 0) + num(s.qty)); });
-    var over = controlUse(o, need, u.branch, p), who = byPin(p, u), lots = issue(u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
+    var over = controlUse(o, need, u.branch, p), who = byPin(p, u), lots = issueP(p.supplies, u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
     upd('Orders', o, { stockPending: false, lot: txt(p.lot, 120) || o.lot || lots.join(', ') });
     log(u, 'recordSupplies', o.id + ' โดย ' + who.code); return true;
   };
@@ -3236,6 +3255,15 @@ function makeCore(store) {
     var bal = walletMove(pt, credit, 'แปลงคอร์ส', c.id + ' ' + c.itemName + ' เหลือ ' + left + ' ครั้ง' + (fee ? ' หัก ' + fee + '%' : '') + ' อนุมัติ ' + mgr.code, u);
     log(u, 'courseToCredit', c.id + ' → ' + credit); return { credit: credit, balance: bal, left: left };
   };
+  // เปิดโหมดลงย้อนหลัง (ปิดร้านแล้วค่อยลงมัดจำ / ลงขาย-ค่ามือที่ทำไม่ทันเมื่อวาน) · ผู้จัดการอนุมัติ · ย้อนได้ไม่เกิน backdateDays วัน
+  A.backdateOn = function (p, u) {
+    var d = String(p.date || ''), t = today(), lim = num(setting('backdateDays', 7)) || 7;
+    if (!isDate(d)) err('เลือกวันที่'); if (d >= t) err('เลือกวันที่ก่อนวันนี้'); if (d < addDays(t, -lim)) err('ย้อนหลังได้ไม่เกิน ' + lim + ' วัน');
+    var mg = has(u, ['manager', 'owner', 'admin', 'account']) ? u : mgrOk(p.approvePin); if (!mg) err('ต้องให้ผู้จัดการใส่รหัสอนุมัติ');
+    var tok = store.uuid(); store.cachePut('bd_' + tok, JSON.stringify({ d: d, by: u.code }), 6 * 3600);
+    log(u, 'backdateOn', d + ' อนุมัติ ' + (mg.nick || mg.name || mg.code)); return { token: tok, date: d };
+  };
+  PERM.backdateOn = ALL;
   A.walletHistory = function (p, u) {
     var pt = find('Patients', 'hn', p.hn); if (!pt) err('ไม่พบคนไข้');
     return { balance: num(pt.wallet), moves: rows('Wallet').filter(function (w) { return w.hn === pt.hn; }).slice(-50).reverse().map(clean) };
@@ -4254,7 +4282,7 @@ function makeCore(store) {
       var have = {}; mine.forEach(function (s) { have[s.code] = 1; });
       rows('Stock').forEach(function (s) { if (s.branch === 'CENTRAL' && !have[s.code]) { var c = clean(s); c.branch = b; c.qty = 0; c.min = 0; c.lot = ''; c.expire = ''; c.fromCentral = true; mine.push(c); } });
     }
-    return mine.map(function (s) { var o = s.fromCentral ? s : clean(s); o.sealed = num(o.qty); o.open = splittable(s) ? openLeft(b, s.code) : 0; o.qty = r2(o.sealed + o.open); o.split = splittable(s); o.low = num(o.min) > 0 && o.qty <= num(o.min); return o; });
+    return mine.map(function (s) { var o = s.fromCentral ? s : clean(s); o.sealed = num(o.qty); o.open = splittable(s) ? openLeft(b, s.code) : 0; o.qty = r2(o.sealed + o.open); o.split = splittable(s); if (o.split) o.vials = openVialsOf(b, s.code).sort(function (x, y) { return String(x.openedAt) < String(y.openedAt) ? -1 : 1; }).map(function (v) { return { id: String(v.id), left: num(v.left), size: num(v.size), exp: String(v.expireAt || '') }; }); o.low = num(o.min) > 0 && o.qty <= num(o.min); return o; });
   };
   function nextRound() {
     var d = today(), day = +d.slice(8), rounds = String(setting('rounds', '15,30')).split(',').map(num).sort(function (a, b) { return a - b; });
@@ -4419,7 +4447,7 @@ function makeCore(store) {
     if (!Object.keys(need).length) err('ยังไม่ได้เลือกของ');
     noControlled(need, u.branch, 'เบิกเข้าห้อง');
     var who = byPin(p, u);
-    issue(u.branch, need, 'เบิกใช้ในห้อง ' + room, txt(p.note) || room, u, who);
+    issueP(p.lines, u.branch, need, 'เบิกใช้ในห้อง ' + room, txt(p.note) || room, u, who);
     log(u, 'roomIssue', room + ' ' + who.code + ' ' + JSON.stringify(need)); return { n: Object.keys(need).length, by: who.name };
   };
   A.stockWaste = function (p, u) {
@@ -4981,7 +5009,7 @@ function bt(n) { return '฿' + fm(n); }
 function nz(v) { var n = Number(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; }
 function rid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 function has(roles) { var u = S.user; if (!u) return false; if (u.roles.indexOf('owner') >= 0 || u.roles.indexOf('admin') >= 0) return true; return u.roles.some(function (r) { return roles.indexOf(r) >= 0; }); }
-function today() { return new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10); }
+function today() { return (typeof S !== 'undefined' && S.bd) ? S.bd.date : new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10); }   // โหมดลงย้อนหลัง: หน้าจอใช้วันที่เลือก
 function addDays(s, n) { var d = new Date(s + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
 var TH_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 var TH_D = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
@@ -5048,6 +5076,7 @@ function call(action, p, opt) {
 }
 function call0(action, p, opt) {
   opt = opt || {};
+  if (S.bd && action !== 'backdateOn') { var p2 = {}; for (var k in (p || {})) p2[k] = p[k]; p2.__bd = S.bd.token; p = p2; }
   var write = !!opt.write;
   if (write && S.busy) return Promise.reject(new Error('BUSY'));
   if (write || opt.spin) showBusy(opt.msg || (write ? 'กำลังบันทึก…' : 'กำลังโหลด…'));
@@ -5063,7 +5092,7 @@ function call0(action, p, opt) {
   }
   return run.then(function (r) {
     if (write || opt.spin) hideBusy();
-    if (!r.ok) { if (r.error === 'AUTH') { toast('หมดเวลาเข้าระบบ กรุณาเข้าใหม่', 1); logout(true); } throw new Error(r.error || 'ผิดพลาด'); }
+    if (!r.ok) { if (r.error === 'BDEXP') { S.bd = null; renderTop(); toast('โหมดลงย้อนหลังหมดเวลา — กลับเป็นวันนี้แล้ว เปิดใหม่ถ้ายังลงไม่เสร็จ', 1); throw new Error('BUSY'); } if (r.error === 'AUTH') { toast('หมดเวลาเข้าระบบ กรุณาเข้าใหม่', 1); logout(true); } throw new Error(r.error || 'ผิดพลาด'); }
     return r.data;
   });
 }
@@ -5177,6 +5206,7 @@ function renderTop() {
     (isHome ? '' : '<button class="btn q sm hide-sm" onclick="home()" aria-label="หน้าแรก">' + ic('home') + '</button>') +
     '<div class="who"' + (isHome ? ' data-a="logout" role="button" title="แตะเพื่อออกจากระบบ"' : '') + '><b>' + esc(S.user.name) + '</b><br>' + esc(S.user.roles.map(function (r) { return ROLE_TH[r] || r; }).join(' · ')) + '</div>' +
     (isHome ? '<button class="btn q sm" data-a="theme" aria-label="สลับสีพื้น" title="สลับพื้นขาว/ดำ">' + (document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙') + '</button><button class="btn sm outbtn" data-a="logout" aria-label="ออกจากระบบ">' + ic('out') + '<span>ออก</span></button>' : '') + '</div>';
+  if (S.bd) t.innerHTML += '<div class="bdbar"><span>📅 กำลังลงย้อนหลัง · วันที่ <b>' + esc(thDate(S.bd.date, 1)) + '</b> — ทุกอย่างที่บันทึกจะลงเป็นวันนั้น</span><button class="btn sm" data-a="bdOff">กลับเป็นวันนี้</button></div>';
 }
 
 /* ---------- เข้าระบบ ---------- */
@@ -5271,7 +5301,7 @@ TITLES.home = '';
 SCR.home = function () {
   var ts = TILES.filter(function (t) { return (!t.r || has(t.r)) && (!t.beam || S.boot.beam) && (!t.stock || S.user.stock) && (!t.noStock || !S.user.stock) && (t.k !== 'me' || S.boot.tabletMe); });
   if (has(['owner'])) ts.sort(function (a, b) { return (b.k === 'owner') - (a.k === 'owner'); });
-  var h = '<div class="stack"><div class="row"><div class="sp"><div class="muted small">' + thDate(today(), 1) + '</div><h1>สวัสดี ' + esc(S.user.name) + '</h1></div></div>' +
+  var h = '<div class="stack"><div class="row"><div class="sp"><div class="muted small">' + thDate(today(), 1) + '</div><h1>สวัสดี ' + esc(S.user.name) + '</h1></div>' + (has(FRONT.concat(CLINS, ['sales', 'adminpage', 'account', 'owner'])) && !S.bd ? '<button class="btn sm" data-a="bdOn">📅 ลงย้อนหลัง</button>' : '') + '</div>' +
     (DEMO ? '<div class="note w small">โหมดทดลอง · ลองกดได้ทุกปุ่ม ข้อมูลรีเซ็ตทุกวัน</div>' : '') + '<div id="alerts"></div>' +
     '<div class="grid">' + ts.map(function (t) {
       return '<button class="tile' + (t.hero ? ' hero' : '') + '" data-go="' + t.k + '"><span class="ic">' + ic(t.ic) + '</span><b>' + esc(t.t) + '</b><span class="small muted">' + esc(t.s) + '</span>' + (t.b ? '<span class="badge" data-b="' + t.b + '" hidden></span>' : '') + '</button>';
@@ -5481,6 +5511,17 @@ function cntAddDlg(c, done) {
       return call('countAddItem', { stock: v('ca-s'), name: v('ca-n'), unit: v('ca-u'), category: v('ca-c'), pack: v('ca-p'), packName: v('ca-pn') }, { write: true }).then(function (r) { toast('เพิ่ม "' + r.name + '" เข้าใบนับแล้ว'); if (done) done(r); });
     } });
 }
+
+/* ---------- โหมดลงย้อนหลัง: ปิดร้านแล้วค่อยลงมัดจำ/ลีด/นัด · ทำไม่ทันเมื่อวานมาลงขาย-ค่ามือตอนเช้า ---------- */
+ACT.bdOn = function () {
+  var mgr = has(['manager', 'owner', 'admin', 'account']), t = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10), y = new Date(Date.parse(t) - 864e5).toISOString().slice(0, 10), mn = new Date(Date.parse(t) - 7 * 864e5).toISOString().slice(0, 10);
+  dialog({ title: 'ลงย้อนหลัง', ok: 'เริ่มลงย้อนหลัง',
+    body: '<p class="small">เลือกวันที่ แล้วทำตามปกติ (ลงลีด ลงนัด รับมัดจำ ขาย กดทำเสร็จ เก็บเงิน) — ทุกอย่างจะลงเป็นวันนั้น ยอดบัญชี/ค่ามือเข้าวันนั้น · ระบบบันทึกไว้ว่าใครลงย้อนหลังเมื่อไหร่</p>' +
+      '<label>วันที่ *<input id="bdd" type="date" value="' + y + '" min="' + mn + '" max="' + y + '"></label>' + (mgr ? '' : '<label>รหัสผู้จัดการ (อนุมัติ) *<input id="bdp" type="password" inputmode="numeric" autocomplete="off"></label>') +
+      '<p class="xs muted">ลงเสร็จแล้วกด "กลับเป็นวันนี้" ที่แถบสีส้มด้านบน (หมดเวลาเองใน 6 ชั่วโมง)</p>',
+    onOk: function (b) { return call('backdateOn', { date: b.querySelector('#bdd').value, approvePin: mgr ? '' : b.querySelector('#bdp').value }, { write: true }).then(function (r) { S.bd = { token: r.token, date: r.date }; S.boot = S.boot; toast('ลงย้อนหลังเป็นวันที่ ' + thDate(r.date, 1)); home(); }); } });
+};
+ACT.bdOff = function () { S.bd = null; toast('กลับเป็นวันนี้แล้ว'); home(); };
 
 /* =====================================================================
  * หน้าร้าน: ค้นหา/ลงทะเบียน · หน้าคนไข้ · ขาย · เก็บเงิน · คิว
@@ -6710,8 +6751,16 @@ ACT.claim = function () {
 };
 function supplyRows(list) {
   var st = S.stock || [];
-  return list.map(function (s, i) { return '<div class="row" data-sr="' + i + '"><select data-k="stock" style="flex:1 1 200px">' + opts(st.map(function (x) { return [x.code, x.name + ' (เหลือ ' + fm(x.qty) + ' ' + x.unit + ')']; }), s.stock, '— เลือกของ —') + '</select>' +
-    '<input data-k="qty" type="number" inputmode="decimal" value="' + (s.qty || '') + '" style="width:90px" placeholder="จำนวน"><button type="button" class="btn q sm" data-del="' + i + '">✕</button></div>'; }).join('');
+  return list.map(function (s, i) {
+    var x = st.filter(function (y) { return y.code === s.stock; })[0], src = '';
+    if (x && x.split) {   // ของแบ่งใช้: เลือกเองว่าใช้จากขวดไหน หรือเปิดขวดใหม่มาแบ่ง (ใส่ว่าขวดนี้ได้กี่ cc)
+      var vo = (x.vials || []).map(function (v) { return '<option value="' + esc(v.id) + '"' + (s.src === v.id ? ' selected' : '') + '>ขวดที่เปิดแล้ว ' + esc(v.id) + ' · เหลือ ' + fm(v.left) + '/' + fm(v.size) + ' ' + esc(x.unit) + '</option>'; }).join('');
+      src = '<div class="row" style="flex:1 1 100%;gap:.4rem"><select data-k="src" style="flex:1 1 220px"><option value="">อัตโนมัติ (ขวดที่เปิดอยู่ก่อน · ปิดผนึก ' + fm(x.sealed) + ' ' + esc(x.unit) + ')</option>' + vo +
+        '<option value="new"' + (s.src === 'new' ? ' selected' : '') + '>➕ เปิดขวดใหม่มาแบ่ง</option></select>' +
+        (s.src === 'new' ? '<input data-k="size" type="number" inputmode="decimal" step="any" value="' + (s.size || x.pack) + '" style="width:110px" title="ขวดนี้ได้กี่ ' + esc(x.unit) + '"><span class="small">' + esc(x.unit) + '/ขวด</span>' : '') + '</div>';
+    }
+    return '<div class="row" data-sr="' + i + '" style="flex-wrap:wrap"><select data-k="stock" style="flex:1 1 200px">' + opts(st.map(function (x) { return [x.code, x.name + ' (เหลือ ' + fm(x.qty) + ' ' + x.unit + ')']; }), s.stock, '— เลือกของ —') + '</select>' +
+      '<input data-k="qty" type="number" inputmode="decimal" value="' + (s.qty || '') + '" style="width:90px" placeholder="จำนวน"><button type="button" class="btn q sm" data-del="' + i + '">✕</button>' + src + '</div>'; }).join('');
 }
 // ใช้ยา/ฟิลเลอร์เกินที่ขาย: ขึ้นรายการเกิน + ช่องเหตุผลในกล่องเดิม แล้วให้กดบันทึกอีกครั้ง
 function ovr(b) { var x = b.querySelector('#ovr'); return x ? x.value.trim() : ''; }
@@ -6728,7 +6777,8 @@ function bindSupplies(box, list) {
   var w = box.querySelector('#sup');
   function draw() { w.innerHTML = supplyRows(list) || '<div class="small muted">ไม่มี</div>'; $$('select[data-k=stock]', w).forEach(function (s) { selSearch(s, '🔍 ค้นหาของ'); }); }
   draw();
-  w.onchange = function (e) { var r = e.target.closest('[data-sr]'); if (!r || !e.target.dataset.k) return; var l = list[+r.dataset.sr]; l[e.target.dataset.k] = e.target.dataset.k === 'qty' ? nz(e.target.value) : e.target.value; };
+  w.onchange = function (e) { var r = e.target.closest('[data-sr]'), k = e.target.dataset.k; if (!r || !k) return; var l = list[+r.dataset.sr]; l[k] = k === 'qty' || k === 'size' ? nz(e.target.value) : e.target.value;
+    if (k === 'stock') { l.src = ''; l.size = ''; } if (k === 'stock' || k === 'src') draw(); };
   w.onclick = function (e) { var x = e.target.closest('[data-del]'); if (x) { list.splice(+x.dataset.del, 1); draw(); } };
   box.querySelector('#addsup').onclick = function () { list.push({ stock: '', qty: 1 }); draw(); };
 }
@@ -7188,7 +7238,7 @@ SCR.stock = function (tab) {
           '<div class="bar" style="max-width:360px"><span class="tr"><i style="width:' + pct + '%"></i></span><span class="num">' + fm(v.left) + '/' + fm(v.size) + ' ' + esc(v.unit) + '</span></div>' +
           '<div class="s">Lot ' + esc(v.lot || '-') + ' · เปิด ' + esc(v.openedAt) + ' โดย ' + esc(v.openedBy) + ' · หมดอายุ ' + esc(v.expireAt) + '</div></div>' +
           '<button class="btn ' + (v.expired ? 'd' : '') + ' sm" data-a="vialDiscard" data-id="' + esc(v.id) + '" data-n="' + esc(v.name + ' เหลือ ' + v.left + ' ' + v.unit) + '">ทิ้งส่วนที่เหลือ</button></div>'; }).join('') + '</div>' : '<div class="empty">ไม่มีขวดที่เปิดอยู่</div>') + '</div>' +
-      (sp.length ? '<div class="row"><select id="vo" style="flex:1 1 220px">' + opts(sp.map(function (s) { return [s.code, s.name + ' (ปิดผนึก ' + fm(s.sealed) + ' ' + s.unit + ')']; })) + '</select><button class="btn" data-a="vialOpen">เปิดขวดใหม่</button></div>' : '') + '</div>';
+      (sp.length ? '<div class="row"><select id="vo" style="flex:1 1 220px">' + opts(sp.map(function (s) { return [s.code, s.name + ' (ปิดผนึก ' + fm(s.sealed) + ' ' + s.unit + ')']; })) + '</select><button class="btn" data-a="vialOpen">เปิดขวดใหม่มาแบ่ง</button></div>' : '') + '</div>';
   });
   if (tab === 'suggest') body = call('reqSuggest').then(function (r) {
     S.v.sug = r.suggest.map(function (x) { return { stock: x.code, qty: x.suggest, pack: x.pack > 1 ? x.pack : 1 }; });
@@ -7251,7 +7301,12 @@ SCR.stock.after = function (tab) {
   if (S.v.stab === 'room') {
     var R = S.v.ri;
     $('#rp').onclick = function (e) { var x = e.target.closest('[data-r]'); if (!x) return; R.room = x.dataset.r; $$('#rp button').forEach(function (y) { y.classList.toggle('on', y === x); }); };
-    var draw = function () { $('#ril').innerHTML = R.lines.map(function (l, i) { var s = S.stock.filter(function (x) { return x.code === l.stock; })[0]; return '<div class="li"><div class="main t">' + esc(s.name) + '</div><input data-rq="' + i + '" type="number" inputmode="decimal" value="' + l.qty + '" style="width:90px;min-height:38px"><span class="small">' + esc(s.unit) + '</span><button class="btn q sm" data-rx="' + i + '">✕</button></div>'; }).join(''); };
+    var draw = function () { $('#ril').innerHTML = R.lines.map(function (l, i) { var s = S.stock.filter(function (x) { return x.code === l.stock; })[0];
+      var src = s.split ? '<div class="row" style="flex:1 1 100%;gap:.4rem"><select data-rs="' + i + '" style="flex:1 1 220px"><option value="">อัตโนมัติ (ขวดที่เปิดอยู่ก่อน · ปิดผนึก ' + fm(s.sealed) + ' ' + esc(s.unit) + ')</option>' +
+        (s.vials || []).map(function (v) { return '<option value="' + esc(v.id) + '"' + (l.src === v.id ? ' selected' : '') + '>ขวดที่เปิดแล้ว ' + esc(v.id) + ' · เหลือ ' + fm(v.left) + '/' + fm(v.size) + ' ' + esc(s.unit) + '</option>'; }).join('') +
+        '<option value="new"' + (l.src === 'new' ? ' selected' : '') + '>➕ เปิดขวดใหม่มาแบ่ง</option></select>' + (l.src === 'new' ? '<input data-rz="' + i + '" type="number" inputmode="decimal" step="any" value="' + (l.size || s.pack) + '" style="width:100px"><span class="small">' + esc(s.unit) + '/ขวด</span>' : '') + '</div>' : '';
+      return '<div class="li" style="flex-wrap:wrap"><div class="main t">' + esc(s.name) + '</div><input data-rq="' + i + '" type="number" inputmode="decimal" value="' + l.qty + '" style="width:90px;min-height:38px"><span class="small">' + esc(s.unit) + '</span><button class="btn q sm" data-rx="' + i + '">✕</button>' + src + '</div>'; }).join(''); };
+    $('#ril').onchange = function (e) { var t = e.target; if (t.dataset.rs != null) { R.lines[+t.dataset.rs].src = t.value; draw(); } if (t.dataset.rz != null) R.lines[+t.dataset.rz].size = nz(t.value); };
     $('#rig').onclick = function (e) { var x = e.target.closest('[data-s]'); if (!x) return; var ex = R.lines.filter(function (l) { return l.stock === x.dataset.s; })[0]; if (ex) ex.qty++; else R.lines.push({ stock: x.dataset.s, qty: 1 }); draw(); };
     $('#ril').oninput = function (e) { var t = e.target; if (t.dataset.rq != null) R.lines[+t.dataset.rq].qty = nz(t.value); };
     $('#ril').onclick = function (e) { var x = e.target.closest('[data-rx]'); if (x) { R.lines.splice(+x.dataset.rx, 1); draw(); } };
@@ -7262,9 +7317,9 @@ ACT.vialDiscard = function (el) {
     onOk: function (b) { return call('vialDiscard', { id: el.dataset.id, reason: b.querySelector('#rs').value, pin: pinVal(b) }, { write: true }).then(function (q) { S.stock = null; toast('บันทึกทิ้ง ' + fm(q)); refresh(); }); } });
 };
 ACT.vialOpen = function () {
-  var c = $('#vo').value;
-  dialog({ title: 'เปิดขวดใหม่', ok: 'เปิดขวด', body: '<label>Lot (ถ้าต่างจากในระบบ)<input id="lt"></label>' + pinField('ผู้เปิดขวด: รหัสพนักงาน *'),
-    onOk: function (b) { return call('vialOpen', { stock: c, lot: b.querySelector('#lt').value, pin: pinVal(b) }, { write: true }).then(function (v) { S.stock = null; toast('เปิด ' + v.id + ' ' + v.size + ' ' + v.unit); refresh(); }); } });
+  var c = $('#vo').value, x = (S.stock || []).filter(function (y) { return y.code === c; })[0] || {};
+  dialog({ title: 'เปิดขวดใหม่มาแบ่ง · ' + (x.name || ''), ok: 'เปิดขวด', body: '<label>ขวดนี้ได้กี่ ' + esc(x.unit || 'cc') + ' (ผสมแล้ว) *<input id="vsz" type="number" inputmode="decimal" step="any" value="' + (x.pack || '') + '"></label><p class="xs muted">ปกติขวดละ ' + fm(x.pack || 0) + ' ' + esc(x.unit || '') + ' · ผสมไม่เท่าเดิมให้ใส่ตามจริง</p><label>Lot (ถ้าต่างจากในระบบ)<input id="lt"></label>' + pinField('ผู้เปิดขวด: รหัสพนักงาน *'),
+    onOk: function (b) { return call('vialOpen', { stock: c, size: b.querySelector('#vsz').value, lot: b.querySelector('#lt').value, pin: pinVal(b) }, { write: true }).then(function (v) { S.stock = null; toast('เปิด ' + v.id + ' ' + v.size + ' ' + v.unit); refresh(); }); } });
 };
 ACT.stab = function (el) { S.cur.arg = el.dataset.t; refresh(); };
 ACT.reqAdd = function () {
