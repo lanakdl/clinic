@@ -1792,6 +1792,8 @@ function makeCore(store) {
       if (isMJ(it.name) && typeOf(it) === 'proc' && /ปากกาลูกค้า|ปากกาของลูกค้า|ฝากปากกา/.test(String(it.name))) addMjFee(v, ao, u);   // ฉีดจากปากกาที่ลูกค้าซื้อเหมาไว้ (เข็มเดี่ยวที่แบ่งขาย = DF % ปกติ ไม่เก็บ 50)
       return ao;
     });
+    // ขายคอร์ส/โปรระหว่างอยู่คลินิก แล้วติ๊ก "ทำครั้งแรกวันนี้" → ขึ้นรายการที่ต้องทำในห้องทรีตเมนต์ทันที (หักครั้งนี้ตอนจ่าย)
+    out.forEach(function (o, k) { var l = lines[k]; if (!l || !l.today || !sellsCourse(o)) return; var x = partsOf(o, v.branch).filter(function (q) { return q.item && !/:/.test(q.item) || itemByCode(q.item); })[0] || partsOf(o, v.branch)[0]; if (x) preMake(o, x, v, u); });
     if (fromRoom || ['DR_DONE', 'NUMB', 'IN_TX', 'IN_DR'].indexOf(v.stage) >= 0) upd('Visits', v, { buyMore: true });
     log(u, 'saleCommit', v.vn + ' ' + out.length + ' รายการ ' + sum(out, function (o) { return o.total; }));
     return { vn: v.vn, queue: v.queue, stage: v.stage, orders: out.map(clean) };
@@ -1826,12 +1828,16 @@ function makeCore(store) {
     if (['DONE', 'CANCEL'].indexOf(v.stage) >= 0) err('เคสนี้ปิดแล้ว');
     var x = partsOf(o, v.branch).filter(function (q) { return String(q.item) === String(p.item); })[0]; if (!x) err('ไม่พบรายการในคอร์ส');
     var n = preOrders(o, x.item).length; if (!x.buffet && n >= num(x.qty)) err('ใช้ครบ ' + x.qty + ' ครั้งแล้ว');
+    var no = preMake(o, x, v, u);
+    log(u, 'preUse', o.id + ' ' + x.item + ' → ' + no.id); return clean(no);
+  };
+  function preMake(o, x, v, u) {
     var it = itemByCode(x.item) || { code: x.item, name: x.name, category: '', type: 'หัตถการ', dfPct: x.dfPct, staffFee: 0, performer: 'แพทย์' };
     var no = addOrder(v, it, 1, u, { price: 0, name: 'ใช้คอร์ส: ' + x.name + (x.choice ? ' (' + x.choice + ')' : '') + ' (ยังไม่จ่าย)', type: 'redeem', courseRef: preKey(o, x.item), dfPct: num(x.dfPct), dfFixed: num(x.dfFixed), seller: '-', forceStatus: 'PENDING' });
     if (isMJ(x.name) || isMJ(it.name)) addMjFee(v, no, u);
     if (v.stage === 'SALE') setStage(v, 'WAIT_TX');
-    log(u, 'preUse', o.id + ' ' + x.item + ' → ' + no.id); return clean(no);
-  };
+    return no;
+  }
 
   A.removeOrder = function (p, u) {
     var o = find('Orders', 'id', p.id); if (!o) err('ไม่พบรายการ');
