@@ -337,6 +337,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:
 @media (prefers-reduced-motion:reduce){.qflash,.qabox.has{animation:none}}
 .bdbar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;justify-content:space-between;background:var(--warn-soft);color:var(--ink);border-top:2px solid var(--warn);padding:.45rem 16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.95rem}
 .note.g{background:var(--good-soft);color:var(--good)}
+.ptab{font-size:.78rem}.ptab th,.ptab td{padding:.3rem .4rem}.ptab input{font-size:.85rem}
 
 </style>
 </head>
@@ -1667,8 +1668,8 @@ var SCHEMA = {
   Orders:     [['id','เลขรายการ'],['vn','VN'],['item','รหัส'],['name','รายการ'],['type','ประเภท'],['category','หมวด'],['qty','จำนวน','n'],['price','ราคา/หน่วย','n'],['disc','ส่วนลด','n'],['total','รวม','n'],
                ['paidNet','รับจริง (หลังลดท้ายบิล)','n'],['cashNet','รับเป็นเงินจริง (ไม่รวมวงเงิน)','n'],['upsell','อัพเซล','b'],['seller','ผู้ขาย'],['adminShare','ยอดของแอดมิน (ปิดจากเพจ)','n'],['voidOf','จากบิลที่ยกเลิก'],['adminBy','แอดมินที่ปิด'],['receipt','ใบเสร็จ'],['status','สถานะ'],['courseRef','ใช้คอร์ส'],['promo','โปร'],['choice','ตัวเลือก'],
                ['perVal','มูลค่าต่อครั้ง','n'],['dfPct','DF %','n'],['staffFee','ค่ามือพนักงาน','n'],['feeTotal','ค่ามือรวมรายการนี้ (แทนคูณจำนวน)','n'],['prepFee','ค่ามือตอนเตรียม','n'],['scrub','Scrub'],['circ','Circulating'],['scrubFee','ค่ามือ Scrub','n'],['circFee','ค่ามือ Circulating','n'],['dfFixed','DF บาท/ครั้ง','n'],['doctor','แพทย์ผู้ทำ'],['staffs','พนักงานผู้ทำ'],
-               ['opNote','Operative note'],['free','แถม (ให้ฟรี)','b'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['issueLater','ห้อง OR เบิกทีหลัง','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
-  Courses:    [['id','เลขคอร์ส'],['hn','HN'],['name','ชื่อ'],['src','รหัสที่ซื้อ'],['srcName','ซื้อจาก'],['item','รหัสบริการ'],['itemName','บริการ'],['total','ทั้งหมด','n'],['used','ใช้แล้ว','n'],
+               ['opNote','Operative note'],['params','ค่าเครื่อง/เลเซอร์'],['round','ครั้งที่'],['free','แถม (ให้ฟรี)','b'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['issueLater','ห้อง OR เบิกทีหลัง','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
+  Courses:    [['id','เลขคอร์ส'],['hn','HN'],['name','ชื่อ'],['src','รหัสที่ซื้อ'],['srcName','ซื้อจาก'],['item','รหัสบริการ'],['itemName','บริการ'],['total','ทั้งหมด','n'],['used','ใช้แล้ว','n'],['prior','ทำไปแล้วก่อนยกมา (กระดาษ)','n'],
                ['perVal','ราคาจริงต่อครั้ง','n'],['dfPct','DF %','n'],['dfFixed','DF บาท/ครั้ง','n'],['expire','หมดอายุ'],['status','สถานะ'],['receipt','ใบเสร็จ'],['branch','สาขาที่ซื้อ'],
                ['created','วันที่ซื้อ','t'],['buffet','บุฟเฟต์','b'],['choice','ตัวเลือก'],['legacy','ยกมาจากกระดาษ','b'],['photo','รูปหลักฐาน']],
   Payments:   [['receipt','เลขใบเสร็จ'],['vn','VN'],['hn','HN'],['name','ชื่อ'],['subtotal','ยอดรวม','n'],['discount','ส่วนลดท้ายบิล','n'],['net','สุทธิ','n'],['method','ชำระโดย'],['by','ผู้รับเงิน'],['time','เวลา','t'],['branch','สาขา'],['change','เงินทอน','n'],['wallet','ใช้วงเงินสมาชิก','n'],['ar','ค้างชำระ (ผ่อนกับคลินิก)','n'],['fee','ค่าธรรมเนียมช่องทาง','n'],['emailed','ส่งใบเสร็จทางอีเมล'],
@@ -2392,13 +2393,41 @@ function makeCore(store) {
       patient: cleanPt(pt), courses: cs, spend: spend, open: clean(open), seenDoctor: seenDoctor, appts: appts,
       openOrders: open ? ords.filter(function (o) { return o.vn === open.vn; }).map(clean) : [],
       due: open ? sum(ords.filter(function (o) { return o.vn === open.vn && !o.receipt; }), function (o) { return o.total; }) : 0,
-      history: visits.slice(-20).reverse().map(function (v) {
-        var op = opd.filter(function (o) { return o.vn === v.vn; })[0] || {};
-        return { vn: v.vn, date: v.date, branch: v.branch, doctor: v.doctor, stage: v.stage, dx: op.dx || '', plan: op.plan || '', proc: op.proc || '', signed: op.signed ? String(op.signed).replace(/^\S+\s/, '') + ' · ' + op.signedAt + (op.sigImg ? ' ✍' : '') : '',
-          orders: ords.filter(function (o) { return o.vn === v.vn; }).map(function (o) { return o.name + ' ×' + o.qty; }) };
-      })
+      history: histOf(pt.hn, '', 20)
     };
   };
+  // ประวัติการรักษา (OPD + บันทึกหัตถการ/ค่าที่ใช้ แต่ละรายการ) — ใช้ทั้งหน้าคนไข้และห้องทรีตเมนต์ (แพทย์ดูรอบก่อน เช่น ค่าเลเซอร์)
+  // ครั้งที่เท่าไรของคอร์ส (เช่น 5/12) — นับรายการ "ใช้คอร์ส" ที่ทำแล้วของคอร์สเดียวกัน
+  function roundOf(o) {
+    if (!blank(o.round)) return String(o.round);
+    var ref = String(o.courseRef || ''); if (!ref || ref.indexOf('pre:') === 0) return '';
+    var c = find('Courses', 'id', ref); if (!c || on(c.buffet)) return '';
+    var at = String(o.doneAt || '~'), n = rows('Orders').filter(function (x) { return String(x.courseRef) === ref && x.status === 'DONE' && x.id !== o.id && String(x.doneAt) <= at; }).length + 1;
+    var pr = num(c.prior); return on(c.legacy) && pr > 0 ? (n + pr) + '/' + (num(c.total) + pr) : n + '/' + num(c.total) + (on(c.legacy) ? ' (นับจากที่ยกมา)' : '');
+  }
+  function paramsOf(o) { try { var a = JSON.parse(String(o.params || '[]')); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function cleanParams(a) {
+    var K = ['m', 'lens', 'spot', 'wl', 'pw', 'pd', 'flu', 'en', 'depth', 'fq', 'cnt', 'area'];
+    return (Array.isArray(a) ? a : []).slice(0, 12).map(function (r) { var x = {}; K.forEach(function (k) { var v = txt(r && r[k], 40); if (v) x[k] = v; }); return x; }).filter(function (x) { return K.some(function (k) { return k !== 'm' && x[k]; }); });
+  }
+  // ครั้งก่อนของรายการเดียวกัน (คนไข้คนนี้) — ให้หมอดูค่าเครื่อง/โน้ตก่อนทำ
+  function lastOf(hn, item, exceptVn) {
+    var vs = {}; rows('Visits').forEach(function (v) { if (v.hn === hn && v.vn !== exceptVn) vs[v.vn] = v; });
+    var o = rows('Orders').filter(function (x) { return vs[x.vn] && String(x.item) === String(item) && x.status === 'DONE'; }).sort(function (a, b) { return String(a.doneAt) < String(b.doneAt) ? -1 : 1; }).pop();
+    if (!o) return null;
+    var stf = function (c) { var x = find('Staff', 'code', c); return x ? String(x.nick || x.name) : c; };
+    return { date: vs[o.vn].date, round: roundOf(o), note: String(o.opNote || ''), params: paramsOf(o), lot: String(o.lot || ''), by: [o.doctor ? stf(o.doctor) : ''].concat(String(o.staffs || '').split(' ').filter(String).map(stf)).filter(String).join(', ') };
+  }
+
+  function histOf(hn, exceptVn, n) {
+    var opd = rows('OPD'), ords = rows('Orders'), stf = function (c) { var x = find('Staff', 'code', c); return x ? String(x.nick || x.name) : c; };
+    return rows('Visits').filter(function (v) { return v.hn === hn && v.stage !== 'CANCEL' && v.vn !== exceptVn; }).slice(-(n || 20)).reverse().map(function (v) {
+      var op = opd.filter(function (o) { return o.vn === v.vn; })[0] || {};
+      return { vn: v.vn, date: v.date, branch: v.branch, doctor: v.doctor, stage: v.stage, cc: op.cc || v.cc || '', pi: op.pi || '', pe: op.pe || '', dx: op.dx || '', plan: op.plan || '', proc: op.proc || '', signed: op.signed ? String(op.signed).replace(/^\S+\s/, '') + ' · ' + op.signedAt + (op.sigImg ? ' ✍' : '') : '',
+        orders: ords.filter(function (o) { return o.vn === v.vn; }).map(function (o) { return o.name + ' ×' + o.qty; }),
+        done: ords.filter(function (o) { return o.vn === v.vn && o.status === 'DONE' && (o.opNote || o.lot || o.doctor || o.staffs || o.params || o.courseRef); }).map(function (o) { return { item: String(o.item), name: String(o.name), qty: num(o.qty), round: roundOf(o), params: paramsOf(o), note: String(o.opNote || ''), lot: String(o.lot || ''), by: [o.doctor ? stf(o.doctor) : ''].concat(String(o.staffs || '').split(' ').filter(String).map(stf)).filter(String).join(', '), at: String(o.doneAt || '') }; }) };
+    });
+  }
 
   function everSawDoctor(hn) {
     var since = addDays(today(), -365);
@@ -2413,7 +2442,7 @@ function makeCore(store) {
     var mgr = rows('Staff').filter(function (s) { var h = store.hash('pin:' + String(p.approvePin || '')); return on(s.active) && (String(s.pin) === h || String(s.pin) === String(p.approvePin)) && rolesOf(s).some(function (r) { return ['manager', 'admin', 'owner'].indexOf(r) >= 0; }); })[0];
     if (!mgr) err('รหัสผู้จัดการไม่ถูกต้อง');
     var per = num(p.perVal) || num(priceAt(it, u.branch));
-    var c = add('Courses', { id: nextId('CS', 'seq_CS'), hn: pt.hn, name: pt.name, src: 'LEGACY', srcName: 'ยกมาจากกระดาษ', item: it.code, itemName: it.name, total: left, used: 0,
+    var c = add('Courses', { id: nextId('CS', 'seq_CS'), hn: pt.hn, name: pt.name, src: 'LEGACY', srcName: 'ยกมาจากกระดาษ', item: it.code, itemName: it.name, total: left, used: 0, prior: Math.max(0, Math.round(num(p.prior))),
       perVal: per, dfPct: num(it.dfPct), dfFixed: 0, expire: isDate(p.expire) ? p.expire : '', status: 'ACTIVE', receipt: '', branch: u.branch, created: stamp(), buffet: false, choice: '', legacy: true,
       photo: p.img ? store.savePhoto(pt.hn + '_legacy', p.img) : '' });
     log(u, 'addLegacyCourse', c.id + ' ' + pt.hn + ' ' + it.name + ' ×' + left + ' อนุมัติ ' + mgr.code);
@@ -2613,13 +2642,14 @@ function makeCore(store) {
       c.performer = it ? perfOf(it) : 'doctor';
       c.orTeam = !!it && (num(it.scrubFee) > 0 || num(it.circFee) > 0 || String(setting('surgCategories', 'ผ่าตัด,ศัลยกรรม')).split(/\s*,\s*/).indexOf(String(it.category)) >= 0 && typeOf(it) === 'proc');
       c.bom = (bomM[o.item] || []).map(function (b) { return { stock: b.stock, name: (st[b.stock] || {}).name || b.stock, unit: (st[b.stock] || {}).unit || '', qty: b.qty * num(o.qty) }; });
+      if (o.status === 'PENDING') { c.round = roundOf(o); c.last = lastOf(v.hn, o.item, v.vn); } else { c.round = roundOf(o); c.params = paramsOf(o); }
       c.used = usedOf(o); c.fixable = o.status === 'DONE' && !on(o.stockPending) && String(o.doneAt).slice(0, 10) >= addDays(today(), -num(setting('supplyFixDays', 7)));
       c.fixes = rows('SupplyEdits').filter(function (e) { return e.order === o.id; }).map(clean);
       if (sellsCourse(o)) c.preParts = partsOf(o, v.branch).map(function (x) { return { item: String(x.item), name: String(x.name), qty: num(x.qty), buffet: !!x.buffet, used: preOrders(o, x.item).length, choice: String(x.choice || '') }; });
       return c;
     });
     var crs = rows('Courses').filter(function (c) { return c.hn === v.hn && c.status === 'ACTIVE' && (!c.expire || c.expire >= today()) && (on(c.buffet) || num(c.total) > num(c.used)); }).map(function (c) { return { id: c.id, itemName: c.itemName, choice: c.choice || '', left: on(c.buffet) ? 'บุฟเฟต์' : (num(c.total) - num(c.used)) + '/' + num(c.total), expire: c.expire || '' }; });
-    return { visit: clean(v), patient: cleanPt(pt), opd: clean(op), orders: os, courses: crs, mins: minsSince(v.stageAt), numbMins: v.numbAt ? minsSince(v.numbAt) : 0,
+    return { visit: clean(v), patient: cleanPt(pt), opd: clean(op), orders: os, courses: crs, history: histOf(v.hn, v.vn, 15), mins: minsSince(v.stageAt), numbMins: v.numbAt ? minsSince(v.numbAt) : 0,
       due: sum(os.filter(function (o) { return !o.receipt; }), function (o) { return o.total; }) };
   };
 
@@ -2827,7 +2857,7 @@ function makeCore(store) {
     var over = controlUse(o, need, u.branch, p);
     var who = Object.keys(need).length ? byPin(p, u) : null;
     var lots = issueP(later ? [] : p.supplies, u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
-    upd('Orders', o, { stockPending: later && hasBom, status: 'DONE', doctor: doc, staffs: staffs.join(' '), opNote: txt(p.opNote, 2000), lot: txt(p.lot, 120) || lots.join(', '), doneAt: stamp(),
+    upd('Orders', o, { stockPending: later && hasBom, status: 'DONE', doctor: doc, staffs: staffs.join(' '), opNote: txt(p.opNote, 2000), params: (function () { var a = cleanParams(p.params); return a.length ? JSON.stringify(a) : ''; })(), round: roundOf(o), lot: txt(p.lot, 120) || lots.join(', '), doneAt: stamp(),
       dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(feeOf(it, u.branch).staffFee) : num(o.staffFee), prepFee: it && !blank(feeOf(it, u.branch).prepFee) ? num(feeOf(it, u.branch).prepFee) : '', scrub: scrub.join(' '), circ: circ.join(' '), scrubFee: num(it && it.scrubFee), circFee: num(it && it.circFee) });
     var ff = freeFee(u.branch); if (on(o.free) && ff != null) upd('Orders', o, { staffFee: ff, prepFee: ff });
     ordersOf(o.vn).filter(function (x) { return x.status === 'PENDING' && String(x.choice) === 'ref:' + o.id; }).forEach(function (x) {   // ค่าบริการแพทย์ที่ผูกกับรายการนี้ → ปิดพร้อมกัน ให้แพทย์คนเดียวกัน
@@ -5831,13 +5861,64 @@ SCR.patient = function (hn) {
       (cs.length ? '<div class="list">' + cs.map(courseRow).join('') + '</div>' : '<div class="empty">ยังไม่มีคอร์ส</div>') +
       (oldc.length ? '<details><summary class="small muted">คอร์สที่ใช้ครบ/หมดอายุ (' + oldc.length + ')</summary><div class="list">' + oldc.map(courseRow).join('') + '</div></details>' : '') + '</div>' +
       (d.receipts && d.receipts.length ? '<div class="card stack"><div class="sec"><h2>ใบเสร็จ</h2><span class="pill">' + d.receipts.length + ' ล่าสุด</span></div><div class="list">' + d.receipts.map(function (x) { return '<div class="li"><div class="main"><div class="t">' + esc(x.receipt) + '</div><div class="s">' + esc(thDate(x.time, 1)) + ' · ' + esc(x.branch) + (x.emailed ? ' · <span class="pill g">✉ ส่งแล้ว</span>' : '') + (x.void === 'VOID' ? ' · <span class="pill d">ยกเลิก</span>' : x.void === 'REQUESTED' ? ' · <span class="pill w">รอยกเลิก</span>' : '') + '</div></div><div class="num">' + bt(x.net) + '</div><button class="btn sm" data-go="receipt" data-arg="' + esc(x.receipt) + '">ดู/ส่ง</button></div>'; }).join('') + '</div></div>' : '') +
-      '<div class="card stack"><h2>ประวัติการรักษา</h2>' + (d.history.length ? '<div class="list">' + d.history.map(function (h) {
-        return '<div class="li"><div class="main"><div class="t">' + esc(thDate(h.date, 1)) + ' · ' + esc(h.branch) + ' ' + stagePill(h.stage) + '</div><div class="s">' + esc(h.orders.join(', ') || '—') + '</div>' +
-          (h.dx || h.plan ? '<div class="small">' + (h.dx ? '<b>Dx</b> ' + esc(h.dx) + ' ' : '') + (h.plan ? '<b>Plan</b> ' + esc(h.plan) : '') + '</div>' : '') + (h.proc ? '<div class="small" style="white-space:pre-wrap"><b>หัตถการ</b> ' + esc(h.proc) + '</div>' : '') + (h.signed ? '<div class="xs muted">ลงนาม ' + esc(h.signed) + '</div>' : '') + '</div></div>';
-      }).join('') + '</div>' : '<div class="empty">ยังไม่มีประวัติ</div>') + '</div></div>';
+      (histCard(d.history, 'ประวัติการรักษา', 0) || '<div class="card stack"><h2>ประวัติการรักษา</h2><div class="empty">ยังไม่มีประวัติ</div></div>') + '</div>';
   });
 };
 SCR.patient.after = function () { instBox(); };
+// ประวัติการรักษา: OPD (CC/PI/PE/Dx/Plan/หัตถการ) + บันทึกของแต่ละรายการที่ทำ (ค่าเครื่อง/ตำแหน่ง/Lot/ใครทำ)
+// ค่าเครื่องแยกตามเครื่อง (ตามที่หมอใช้จริง) — ช่องที่มี opts = เลือก
+var PF = { spot: ['Spot size', 'mm'], wl: ['Wavelength', 'nm'], pw: ['ps/pt'], pd: ['Pulse duration', 'ms'], flu: ['Fluence', 'J/cm²'], en: ['Energy'], depth: ['Depth', 'mm'], fq: ['Frequency', 'Hz'], cnt: ['Count'], area: ['ตำแหน่ง'], lens: ['หัว/เลนส์'] };
+var MACH = [
+  { m: 'Oligio', re: /oligio/i, f: ['en', 'cnt'] },
+  { m: 'Morpheus', re: /morpheus/i, f: ['cnt'] },
+  { m: 'Pico', re: /pico/i, f: ['wl', 'spot', 'fq', 'pw', 'flu', 'cnt'], o: { wl: ['532', '1064'], pw: ['ps', 'pt'] } },
+  { m: 'Spectra', re: /spectra/i, f: ['wl', 'spot', 'fq', 'flu', 'cnt'], o: { wl: ['1064', '532', 'Spectra'] } },
+  { m: 'Vbeam', re: /v.?beam/i, f: ['pd', 'flu', 'cnt'] },
+  { m: 'YAG', re: /yag/i, f: ['pd', 'flu', 'fq', 'cnt'] },
+  { m: 'Diode', re: /diode|ไดโอด|กำจัดขน|ขนรักแร้/i, f: ['pd', 'flu', 'fq', 'cnt'] },
+  { m: 'Ultraformer', re: /ultraformer|hifu|ไฮฟู/i, f: ['depth', 'cnt'], o: { depth: ['4.5', '3', '1.5'] } }
+];
+var MOTHER = { m: 'อื่นๆ', f: ['lens', 'wl', 'pd', 'flu', 'fq', 'cnt'] };
+function machOf(m) { return MACH.filter(function (x) { return x.m === m; })[0] || (m ? { m: m, f: MOTHER.f } : MOTHER); }
+function machGuess(name) { var x = MACH.filter(function (x) { return x.re.test(name || ''); })[0]; return x ? x.m : ''; }
+function paramTable(ps) {
+  if (!ps || !ps.length) return '';
+  var g = []; ps.forEach(function (r) { var k = r.m || ''; var x = g.filter(function (y) { return y.m === k; })[0]; if (!x) g.push(x = { m: k, rs: [] }); x.rs.push(r); });
+  return g.map(function (x) {
+    var M = machOf(x.m), cols = M.f.concat(['area']).filter(function (k) { return x.rs.some(function (r) { return r[k]; }); });
+    ['lens', 'spot', 'wl', 'pw', 'pd', 'flu', 'en', 'depth', 'fq', 'cnt'].forEach(function (k) { if (cols.indexOf(k) < 0 && x.rs.some(function (r) { return r[k]; })) cols.splice(cols.length - 1, 0, k); });
+    return '<div style="overflow-x:auto;margin:.3rem 0"><table class="ptab"><thead><tr><th>' + esc(x.m || 'เครื่อง') + '</th>' + cols.map(function (k) { return '<th>' + PF[k][0] + (PF[k][1] ? ' <span class="muted">' + PF[k][1] + '</span>' : '') + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      x.rs.map(function (r, i) { return '<tr><td class="muted">' + (i + 1) + '</td>' + cols.map(function (k) { return '<td>' + esc(r[k] || '') + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+  }).join('');
+}
+// ดูทีละรายการ ทุกรอบเรียงกัน (เช่น Pico แผลเป็น 1/12 … 8/12)
+function histByItem(hs, pri) {
+  var g = {}, ord = [];
+  (hs || []).forEach(function (h) { (h.done || []).forEach(function (o) { var k = o.name; if (!g[k]) { g[k] = []; ord.push(k); } g[k].push({ date: h.date, branch: h.branch, o: o }); }); });
+  if (!ord.length) return '<div class="empty">ยังไม่มีบันทึกหัตถการ</div>';
+  if (pri && pri.length) ord.sort(function (a, b) { return (pri.indexOf(a) < 0) - (pri.indexOf(b) < 0); });
+  return '<div class="stack" style="gap:.45rem">' + ord.map(function (k, i) {
+    return '<details class="card flat"' + (i < 1 ? ' open' : '') + '><summary><b>' + esc(k) + '</b> <span class="pill">' + g[k].length + ' รอบ</span>' + (g[k][0].o.round ? ' <span class="pill a">ล่าสุดครั้งที่ ' + esc(g[k][0].o.round) + '</span>' : '') + '</summary><div class="stack" style="gap:.35rem;margin-top:.4rem">' +
+      g[k].map(function (x) { var o = x.o; return '<div class="small" style="border-left:3px solid var(--line,#ddd);padding-left:.55rem"><b>' + esc(thDate(x.date, 1)) + '</b>' + (o.round ? ' · ครั้งที่ ' + esc(o.round) : '') + (o.by ? ' <span class="xs muted">· ' + esc(o.by) + '</span>' : '') + paramTable(o.params) + (o.note ? '<div style="white-space:pre-wrap">' + esc(o.note) + '</div>' : '') + '</div>'; }).join('') + '</div></details>';
+  }).join('') + '</div>';
+}
+// การ์ดประวัติ มีสลับ ตามวันที่ / ตามรายการ
+function histCard(hs, title, more, pri) {
+  if (!hs || !hs.length) return '';
+  var byDate = more ? histHtml(hs.slice(0, 3), 1) + (hs.length > 3 ? '<details><summary class="small b">ดูย้อนหลังอีก ' + (hs.length - 3) + ' ครั้ง</summary>' + histHtml(hs.slice(3), 0) + '</details>' : '') : histHtml(hs, 1);
+  return '<div class="card stack hcard"><div class="sec"><h3>' + title + '</h3><span class="pill">' + hs.length + ' ครั้ง</span></div><div class="seg chips" style="margin:0"><button type="button" class="on" data-hv="d">ตามวันที่</button><button type="button" data-hv="i">ตามรายการ</button></div><div data-hp="d">' + byDate + '</div><div data-hp="i" hidden>' + histByItem(hs, pri) + '</div></div>';
+}
+document.addEventListener('click', function (e) { var x = e.target.closest && e.target.closest('[data-hv]'); if (!x) return; var c = x.closest('.hcard'); $$('[data-hv]', c).forEach(function (y) { y.classList.toggle('on', y === x); }); $$('[data-hp]', c).forEach(function (p) { p.hidden = p.dataset.hp !== x.dataset.hv; }); });
+function histHtml(hs, openN) {
+  if (!hs || !hs.length) return '<div class="empty">ยังไม่มีประวัติ</div>';
+  var L = function (k, v) { return v ? '<div class="small" style="white-space:pre-wrap"><b>' + k + '</b> ' + esc(v) + '</div>' : ''; };
+  return '<div class="stack" style="gap:.45rem">' + hs.map(function (h, i) {
+    var body = L('CC', h.cc) + L('PI', h.pi) + L('PE', h.pe) + L('Dx', h.dx) + L('Plan', h.plan) + L('บันทึกหัตถการ', h.proc) +
+      (h.done || []).map(function (o) { return '<div class="card flat small" style="padding:.5rem .7rem"><b>' + esc(o.name) + (o.qty > 1 ? ' ×' + fm(o.qty) : '') + '</b>' + (o.round ? ' <span class="pill a">ครั้งที่ ' + esc(o.round) + '</span>' : '') + (o.by ? ' <span class="xs muted">· ' + esc(o.by) + '</span>' : '') + paramTable(o.params) + (o.note ? '<div style="white-space:pre-wrap">' + esc(o.note) + '</div>' : '') + (o.lot ? '<div class="xs muted">Lot ' + esc(o.lot) + '</div>' : '') + '</div>'; }).join('') +
+      (h.signed ? '<div class="xs muted">ลงนาม ' + esc(h.signed) + '</div>' : '');
+    return '<details class="card flat"' + (i < (openN || 0) ? ' open' : '') + '><summary><b>' + esc(thDate(h.date, 1)) + '</b> · ' + esc(h.branch) + ' ' + stagePill(h.stage) + '<div class="xs muted" style="margin-top:.15rem">' + esc(h.orders.join(', ') || '—') + '</div></summary><div class="stack" style="gap:.35rem;margin-top:.4rem">' + (body || '<div class="xs muted">ไม่มีบันทึก</div>') + '</div></details>';
+  }).join('') + '</div>';
+}
 function courseRow(c) {
   var left = c.buffet ? 'บุฟเฟต์' : (c.total - c.used) + '/' + c.total;
   var ok = c.status === 'ACTIVE';
@@ -6067,11 +6148,11 @@ function legacyDlg() {
   var img = '', its = S.boot.items.filter(function (i) { return i.type === 'proc' || i.type === 'service'; });
   dialog({ title: 'ยกคอร์สคงเหลือเดิม', ok: 'บันทึกคอร์ส',
     body: '<div class="note small">ใช้ตอนคนไข้เก่ามา visit ครั้งแรกในระบบ — ดูยอดจากบัตรคอร์ส หรือ "รายการฝาก" ในบิล LINE ล่าสุด · ต้องให้ผู้จัดการอนุมัติด้วยรหัส</div><label>บริการ<select id="it">' + opts(its.map(function (i) { return [i.code, i.name]; }), '', '— เลือก —') + '</select></label>' +
-      '<div class="g3"><label>เหลือกี่ครั้ง<input id="lf" type="number" min="1" inputmode="numeric"></label><label>มูลค่าต่อครั้ง (บาท)<input id="pv" type="number" inputmode="decimal" placeholder="ใช้คิด DF"></label><label>หมดอายุ<input id="ex" type="date"></label></div>' +
+      '<div class="g3"><label>เหลือกี่ครั้ง<input id="lf" type="number" min="1" inputmode="numeric"></label><label>ทำไปแล้วกี่ครั้ง (ในกระดาษ)<input id="pr" type="number" min="0" inputmode="numeric" placeholder="เช่น 4 ของ 12"></label><label>มูลค่าต่อครั้ง (บาท)<input id="pv" type="number" inputmode="decimal" placeholder="ใช้คิด DF"></label><label>หมดอายุ<input id="ex" type="date"></label></div>' +
       '<label class="btn" style="flex-direction:row">' + ic('cam', 18) + ' ถ่ายรูปบัตรคอร์ส / บิลเดิม (ถ้ามี)<input type="file" accept="image/*" capture="environment" id="lp" hidden></label><img id="lpi" class="idimg" hidden alt="">' +
       '<label>รหัสผู้จัดการ (อนุมัติ)<input id="mp" type="password" inputmode="numeric" autocomplete="off"></label>',
     mount: function (b) { selSearch(b.querySelector('#it')); var f = b.querySelector('#lp'); f.onchange = function () { readImg(f.files[0]).then(function (d) { img = d; var i = b.querySelector('#lpi'); i.src = d; i.hidden = false; }); }; },
-    onOk: function (b) { return call('addLegacyCourse', { hn: S.v.pt.patient.hn, item: need(b.querySelector('#it').value, 'เลือกบริการ'), itemName: (b.querySelector('#it').selectedOptions[0] || {}).text || '', left: b.querySelector('#lf').value, perVal: b.querySelector('#pv').value, expire: b.querySelector('#ex').value, approvePin: b.querySelector('#mp').value, img: img }, { write: true }).then(function () { toast('เพิ่มคอร์สแล้ว'); refresh(); }); } });
+    onOk: function (b) { return call('addLegacyCourse', { hn: S.v.pt.patient.hn, item: need(b.querySelector('#it').value, 'เลือกบริการ'), itemName: (b.querySelector('#it').selectedOptions[0] || {}).text || '', left: b.querySelector('#lf').value, prior: b.querySelector('#pr').value, perVal: b.querySelector('#pv').value, expire: b.querySelector('#ex').value, approvePin: b.querySelector('#mp').value, img: img }, { write: true }).then(function () { toast('เพิ่มคอร์สแล้ว'); refresh(); }); } });
 }
 ACT.photos = function () {
   var p = S.v.pt.patient, o = S.v.pt.open;
@@ -6833,7 +6914,8 @@ SCR.tx = function (vn) {
       drNoteCard(d) +
       '<div class="card stack"><div class="sec"><h2>รายการที่ต้องทำ</h2><span class="pill w">' + pend.length + '</span></div>' + (pend.length ? '<div class="list">' + pend.map(function (o) {
         return '<div class="li"><div class="main"><div class="t">' + esc(o.name) + (o.qty > 1 ? ' ×' + o.qty : '') + (o.choice ? ' · ' + esc(o.choice) : '') + '</div><div class="s">' + ({ doctor: 'แพทย์ทำ', staff: 'พนักงานทำ', both: 'แพทย์+พนักงาน', either: 'แพทย์หรือพนักงาน' }[o.performer] || '') +
-          (String(o.courseRef || '').indexOf('pre:') === 0 ? ' · <span class="pill w">ใช้คอร์ส · ยังไม่จ่าย</span>' : o.receipt || o.courseRef ? ' · <span class="pill g">' + (o.courseRef ? 'ใช้คอร์ส' : 'จ่ายแล้ว') + '</span>' : ' · <span class="pill w">ยังไม่จ่าย</span>') + (o.consent ? ' · <span class="pill a">เซ็นยินยอมแล้ว</span>' : '') + '</div></div>' +
+          (String(o.courseRef || '').indexOf('pre:') === 0 ? ' · <span class="pill w">ใช้คอร์ส · ยังไม่จ่าย</span>' : o.receipt || o.courseRef ? ' · <span class="pill g">' + (o.courseRef ? 'ใช้คอร์ส' : 'จ่ายแล้ว') + '</span>' : ' · <span class="pill w">ยังไม่จ่าย</span>') + (o.consent ? ' · <span class="pill a">เซ็นยินยอมแล้ว</span>' : '') + (o.round ? ' · <span class="pill a">ครั้งที่ ' + esc(o.round) + '</span>' : '') + '</div>' +
+          (o.last ? '<details class="xs" style="margin-top:.25rem"><summary class="muted">ครั้งก่อน ' + esc(thDate(o.last.date, 1)) + (o.last.round ? ' · ครั้งที่ ' + esc(o.last.round) : '') + (o.last.by ? ' · ' + esc(o.last.by) : '') + (o.last.note ? ' · ' + esc(o.last.note.slice(0, 40)) : '') + '</summary>' + paramTable(o.last.params) + (o.last.note ? '<div style="white-space:pre-wrap">' + esc(o.last.note) + '</div>' : '') + '</details>' : '') + '</div>' +
           '<button class="btn sm" data-a="consent" data-id="' + esc(o.id) + '">ใบยินยอม</button><button class="btn p" data-a="complete" data-id="' + esc(o.id) + '">ทำเสร็จ</button></div>';
       }).join('') + '</div>' : '<div class="empty">ไม่มีรายการรอทำ</div>') +
       d.orders.filter(function (o) { return o.preParts && o.preParts.length; }).map(function (o) {
@@ -6845,7 +6927,7 @@ SCR.tx = function (vn) {
       (done.length ? '<div class="small muted">ทำแล้ว: ' + esc(done.map(function (o) { return o.name; }).join(', ')) + '</div>' : '') +
       done.filter(function (o) { return !o.stockPending && o.fixable && (has(['account']) || String(o.doneAt).slice(0, 10) === today()); }).map(function (o) { return '<div class="row small" style="border-top:1px dashed var(--line);padding-top:.4rem"><span class="sp"><b>' + esc(o.name) + '</b> · ใช้ ' + esc(o.used.map(function (x) { return x.name + ' ' + fm(x.qty); }).join(', ') || 'ไม่ได้ตัดของ') + (o.fixes.length ? ' · <span class="pill w">แก้ย้อนหลัง ' + o.fixes.length + ' ครั้ง</span>' : '') + '</span><button class="btn sm q" data-a="supFix" data-id="' + esc(o.id) + '">แก้ของที่ใช้ (ตกหล่น)</button></div>'; }).join('') +
       done.filter(function (o) { return o.stockPending; }).map(function (o) { return '<div class="note w row"><span class="sp">' + esc(o.name) + ' · รอบันทึกของที่ใช้</span>' + (S.user.stock ? '<button class="btn sm w" data-a="recSup" data-id="' + esc(o.id) + '">บันทึกของที่ใช้</button>' : '<span class="xs">ให้ผู้ช่วย/พยาบาลบันทึก</span>') + '</div>'; }).join('') + '</div></div>' +
-      '<div class="stack">' + (d.courses && d.courses.length && ['DONE', 'CANCEL'].indexOf(v.stage) < 0 ? '<div class="card stack"><div class="sec"><h3>คอร์สที่คนไข้มีอยู่</h3><span class="xs muted">ใช้ได้เลย ไม่ต้องเรียกเซล</span></div><div class="list">' + d.courses.map(function (c) { return '<div class="li"><div class="qn" style="font-size:.8rem">' + esc(c.left) + '</div><div class="main"><div class="t">' + esc(c.itemName) + (c.choice ? ' · ' + esc(c.choice) : '') + '</div>' + (c.expire ? '<div class="s">หมดอายุ ' + esc(thDate(c.expire)) + '</div>' : '') + '</div><button class="btn sm p" data-a="txUseCourse" data-id="' + esc(c.id) + '" data-n="' + esc(c.itemName) + '">ใช้วันนี้</button></div>'; }).join('') + '</div></div>' : '') +
+      '<div class="stack">' + histCard(d.history, 'ประวัติการรักษาครั้งก่อน', 1, (d.orders || []).map(function (o) { return o.name; })) + (d.courses && d.courses.length && ['DONE', 'CANCEL'].indexOf(v.stage) < 0 ? '<div class="card stack"><div class="sec"><h3>คอร์สที่คนไข้มีอยู่</h3><span class="xs muted">ใช้ได้เลย ไม่ต้องเรียกเซล</span></div><div class="list">' + d.courses.map(function (c) { return '<div class="li"><div class="qn" style="font-size:.8rem">' + esc(c.left) + '</div><div class="main"><div class="t">' + esc(c.itemName) + (c.choice ? ' · ' + esc(c.choice) : '') + '</div>' + (c.expire ? '<div class="s">หมดอายุ ' + esc(thDate(c.expire)) + '</div>' : '') + '</div><button class="btn sm p" data-a="txUseCourse" data-id="' + esc(c.id) + '" data-n="' + esc(c.itemName) + '">ใช้วันนี้</button></div>'; }).join('') + '</div></div>' : '') +
       '<button class="btn lg blk" data-go="pos" data-arg=\'' + esc(JSON.stringify({ hn: p.hn, ret: 1 })) + '\'>' + ic('plus', 20) + ' คนไข้ซื้อเพิ่ม (อัพเซล)</button>' +
       '<button class="btn lg blk" data-a="txPhotos">' + ic('cam', 20) + ' ถ่ายรูปก่อน/หลัง</button>' +
       '<button class="btn g lg blk" data-a="sendBack">ส่งกลับเคาน์เตอร์</button><p class="xs muted">ถ้ายังมีรายการค้างจ่าย หน้าร้านจะเห็นใน “เก็บเงิน” ทันที</p></div></div>';
@@ -6941,6 +7023,32 @@ ACT.numb = function () {
     mount: function (b) { bindSupplies(b, list); b.querySelector('#qm').onclick = function (e) { var x = e.target.closest('[data-m]'); if (x) b.querySelector('#mn').value = x.dataset.m; }; },
     onOk: function (b) { return call('startNumb', { vn: d.visit.vn, minutes: b.querySelector('#mn').value, supplies: list.filter(function (s) { return s.stock; }), pin: pinVal(b) }, { write: true }).then(function () { S.stock = null; toast('เริ่มจับเวลายาชา'); back(); }); } });
 };
+function paramRow(r, m) {
+  r = r || {}; var M = machOf(r.m || m || ''), o = M.o || {};
+  return '<div class="prow card flat" data-m="' + esc(M.m) + '" style="padding:.5rem .6rem"><div class="row" style="gap:.4rem;flex-wrap:wrap;align-items:flex-end"><label class="xs" style="min-width:7.5rem">เครื่อง<select data-k="m">' + MACH.concat([MOTHER]).map(function (x) { return '<option' + (x.m === M.m ? ' selected' : '') + '>' + esc(x.m) + '</option>'; }).join('') + '</select></label>' +
+    M.f.concat(['area']).map(function (k) { var v = String(r[k] || ''), lab = PF[k][0] + (PF[k][1] ? ' (' + PF[k][1] + ')' : '');
+      return '<label class="xs" style="min-width:' + (k === 'area' ? '8rem' : '5rem') + ';flex:' + (k === 'area' ? '2' : '1') + '">' + lab + (o[k] ? '<select data-k="' + k + '"><option></option>' + o[k].map(function (x) { return '<option' + (x === v ? ' selected' : '') + '>' + x + '</option>'; }).join('') + (v && o[k].indexOf(v) < 0 ? '<option selected>' + esc(v) + '</option>' : '') + '</select>' : '<input data-k="' + k + '" value="' + esc(v) + '"' + (k === 'area' ? '' : ' inputmode="decimal"') + '>') + '</label>'; }).join('') +
+    '<button type="button" class="btn q sm" data-rm aria-label="ลบแถว">✕</button></div></div>';
+}
+function paramBox(o) {
+  var ps = o.last && o.last.params || [], gm = machGuess((o.category || '') + ' ' + o.name) || (ps[0] && ps[0].m) || '', show = gm || ps.length;
+  var all = ((S.v.tx && S.v.tx.history) || []).some(function (h) { return (h.done || []).some(function (x) { return x.name === o.name; }); });
+  return '<details id="pbox"' + (show ? ' open' : '') + '><summary class="small b">ค่าเครื่อง / เลเซอร์' + (o.round ? ' · ครั้งที่ ' + esc(o.round) : '') + '</summary><div class="stack" style="gap:.4rem;margin-top:.4rem">' +
+    (o.last ? '<div class="note small">ครั้งก่อน ' + esc(thDate(o.last.date, 1)) + (o.last.round ? ' · ครั้งที่ ' + esc(o.last.round) : '') + (o.last.by ? ' · ' + esc(o.last.by) : '') + paramTable(o.last.params) + (o.last.note ? '<div style="white-space:pre-wrap">' + esc(o.last.note) + '</div>' : '') + '</div>' : '') +
+    (all ? '<details><summary class="xs b">ดูทุกรอบของรายการนี้</summary>' + histByItem(S.v.tx.history.map(function (h) { return { date: h.date, branch: h.branch, done: (h.done || []).filter(function (x) { return x.name === o.name; }) }; })) + '</details>' : '') +
+    '<div id="ptb" class="stack" style="gap:.4rem">' + (show ? paramRow({}, gm) : '') + '</div>' +
+    '<div class="row"><button type="button" class="btn q sm" id="padd">+ เพิ่มแถว</button>' + (ps.length ? '<button type="button" class="btn sm" id="plast">ใช้ค่าครั้งก่อน (แล้วแก้ได้)</button>' : '') + '</div></div></details>';
+}
+function bindParams(b, o) {
+  var tb = b.querySelector('#ptb'); if (!tb) return;
+  var lastM = function () { var s = $$('select[data-k="m"]', tb).pop(); return s ? s.value : (machGuess(o.name) || ''); };
+  b.querySelector('#padd').onclick = function () { tb.insertAdjacentHTML('beforeend', paramRow({}, lastM())); };
+  var pl = b.querySelector('#plast'); if (pl) pl.onclick = function () { tb.innerHTML = o.last.params.map(function (r) { return paramRow(r); }).join(''); };
+  tb.onclick = function (e) { var x = e.target.closest('[data-rm]'); if (x) x.closest('.prow').remove(); };
+  tb.onchange = function (e) { if (e.target.dataset.k !== 'm') return; var row = e.target.closest('.prow'), r = rowVal(row); r.m = e.target.value; row.outerHTML = paramRow(r); };
+}
+function rowVal(row) { var r = {}; $$('[data-k]', row).forEach(function (i) { r[i.dataset.k] = i.value.trim(); }); return r; }
+function readParams(b) { return $$('#ptb .prow', b).map(rowVal).filter(function (r) { return Object.keys(r).some(function (k) { return k !== 'm' && r[k]; }); }); }
 ACT.complete = function (el) {
   var d = S.v.tx, o = d.orders.filter(function (x) { return x.id === el.dataset.id; })[0], perf = o.performer;
   var docs = S.boot.staff.filter(function (s) { return s.roles.indexOf('doctor') >= 0; }), stf = S.boot.staff.filter(function (s) { return s.roles.some(function (r) { return ['nurse', 'assistant', 'therapist'].indexOf(r) >= 0; }); });
@@ -6954,15 +7062,15 @@ ACT.complete = function (el) {
       (o.orTeam ? ['scrub', 'circ'].map(function (k) { return '<div class="stack" style="gap:.35rem"><div class="small b">' + (k === 'scrub' ? 'Scrub nurse' : 'Circulating nurse') + '</div><div class="chips" data-team="' + k + '">' + stf.map(function (s) { return '<button type="button" data-c="' + esc(s.code) + '">' + esc(s.name) + '</button>'; }).join('') + '</div></div>'; }).join('') : '') +
       (S.user.stock ? '<label class="ck"><input type="checkbox" id="lt"' + (later ? ' checked' : '') + '> ให้ผู้ช่วย/พยาบาลบันทึกของที่ใช้ทีหลัง</label>' : '<div class="note small">ของที่ใช้ ผู้ช่วย/พยาบาลจะบันทึกทีหลัง</div>') +
       '<div class="stack" id="supw" style="gap:.4rem"' + (later ? ' hidden' : '') + '><div class="small b">ของที่ใช้จริง (ตัดสต้อกสาขา)</div><div id="sup" class="stack" style="gap:.4rem"></div><button type="button" class="btn q sm" id="addsup">+ เพิ่มของ</button>' +
-      pinField('ผู้เบิกของ: รหัสพนักงาน (ยืนยันว่าใครใช้ของ) *') + '</div><label>Lot / เลขล็อต' + (needLot ? ' (ยา/ฟิลเลอร์ ควรใส่)' : '') + '<input id="lot" placeholder="ว่างไว้ = ใช้ล็อตของขวดที่ตัดอัตโนมัติ"></label><label>Operative note / หมายเหตุ<textarea id="on" placeholder="ตำแหน่ง จำนวนยูนิต/ซีซี ปฏิกิริยา"></textarea></label>',
+      pinField('ผู้เบิกของ: รหัสพนักงาน (ยืนยันว่าใครใช้ของ) *') + '</div><label>Lot / เลขล็อต' + (needLot ? ' (ยา/ฟิลเลอร์ ควรใส่)' : '') + '<input id="lot" placeholder="ว่างไว้ = ใช้ล็อตของขวดที่ตัดอัตโนมัติ"></label>' + paramBox(o) + '<label>Operative note / หมายเหตุ<textarea id="on" placeholder="ตำแหน่ง จำนวนยูนิต/ซีซี ปฏิกิริยา"></textarea></label>',
     mount: function (b) {
-      bindSupplies(b, list);
+      bindSupplies(b, list); bindParams(b, o);
       var lt = b.querySelector('#lt'); if (lt) lt.onchange = function () { later = lt.checked; b.querySelector('#supw').hidden = later; };
       var dc = b.querySelector('#dc'); if (dc) dc.onclick = function (e) { var x = e.target.closest('[data-c]'); if (!x) return; doc = doc === x.dataset.c ? '' : x.dataset.c; $$('#dc button', b).forEach(function (y) { y.classList.toggle('on', y.dataset.c === doc); }); };
       $$('[data-team]', b).forEach(function (g) { g.onclick = function (e) { var x = e.target.closest('[data-c]'); if (x) x.classList.toggle('on'); }; });
       var sc = b.querySelector('#sc'); if (sc) sc.onclick = function (e) { var x = e.target.closest('[data-c]'); if (!x) return; var i = staffs.indexOf(x.dataset.c); if (i >= 0) staffs.splice(i, 1); else staffs.push(x.dataset.c); x.classList.toggle('on', i < 0); };
     },
-    onOk: function (b) { var tm = function (k) { return $$('[data-team="' + k + '"] button.on', b).map(function (x) { return x.dataset.c; }); }; return call('completeOrder', { id: o.id, doctor: doc, staffs: staffs, scrub: tm('scrub'), circ: tm('circ'), stockLater: later, supplies: later ? [] : list.filter(function (s) { return s.stock; }), lot: b.querySelector('#lot').value, opNote: b.querySelector('#on').value, pin: pinVal(b), overReason: ovr(b) }, { write: true }).catch(function (e) { return overHandle(b, e); }).then(function () { S.stock = null; toast('บันทึกแล้ว · ตัดสต้อกแล้ว'); refresh(); }); } });
+    onOk: function (b) { var tm = function (k) { return $$('[data-team="' + k + '"] button.on', b).map(function (x) { return x.dataset.c; }); }; return call('completeOrder', { id: o.id, doctor: doc, staffs: staffs, scrub: tm('scrub'), circ: tm('circ'), stockLater: later, supplies: later ? [] : list.filter(function (s) { return s.stock; }), lot: b.querySelector('#lot').value, opNote: b.querySelector('#on').value, params: readParams(b), pin: pinVal(b), overReason: ovr(b) }, { write: true }).catch(function (e) { return overHandle(b, e); }).then(function () { S.stock = null; toast('บันทึกแล้ว · ตัดสต้อกแล้ว'); refresh(); }); } });
 };
 ACT.recSup = function (el) {
   var o = ((S.v.tx && S.v.tx.orders) || []).concat(S.v.pend || []).filter(function (x) { return x.id === el.dataset.id; })[0]; if (!o) return; var list = (o.bom || []).map(function (b) { return { stock: b.stock, qty: b.qty }; });

@@ -337,6 +337,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:
 @media (prefers-reduced-motion:reduce){.qflash,.qabox.has{animation:none}}
 .bdbar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;justify-content:space-between;background:var(--warn-soft);color:var(--ink);border-top:2px solid var(--warn);padding:.45rem 16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.95rem}
 .note.g{background:var(--good-soft);color:var(--good)}
+.ptab{font-size:.78rem}.ptab th,.ptab td{padding:.3rem .4rem}.ptab input{font-size:.85rem}
 
 /* ===== แอพพนักงานใน LINE ===== */
 .lx{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px calc(96px + env(safe-area-inset-bottom,0px))}
@@ -449,8 +450,8 @@ var SCHEMA = {
   Orders:     [['id','เลขรายการ'],['vn','VN'],['item','รหัส'],['name','รายการ'],['type','ประเภท'],['category','หมวด'],['qty','จำนวน','n'],['price','ราคา/หน่วย','n'],['disc','ส่วนลด','n'],['total','รวม','n'],
                ['paidNet','รับจริง (หลังลดท้ายบิล)','n'],['cashNet','รับเป็นเงินจริง (ไม่รวมวงเงิน)','n'],['upsell','อัพเซล','b'],['seller','ผู้ขาย'],['adminShare','ยอดของแอดมิน (ปิดจากเพจ)','n'],['voidOf','จากบิลที่ยกเลิก'],['adminBy','แอดมินที่ปิด'],['receipt','ใบเสร็จ'],['status','สถานะ'],['courseRef','ใช้คอร์ส'],['promo','โปร'],['choice','ตัวเลือก'],
                ['perVal','มูลค่าต่อครั้ง','n'],['dfPct','DF %','n'],['staffFee','ค่ามือพนักงาน','n'],['feeTotal','ค่ามือรวมรายการนี้ (แทนคูณจำนวน)','n'],['prepFee','ค่ามือตอนเตรียม','n'],['scrub','Scrub'],['circ','Circulating'],['scrubFee','ค่ามือ Scrub','n'],['circFee','ค่ามือ Circulating','n'],['dfFixed','DF บาท/ครั้ง','n'],['doctor','แพทย์ผู้ทำ'],['staffs','พนักงานผู้ทำ'],
-               ['opNote','Operative note'],['free','แถม (ให้ฟรี)','b'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['issueLater','ห้อง OR เบิกทีหลัง','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
-  Courses:    [['id','เลขคอร์ส'],['hn','HN'],['name','ชื่อ'],['src','รหัสที่ซื้อ'],['srcName','ซื้อจาก'],['item','รหัสบริการ'],['itemName','บริการ'],['total','ทั้งหมด','n'],['used','ใช้แล้ว','n'],
+               ['opNote','Operative note'],['params','ค่าเครื่อง/เลเซอร์'],['round','ครั้งที่'],['free','แถม (ให้ฟรี)','b'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['issueLater','ห้อง OR เบิกทีหลัง','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
+  Courses:    [['id','เลขคอร์ส'],['hn','HN'],['name','ชื่อ'],['src','รหัสที่ซื้อ'],['srcName','ซื้อจาก'],['item','รหัสบริการ'],['itemName','บริการ'],['total','ทั้งหมด','n'],['used','ใช้แล้ว','n'],['prior','ทำไปแล้วก่อนยกมา (กระดาษ)','n'],
                ['perVal','ราคาจริงต่อครั้ง','n'],['dfPct','DF %','n'],['dfFixed','DF บาท/ครั้ง','n'],['expire','หมดอายุ'],['status','สถานะ'],['receipt','ใบเสร็จ'],['branch','สาขาที่ซื้อ'],
                ['created','วันที่ซื้อ','t'],['buffet','บุฟเฟต์','b'],['choice','ตัวเลือก'],['legacy','ยกมาจากกระดาษ','b'],['photo','รูปหลักฐาน']],
   Payments:   [['receipt','เลขใบเสร็จ'],['vn','VN'],['hn','HN'],['name','ชื่อ'],['subtotal','ยอดรวม','n'],['discount','ส่วนลดท้ายบิล','n'],['net','สุทธิ','n'],['method','ชำระโดย'],['by','ผู้รับเงิน'],['time','เวลา','t'],['branch','สาขา'],['change','เงินทอน','n'],['wallet','ใช้วงเงินสมาชิก','n'],['ar','ค้างชำระ (ผ่อนกับคลินิก)','n'],['fee','ค่าธรรมเนียมช่องทาง','n'],['emailed','ส่งใบเสร็จทางอีเมล'],
@@ -1174,13 +1175,41 @@ function makeCore(store) {
       patient: cleanPt(pt), courses: cs, spend: spend, open: clean(open), seenDoctor: seenDoctor, appts: appts,
       openOrders: open ? ords.filter(function (o) { return o.vn === open.vn; }).map(clean) : [],
       due: open ? sum(ords.filter(function (o) { return o.vn === open.vn && !o.receipt; }), function (o) { return o.total; }) : 0,
-      history: visits.slice(-20).reverse().map(function (v) {
-        var op = opd.filter(function (o) { return o.vn === v.vn; })[0] || {};
-        return { vn: v.vn, date: v.date, branch: v.branch, doctor: v.doctor, stage: v.stage, dx: op.dx || '', plan: op.plan || '', proc: op.proc || '', signed: op.signed ? String(op.signed).replace(/^\S+\s/, '') + ' · ' + op.signedAt + (op.sigImg ? ' ✍' : '') : '',
-          orders: ords.filter(function (o) { return o.vn === v.vn; }).map(function (o) { return o.name + ' ×' + o.qty; }) };
-      })
+      history: histOf(pt.hn, '', 20)
     };
   };
+  // ประวัติการรักษา (OPD + บันทึกหัตถการ/ค่าที่ใช้ แต่ละรายการ) — ใช้ทั้งหน้าคนไข้และห้องทรีตเมนต์ (แพทย์ดูรอบก่อน เช่น ค่าเลเซอร์)
+  // ครั้งที่เท่าไรของคอร์ส (เช่น 5/12) — นับรายการ "ใช้คอร์ส" ที่ทำแล้วของคอร์สเดียวกัน
+  function roundOf(o) {
+    if (!blank(o.round)) return String(o.round);
+    var ref = String(o.courseRef || ''); if (!ref || ref.indexOf('pre:') === 0) return '';
+    var c = find('Courses', 'id', ref); if (!c || on(c.buffet)) return '';
+    var at = String(o.doneAt || '~'), n = rows('Orders').filter(function (x) { return String(x.courseRef) === ref && x.status === 'DONE' && x.id !== o.id && String(x.doneAt) <= at; }).length + 1;
+    var pr = num(c.prior); return on(c.legacy) && pr > 0 ? (n + pr) + '/' + (num(c.total) + pr) : n + '/' + num(c.total) + (on(c.legacy) ? ' (นับจากที่ยกมา)' : '');
+  }
+  function paramsOf(o) { try { var a = JSON.parse(String(o.params || '[]')); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function cleanParams(a) {
+    var K = ['m', 'lens', 'spot', 'wl', 'pw', 'pd', 'flu', 'en', 'depth', 'fq', 'cnt', 'area'];
+    return (Array.isArray(a) ? a : []).slice(0, 12).map(function (r) { var x = {}; K.forEach(function (k) { var v = txt(r && r[k], 40); if (v) x[k] = v; }); return x; }).filter(function (x) { return K.some(function (k) { return k !== 'm' && x[k]; }); });
+  }
+  // ครั้งก่อนของรายการเดียวกัน (คนไข้คนนี้) — ให้หมอดูค่าเครื่อง/โน้ตก่อนทำ
+  function lastOf(hn, item, exceptVn) {
+    var vs = {}; rows('Visits').forEach(function (v) { if (v.hn === hn && v.vn !== exceptVn) vs[v.vn] = v; });
+    var o = rows('Orders').filter(function (x) { return vs[x.vn] && String(x.item) === String(item) && x.status === 'DONE'; }).sort(function (a, b) { return String(a.doneAt) < String(b.doneAt) ? -1 : 1; }).pop();
+    if (!o) return null;
+    var stf = function (c) { var x = find('Staff', 'code', c); return x ? String(x.nick || x.name) : c; };
+    return { date: vs[o.vn].date, round: roundOf(o), note: String(o.opNote || ''), params: paramsOf(o), lot: String(o.lot || ''), by: [o.doctor ? stf(o.doctor) : ''].concat(String(o.staffs || '').split(' ').filter(String).map(stf)).filter(String).join(', ') };
+  }
+
+  function histOf(hn, exceptVn, n) {
+    var opd = rows('OPD'), ords = rows('Orders'), stf = function (c) { var x = find('Staff', 'code', c); return x ? String(x.nick || x.name) : c; };
+    return rows('Visits').filter(function (v) { return v.hn === hn && v.stage !== 'CANCEL' && v.vn !== exceptVn; }).slice(-(n || 20)).reverse().map(function (v) {
+      var op = opd.filter(function (o) { return o.vn === v.vn; })[0] || {};
+      return { vn: v.vn, date: v.date, branch: v.branch, doctor: v.doctor, stage: v.stage, cc: op.cc || v.cc || '', pi: op.pi || '', pe: op.pe || '', dx: op.dx || '', plan: op.plan || '', proc: op.proc || '', signed: op.signed ? String(op.signed).replace(/^\S+\s/, '') + ' · ' + op.signedAt + (op.sigImg ? ' ✍' : '') : '',
+        orders: ords.filter(function (o) { return o.vn === v.vn; }).map(function (o) { return o.name + ' ×' + o.qty; }),
+        done: ords.filter(function (o) { return o.vn === v.vn && o.status === 'DONE' && (o.opNote || o.lot || o.doctor || o.staffs || o.params || o.courseRef); }).map(function (o) { return { item: String(o.item), name: String(o.name), qty: num(o.qty), round: roundOf(o), params: paramsOf(o), note: String(o.opNote || ''), lot: String(o.lot || ''), by: [o.doctor ? stf(o.doctor) : ''].concat(String(o.staffs || '').split(' ').filter(String).map(stf)).filter(String).join(', '), at: String(o.doneAt || '') }; }) };
+    });
+  }
 
   function everSawDoctor(hn) {
     var since = addDays(today(), -365);
@@ -1195,7 +1224,7 @@ function makeCore(store) {
     var mgr = rows('Staff').filter(function (s) { var h = store.hash('pin:' + String(p.approvePin || '')); return on(s.active) && (String(s.pin) === h || String(s.pin) === String(p.approvePin)) && rolesOf(s).some(function (r) { return ['manager', 'admin', 'owner'].indexOf(r) >= 0; }); })[0];
     if (!mgr) err('รหัสผู้จัดการไม่ถูกต้อง');
     var per = num(p.perVal) || num(priceAt(it, u.branch));
-    var c = add('Courses', { id: nextId('CS', 'seq_CS'), hn: pt.hn, name: pt.name, src: 'LEGACY', srcName: 'ยกมาจากกระดาษ', item: it.code, itemName: it.name, total: left, used: 0,
+    var c = add('Courses', { id: nextId('CS', 'seq_CS'), hn: pt.hn, name: pt.name, src: 'LEGACY', srcName: 'ยกมาจากกระดาษ', item: it.code, itemName: it.name, total: left, used: 0, prior: Math.max(0, Math.round(num(p.prior))),
       perVal: per, dfPct: num(it.dfPct), dfFixed: 0, expire: isDate(p.expire) ? p.expire : '', status: 'ACTIVE', receipt: '', branch: u.branch, created: stamp(), buffet: false, choice: '', legacy: true,
       photo: p.img ? store.savePhoto(pt.hn + '_legacy', p.img) : '' });
     log(u, 'addLegacyCourse', c.id + ' ' + pt.hn + ' ' + it.name + ' ×' + left + ' อนุมัติ ' + mgr.code);
@@ -1395,13 +1424,14 @@ function makeCore(store) {
       c.performer = it ? perfOf(it) : 'doctor';
       c.orTeam = !!it && (num(it.scrubFee) > 0 || num(it.circFee) > 0 || String(setting('surgCategories', 'ผ่าตัด,ศัลยกรรม')).split(/\s*,\s*/).indexOf(String(it.category)) >= 0 && typeOf(it) === 'proc');
       c.bom = (bomM[o.item] || []).map(function (b) { return { stock: b.stock, name: (st[b.stock] || {}).name || b.stock, unit: (st[b.stock] || {}).unit || '', qty: b.qty * num(o.qty) }; });
+      if (o.status === 'PENDING') { c.round = roundOf(o); c.last = lastOf(v.hn, o.item, v.vn); } else { c.round = roundOf(o); c.params = paramsOf(o); }
       c.used = usedOf(o); c.fixable = o.status === 'DONE' && !on(o.stockPending) && String(o.doneAt).slice(0, 10) >= addDays(today(), -num(setting('supplyFixDays', 7)));
       c.fixes = rows('SupplyEdits').filter(function (e) { return e.order === o.id; }).map(clean);
       if (sellsCourse(o)) c.preParts = partsOf(o, v.branch).map(function (x) { return { item: String(x.item), name: String(x.name), qty: num(x.qty), buffet: !!x.buffet, used: preOrders(o, x.item).length, choice: String(x.choice || '') }; });
       return c;
     });
     var crs = rows('Courses').filter(function (c) { return c.hn === v.hn && c.status === 'ACTIVE' && (!c.expire || c.expire >= today()) && (on(c.buffet) || num(c.total) > num(c.used)); }).map(function (c) { return { id: c.id, itemName: c.itemName, choice: c.choice || '', left: on(c.buffet) ? 'บุฟเฟต์' : (num(c.total) - num(c.used)) + '/' + num(c.total), expire: c.expire || '' }; });
-    return { visit: clean(v), patient: cleanPt(pt), opd: clean(op), orders: os, courses: crs, mins: minsSince(v.stageAt), numbMins: v.numbAt ? minsSince(v.numbAt) : 0,
+    return { visit: clean(v), patient: cleanPt(pt), opd: clean(op), orders: os, courses: crs, history: histOf(v.hn, v.vn, 15), mins: minsSince(v.stageAt), numbMins: v.numbAt ? minsSince(v.numbAt) : 0,
       due: sum(os.filter(function (o) { return !o.receipt; }), function (o) { return o.total; }) };
   };
 
@@ -1609,7 +1639,7 @@ function makeCore(store) {
     var over = controlUse(o, need, u.branch, p);
     var who = Object.keys(need).length ? byPin(p, u) : null;
     var lots = issueP(later ? [] : p.supplies, u.branch, need, 'ใช้ในหัตถการ', o.vn + ' ' + o.id, u, who); flagOver(over, o, u.branch, p, who);
-    upd('Orders', o, { stockPending: later && hasBom, status: 'DONE', doctor: doc, staffs: staffs.join(' '), opNote: txt(p.opNote, 2000), lot: txt(p.lot, 120) || lots.join(', '), doneAt: stamp(),
+    upd('Orders', o, { stockPending: later && hasBom, status: 'DONE', doctor: doc, staffs: staffs.join(' '), opNote: txt(p.opNote, 2000), params: (function () { var a = cleanParams(p.params); return a.length ? JSON.stringify(a) : ''; })(), round: roundOf(o), lot: txt(p.lot, 120) || lots.join(', '), doneAt: stamp(),
       dfPct: blank(o.dfPct) || num(o.dfPct) === 0 ? num(it && it.dfPct) : num(o.dfPct), staffFee: blank(o.staffFee) || num(o.staffFee) === 0 ? num(feeOf(it, u.branch).staffFee) : num(o.staffFee), prepFee: it && !blank(feeOf(it, u.branch).prepFee) ? num(feeOf(it, u.branch).prepFee) : '', scrub: scrub.join(' '), circ: circ.join(' '), scrubFee: num(it && it.scrubFee), circFee: num(it && it.circFee) });
     var ff = freeFee(u.branch); if (on(o.free) && ff != null) upd('Orders', o, { staffFee: ff, prepFee: ff });
     ordersOf(o.vn).filter(function (x) { return x.status === 'PENDING' && String(x.choice) === 'ref:' + o.id; }).forEach(function (x) {   // ค่าบริการแพทย์ที่ผูกกับรายการนี้ → ปิดพร้อมกัน ให้แพทย์คนเดียวกัน
