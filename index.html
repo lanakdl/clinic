@@ -7047,6 +7047,7 @@ function paramBox(o) {
   return '<details id="pbox"' + (show ? ' open' : '') + '><summary class="small b">ค่าเครื่อง / เลเซอร์' + (o.round ? ' · ครั้งที่ ' + esc(o.round) : '') + '</summary><div class="stack" style="gap:.4rem;margin-top:.4rem">' +
     (o.last ? '<div class="note small">ครั้งก่อน ' + esc(thDate(o.last.date, 1)) + (o.last.name && o.last.name !== o.name ? ' · ' + esc(String(o.last.name).replace(/^ใช้คอร์ส:\s*/, '')) : '') + (o.last.round ? ' · ครั้งที่ ' + esc(o.last.round) : '') + (o.last.by ? ' · ' + esc(o.last.by) : '') + paramTable(o.last.params) + (o.last.note ? '<div style="white-space:pre-wrap">' + esc(o.last.note) + '</div>' : '') + '</div>' : '') +
     (all ? '<details><summary class="xs b">ดูทุกรอบของรายการนี้</summary>' + histByItem(S.v.tx.history.map(function (h) { return { date: h.date, branch: h.branch, done: (h.done || []).filter(function (x) { return famOf(x.name, x.params) === fam; }) }; })) + '</details>' : '') +
+    (((S.v.tx && S.v.tx.history) || []).some(function (h) { return (h.done || []).length; }) ? '<details><summary class="xs b">ดูบันทึกทั้งหมดของลูกค้า (ทุกรายการ ทุกเครื่อง)</summary>' + histByItem(S.v.tx.history, [o.name]) + '</details>' : '') +
     '<div id="ptb" class="stack" style="gap:.4rem">' + (show ? paramRow({}, gm) : '') + '</div>' +
     '<div class="row"><button type="button" class="btn q sm" id="padd">+ เพิ่มแถว</button>' + (ps.length ? '<button type="button" class="btn sm" id="plast">ใช้ค่าครั้งก่อน (แล้วแก้ได้)</button>' : '') + '</div></div></details>';
 }
