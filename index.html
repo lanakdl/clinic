@@ -5892,14 +5892,19 @@ function paramTable(ps) {
   }).join('');
 }
 // ดูทีละรายการ ทุกรอบเรียงกัน (เช่น Pico แผลเป็น 1/12 … 8/12)
+// รวมรายการเดียวกันแม้ซื้อคนละแบบ (ครั้งเดียว / คอร์ส / โปร) — ใช้เครื่องเป็นหลัก ไม่งั้นใช้ชื่อที่ตัดคำว่าคอร์ส/จำนวนครั้งออก
+function famOf(name, params) {
+  var m = (params && params[0] && params[0].m) || machGuess(name); if (m && m !== 'อื่นๆ') return m;
+  return String(name || '').replace(/^ใช้คอร์ส:\s*/, '').replace(/\(ยังไม่จ่าย\)/, '').replace(/\(.*?\)/g, '').replace(/คอร์ส|โปร(โมชั่น)?|แพ็กเกจ|แพคเกจ/g, '').replace(/\d+\s*(ครั้ง|รอบ|ที|x)/gi, '').replace(/\s+/g, ' ').trim() || String(name || '');
+}
 function histByItem(hs, pri) {
   var g = {}, ord = [];
-  (hs || []).forEach(function (h) { (h.done || []).forEach(function (o) { var k = o.name; if (!g[k]) { g[k] = []; ord.push(k); } g[k].push({ date: h.date, branch: h.branch, o: o }); }); });
+  (hs || []).forEach(function (h) { (h.done || []).forEach(function (o) { var k = famOf(o.name, o.params); if (!g[k]) { g[k] = []; ord.push(k); } g[k].push({ date: h.date, branch: h.branch, o: o }); }); });
   if (!ord.length) return '<div class="empty">ยังไม่มีบันทึกหัตถการ</div>';
-  if (pri && pri.length) ord.sort(function (a, b) { return (pri.indexOf(a) < 0) - (pri.indexOf(b) < 0); });
+  if (pri && pri.length) { pri = pri.map(function (n) { return famOf(n); }); } if (pri && pri.length) ord.sort(function (a, b) { return (pri.indexOf(a) < 0) - (pri.indexOf(b) < 0); });
   return '<div class="stack" style="gap:.45rem">' + ord.map(function (k, i) {
     return '<details class="card flat"' + (i < 1 ? ' open' : '') + '><summary><b>' + esc(k) + '</b> <span class="pill">' + g[k].length + ' รอบ</span>' + (g[k][0].o.round ? ' <span class="pill a">ล่าสุดครั้งที่ ' + esc(g[k][0].o.round) + '</span>' : '') + '</summary><div class="stack" style="gap:.35rem;margin-top:.4rem">' +
-      g[k].map(function (x) { var o = x.o; return '<div class="small" style="border-left:3px solid var(--line,#ddd);padding-left:.55rem"><b>' + esc(thDate(x.date, 1)) + '</b>' + (o.round ? ' · ครั้งที่ ' + esc(o.round) : '') + (o.by ? ' <span class="xs muted">· ' + esc(o.by) + '</span>' : '') + paramTable(o.params) + (o.note ? '<div style="white-space:pre-wrap">' + esc(o.note) + '</div>' : '') + '</div>'; }).join('') + '</div></details>';
+      g[k].map(function (x) { var o = x.o; return '<div class="small" style="border-left:3px solid var(--line,#ddd);padding-left:.55rem"><b>' + esc(thDate(x.date, 1)) + '</b>' + (o.name !== k ? ' · ' + esc(String(o.name).replace(/^ใช้คอร์ส:\s*/, '')) : '') + (o.round ? ' · ครั้งที่ ' + esc(o.round) : '') + (o.by ? ' <span class="xs muted">· ' + esc(o.by) + '</span>' : '') + paramTable(o.params) + (o.note ? '<div style="white-space:pre-wrap">' + esc(o.note) + '</div>' : '') + '</div>'; }).join('') + '</div></details>';
   }).join('') + '</div>';
 }
 // การ์ดประวัติ มีสลับ ตามวันที่ / ตามรายการ
@@ -7030,12 +7035,18 @@ function paramRow(r, m) {
       return '<label class="xs" style="min-width:' + (k === 'area' ? '8rem' : '5rem') + ';flex:' + (k === 'area' ? '2' : '1') + '">' + lab + (o[k] ? '<select data-k="' + k + '"><option></option>' + o[k].map(function (x) { return '<option' + (x === v ? ' selected' : '') + '>' + x + '</option>'; }).join('') + (v && o[k].indexOf(v) < 0 ? '<option selected>' + esc(v) + '</option>' : '') + '</select>' : '<input data-k="' + k + '" value="' + esc(v) + '"' + (k === 'area' ? '' : ' inputmode="decimal"') + '>') + '</label>'; }).join('') +
     '<button type="button" class="btn q sm" data-rm aria-label="ลบแถว">✕</button></div></div>';
 }
+function famLast(o) {
+  var f = famOf(o.name, o.last && o.last.params), hit = null;
+  ((S.v.tx && S.v.tx.history) || []).some(function (h) { return (h.done || []).some(function (x) { if (famOf(x.name, x.params) === f) { hit = { date: h.date, round: x.round, by: x.by, note: x.note, params: x.params, name: x.name }; return true; } }); });
+  if (hit && (!o.last || String(hit.date) >= String(o.last.date))) o.last = hit;
+  return f;
+}
 function paramBox(o) {
-  var ps = o.last && o.last.params || [], gm = machGuess((o.category || '') + ' ' + o.name) || (ps[0] && ps[0].m) || '', show = gm || ps.length;
-  var all = ((S.v.tx && S.v.tx.history) || []).some(function (h) { return (h.done || []).some(function (x) { return x.name === o.name; }); });
+  var fam = famLast(o), ps = o.last && o.last.params || [], gm = machGuess((o.category || '') + ' ' + o.name) || (ps[0] && ps[0].m) || '', show = gm || ps.length;
+  var all = ((S.v.tx && S.v.tx.history) || []).some(function (h) { return (h.done || []).some(function (x) { return famOf(x.name, x.params) === fam; }); });
   return '<details id="pbox"' + (show ? ' open' : '') + '><summary class="small b">ค่าเครื่อง / เลเซอร์' + (o.round ? ' · ครั้งที่ ' + esc(o.round) : '') + '</summary><div class="stack" style="gap:.4rem;margin-top:.4rem">' +
-    (o.last ? '<div class="note small">ครั้งก่อน ' + esc(thDate(o.last.date, 1)) + (o.last.round ? ' · ครั้งที่ ' + esc(o.last.round) : '') + (o.last.by ? ' · ' + esc(o.last.by) : '') + paramTable(o.last.params) + (o.last.note ? '<div style="white-space:pre-wrap">' + esc(o.last.note) + '</div>' : '') + '</div>' : '') +
-    (all ? '<details><summary class="xs b">ดูทุกรอบของรายการนี้</summary>' + histByItem(S.v.tx.history.map(function (h) { return { date: h.date, branch: h.branch, done: (h.done || []).filter(function (x) { return x.name === o.name; }) }; })) + '</details>' : '') +
+    (o.last ? '<div class="note small">ครั้งก่อน ' + esc(thDate(o.last.date, 1)) + (o.last.name && o.last.name !== o.name ? ' · ' + esc(String(o.last.name).replace(/^ใช้คอร์ส:\s*/, '')) : '') + (o.last.round ? ' · ครั้งที่ ' + esc(o.last.round) : '') + (o.last.by ? ' · ' + esc(o.last.by) : '') + paramTable(o.last.params) + (o.last.note ? '<div style="white-space:pre-wrap">' + esc(o.last.note) + '</div>' : '') + '</div>' : '') +
+    (all ? '<details><summary class="xs b">ดูทุกรอบของรายการนี้</summary>' + histByItem(S.v.tx.history.map(function (h) { return { date: h.date, branch: h.branch, done: (h.done || []).filter(function (x) { return famOf(x.name, x.params) === fam; }) }; })) + '</details>' : '') +
     '<div id="ptb" class="stack" style="gap:.4rem">' + (show ? paramRow({}, gm) : '') + '</div>' +
     '<div class="row"><button type="button" class="btn q sm" id="padd">+ เพิ่มแถว</button>' + (ps.length ? '<button type="button" class="btn sm" id="plast">ใช้ค่าครั้งก่อน (แล้วแก้ได้)</button>' : '') + '</div></div></details>';
 }
