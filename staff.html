@@ -450,10 +450,10 @@ var SCHEMA = {
   Orders:     [['id','เลขรายการ'],['vn','VN'],['item','รหัส'],['name','รายการ'],['type','ประเภท'],['category','หมวด'],['qty','จำนวน','n'],['price','ราคา/หน่วย','n'],['disc','ส่วนลด','n'],['total','รวม','n'],
                ['paidNet','รับจริง (หลังลดท้ายบิล)','n'],['cashNet','รับเป็นเงินจริง (ไม่รวมวงเงิน)','n'],['upsell','อัพเซล','b'],['seller','ผู้ขาย'],['adminShare','ยอดของแอดมิน (ปิดจากเพจ)','n'],['voidOf','จากบิลที่ยกเลิก'],['adminBy','แอดมินที่ปิด'],['receipt','ใบเสร็จ'],['status','สถานะ'],['courseRef','ใช้คอร์ส'],['promo','โปร'],['choice','ตัวเลือก'],
                ['perVal','มูลค่าต่อครั้ง','n'],['dfPct','DF %','n'],['staffFee','ค่ามือพนักงาน','n'],['feeTotal','ค่ามือรวมรายการนี้ (แทนคูณจำนวน)','n'],['prepFee','ค่ามือตอนเตรียม','n'],['scrub','Scrub'],['circ','Circulating'],['scrubFee','ค่ามือ Scrub','n'],['circFee','ค่ามือ Circulating','n'],['dfFixed','DF บาท/ครั้ง','n'],['doctor','แพทย์ผู้ทำ'],['staffs','พนักงานผู้ทำ'],
-               ['opNote','Operative note'],['params','ค่าเครื่อง/เลเซอร์'],['round','ครั้งที่'],['free','แถม (ให้ฟรี)','b'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['issueLater','ห้อง OR เบิกทีหลัง','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
+               ['opNote','Operative note'],['params','ค่าเครื่อง/เลเซอร์'],['round','ครั้งที่'],['free','แถม (ให้ฟรี)','b'],['lot','Lot'],['stockPending','รอบันทึกของที่ใช้','b'],['issueLater','ห้อง OR เบิกทีหลัง','b'],['kept','ไม่ทำวันนี้ เก็บไว้ครั้งหน้า','b'],['consent','ใบยินยอม'],['doneAt','เวลาทำ','t'],['time','เวลาสั่ง','t'],['by','ผู้บันทึก']],
   Courses:    [['id','เลขคอร์ส'],['hn','HN'],['name','ชื่อ'],['src','รหัสที่ซื้อ'],['srcName','ซื้อจาก'],['item','รหัสบริการ'],['itemName','บริการ'],['total','ทั้งหมด','n'],['used','ใช้แล้ว','n'],['prior','ทำไปแล้วก่อนยกมา (กระดาษ)','n'],
                ['perVal','ราคาจริงต่อครั้ง','n'],['dfPct','DF %','n'],['dfFixed','DF บาท/ครั้ง','n'],['expire','หมดอายุ'],['status','สถานะ'],['receipt','ใบเสร็จ'],['branch','สาขาที่ซื้อ'],
-               ['created','วันที่ซื้อ','t'],['buffet','บุฟเฟต์','b'],['choice','ตัวเลือก'],['legacy','ยกมาจากกระดาษ','b'],['photo','รูปหลักฐาน']],
+               ['created','วันที่ซื้อ','t'],['buffet','บุฟเฟต์','b'],['choice','ตัวเลือก'],['legacy','ยกมาจากกระดาษ','b'],['photo','รูปหลักฐาน'],['unitQty','หน่วยต่อครั้ง (ยูนิต/ซีซี)','n']],
   Payments:   [['receipt','เลขใบเสร็จ'],['vn','VN'],['hn','HN'],['name','ชื่อ'],['subtotal','ยอดรวม','n'],['discount','ส่วนลดท้ายบิล','n'],['net','สุทธิ','n'],['method','ชำระโดย'],['by','ผู้รับเงิน'],['time','เวลา','t'],['branch','สาขา'],['change','เงินทอน','n'],['wallet','ใช้วงเงินสมาชิก','n'],['ar','ค้างชำระ (ผ่อนกับคลินิก)','n'],['fee','ค่าธรรมเนียมช่องทาง','n'],['emailed','ส่งใบเสร็จทางอีเมล'],
                ['printed','พิมพ์แล้ว (ครั้ง)','n'],['void','ยกเลิกบิล'],['voidReason','เหตุผลขอยกเลิก'],['voidReqBy','ขอยกเลิกโดย'],['voidReqAt','ขอเมื่อ','t'],['voidBy','อนุมัติยกเลิกโดย (บัญชี)'],['voidAt','ยกเลิกเมื่อ','t'],['voidNote','หมายเหตุบัญชี']],
   PayLines:   [['receipt','เลขใบเสร็จ'],['method','ช่องทาง'],['amount','จำนวนเงิน','n'],['fee','ค่าธรรมเนียม','n'],['ref','เลขอ้างอิง'],['branch','สาขา'],['time','เวลา','t'],['by','ผู้รับเงิน']],
@@ -604,7 +604,7 @@ function makeCore(store) {
     dayBook: ALL, slots: FRONTISH.concat(['adminpage', 'sales']), apptCreate: FRONTISH.concat(['sales']), apptCancel: FRONTISH.concat(['sales']), apptMove: FRONTISH.concat(['sales']), apptArrive: FRONTISH.concat(['sales']), apptNoShow: FRONTISH.concat(['sales']),
     createVisit: FRONTISH.concat(['sales']), queue: ALL, cancelVisit: FRONTISH,
     callDoctor: ['doctor'], saveOPD: CLIN, opdSig: ALL, startNumb: CLIN, claim: CLIN, moveRoom: CLIN, completeOrder: CLIN, sendBack: CLIN, visitDetail: ALL,
-    saleCommit: SELLERS, useCourse: SELLERS, removeOrder: FRONTISH.concat(['doctor']), dueList: FRONTISH.concat(['account', 'sales']), bill: FRONTISH.concat(['account', 'sales']), pay: FRONTISH.concat(['sales']),
+    saleCommit: SELLERS, useCourse: SELLERS, orderKeep: SELLERS, removeOrder: FRONTISH.concat(['doctor']), dueList: FRONTISH.concat(['account', 'sales']), bill: FRONTISH.concat(['account', 'sales']), pay: FRONTISH.concat(['sales']),
     reviewConsent: CLIN.concat(FRONTISH),
     leadCreate: ['adminpage', 'front', 'manager'], leadList: ['adminpage', 'front', 'manager', 'marketing'], ads: ALL,
     exportAudience: ['account', 'marketing'], exportConversions: ['account', 'marketing'],
@@ -615,7 +615,7 @@ function makeCore(store) {
   };
   var STOCK_ACTIONS = ['roomIssue', 'stockWaste', 'vialOpen', 'vialDiscard', 'reqCreate', 'reqReceive', 'countSubmit', 'countSheet', 'countAddItem', 'recordSupplies', 'reqSuggest', 'branchReceive'];
   var WRITES = { registerPatient: 1, patientConsent: 1, setPhoto: 1, addLegacyCourse: 1, apptCreate: 1, apptCancel: 1, apptMove: 1, apptArrive: 1, apptNoShow: 1, createVisit: 1, cancelVisit: 1,
-    callDoctor: 1, saveOPD: 1, startNumb: 1, claim: 1, moveRoom: 1, completeOrder: 1, sendBack: 1, saleCommit: 1, useCourse: 1, removeOrder: 1, pay: 1, reviewConsent: 1,
+    callDoctor: 1, saveOPD: 1, startNumb: 1, claim: 1, moveRoom: 1, completeOrder: 1, sendBack: 1, saleCommit: 1, useCourse: 1, orderKeep: 1, removeOrder: 1, pay: 1, reviewConsent: 1,
     leadCreate: 1, clock: 1, feeConfirm: 1, feeReopen: 1, feeEdit: 1, reqCreate: 1, reqApprove: 1, reqReceive: 1, centralReceive: 1, countSubmit: 1, countAddItem: 1 };
 
   /* ---------- LINE OA (พนักงานเช็คอิน/ดูค่ามือของตัวเอง ผ่าน LIFF) ---------- */
@@ -1817,7 +1817,9 @@ function makeCore(store) {
       var sp = {};
       if (stf) { if (l.perk) { if (!on(it.staffFree)) err(it.name + ' ไม่อยู่ในรายการสวัสดิการทำฟรี'); sp = { price: 0, name: String(it.name) + ' (สวัสดิการพนักงาน ' + per + ' · ' + staffNick(stf) + ')' }; }
         else if (!blank(it.staffPrice)) sp = { price: num(it.staffPrice), name: String(it.name) + ' (ราคาพนักงาน · ' + staffNick(stf) + ')' }; }
-      var ao = addOrder(v, it, l.qty, u, { disc: l.free ? 1e12 : l.disc, upsell: l.upsell || fromRoom, seller: p.seller, choice: l.choice, free: !!l.free, later: !!l.later, price: sp.price, name: sp.name });
+      var keep = !!l.keep && typeOf(it) === 'proc' && !(stf && l.perk);
+      var ao = addOrder(v, it, l.qty, u, { disc: l.free ? 1e12 : l.disc, upsell: l.upsell || fromRoom, seller: p.seller, choice: l.choice, free: !!l.free, later: !!l.later, price: sp.price, name: keep ? keptName(sp.name || it.name) : sp.name, type: keep ? 'course' : undefined, forceStatus: keep ? '-' : undefined });
+      if (keep) upd('Orders', ao, { kept: true });
       if (stf && l.perk) { add('StaffPerks', { id: nextId('SP', 'seq_SP', 5), staff: String(stf.code), period: per, item: String(it.code), name: String(it.name), order: ao.id, vn: v.vn, branch: u.branch, at: stamp(), by: u.name, status: 'USED' }); usedPerk = true; }
       if (isMJ(it.name) && typeOf(it) === 'proc' && /ปากกาลูกค้า|ปากกาของลูกค้า|ฝากปากกา/.test(String(it.name))) addMjFee(v, ao, u);   // ฉีดจากปากกาที่ลูกค้าซื้อเหมาไว้ (เข็มเดี่ยวที่แบ่งขาย = DF % ปกติ ไม่เก็บ 50)
       return ao;
@@ -1846,7 +1848,7 @@ function makeCore(store) {
     }
     var used = num(c.used) + 1;
     upd('Courses', c, { used: used, status: !buffet && used >= num(c.total) ? 'USED' : 'ACTIVE' });
-    var o = addOrder(v, it, 1, u, { price: 0, name: 'ใช้คอร์ส: ' + c.itemName + (c.choice ? ' (' + c.choice + ')' : ''), type: 'redeem', courseRef: c.id, perVal: num(c.perVal), dfPct: num(c.dfPct), dfFixed: num(c.dfFixed), seller: '-', forceStatus: 'PENDING' });
+    var o = addOrder(v, it, num(c.unitQty) || 1, u, { price: 0, name: 'ใช้คอร์ส: ' + c.itemName + (c.choice ? ' (' + c.choice + ')' : ''), type: 'redeem', courseRef: c.id, perVal: num(c.perVal), dfPct: num(c.dfPct), dfFixed: num(c.dfFixed), seller: '-', forceStatus: 'PENDING' });
     if (isMJ(c.itemName) || isMJ(it.name)) addMjFee(v, o, u);
     return { vn: v.vn, queue: v.queue, queued: queued, left: buffet ? 'ไม่จำกัด' : num(c.total) - used, order: clean(o) };
   }
@@ -1869,6 +1871,31 @@ function makeCore(store) {
     return no;
   }
 
+  function fmQ(n) { return String(Math.round(num(n) * 100) / 100); }
+  function keptName(n) { return String(n).replace(/ \(ไม่ทำวันนี้.*\)$/, '') + ' (ไม่ทำวันนี้ · เก็บไว้ครั้งหน้า)'; }
+  // ซื้อแล้วแต่ไม่ทำวันนี้ → เก็บเป็นคอร์ส 1 ครั้ง (ใช้ครั้งหน้าจาก "คอร์สที่คนไข้มีอยู่") · undo ได้ถ้ายังไม่ได้ใช้
+  A.orderKeep = function (p, u) {
+    var o = find('Orders', 'id', txt(p.id)); if (!o) err('ไม่พบรายการ'); var v = visitOf(o.vn, u), it = itemByCode(o.item);
+    if (p.undo) {
+      if (!on(o.kept)) err('รายการนี้ไม่ได้เก็บไว้');
+      if (o.receipt) { var cs = rows('Courses').filter(function (c) { return String(c.src) === 'KEEP:' + o.id && c.status !== 'VOID'; });
+        if (cs.some(function (c) { return num(c.used) > 0; })) err('ใช้คอร์สที่เก็บไว้ไปแล้ว — เอากลับไม่ได้');
+        cs.forEach(function (c) { upd('Courses', c, { status: 'VOID' }); }); }
+      upd('Orders', o, { kept: false, type: typeOf(it || {}), status: 'PENDING', name: String(o.name).replace(/ \(ไม่ทำวันนี้.*\)$/, '') });
+      log(u, 'orderKeepUndo', o.vn + ' ' + o.name); return { ok: true };
+    }
+    if (o.status !== 'PENDING') err(o.status === 'DONE' ? 'ทำไปแล้ว' : 'รายการนี้ไม่ใช่หัตถการที่รอทำ');
+    if (o.courseRef) err('รายการนี้ใช้จากคอร์สอยู่แล้ว — ถ้าไม่ทำวันนี้ให้กดลบ (ครั้งที่ใช้จะคืนเข้าคอร์ส)');
+    if (typeOf(it || {}) !== 'proc') err('เก็บไว้ได้เฉพาะหัตถการ');
+    var nm = keptName(o.name);
+    if (!o.receipt) { upd('Orders', o, { kept: true, type: 'course', status: '-', name: nm }); log(u, 'orderKeep', o.vn + ' ' + o.name); return { ok: true, paid: false }; }
+    // จ่ายแล้ว → เปิดคอร์สให้ทันที
+    var un = it && String(it.unit || ''), qty = un ? 1 : Math.max(1, Math.round(num(o.qty)));
+    var c = add('Courses', { id: nextId('CS', 'seq_CS'), hn: v.hn, name: v.name, src: 'KEEP:' + o.id, srcName: String(o.name) + ' (ซื้อ ' + o.vn + ' ไม่ได้ทำ)', item: String(o.item), itemName: String((it && it.name) || o.name) + (un ? ' ' + fmQ(num(o.qty)) + ' ' + un : ''), total: qty, used: 0,
+      perVal: r2(num(o.paidNet) / qty), dfPct: num(o.dfPct), dfFixed: num(o.dfFixed), expire: num(it && it.validDays) ? addDays(today(), num(it.validDays)) : '', status: 'ACTIVE', receipt: o.receipt, branch: u.branch, created: stamp(), buffet: false, choice: o.choice || '', legacy: false, photo: '', unitQty: un ? num(o.qty) : '' });
+    upd('Orders', o, { kept: true, status: '-', name: nm });
+    log(u, 'orderKeep', o.vn + ' ' + o.name + ' → ' + c.id); return { ok: true, paid: true, course: c.id };
+  };
   A.removeOrder = function (p, u) {
     var o = find('Orders', 'id', p.id); if (!o) err('ไม่พบรายการ');
     var v = visitOf(o.vn, u);
@@ -1916,6 +1943,7 @@ function makeCore(store) {
       var ci = rows('CourseItems').filter(function (c) { return String(c.course) === String(o.item); });
       if (ci.length) ci.forEach(function (c) { var cit = itemByCode(c.item); parts.push({ item: String(c.item), name: c.itemName || (cit && cit.name) || c.item, qty: num(c.sessions) * num(o.qty),
         weight: num(priceAt(cit || {}, br)) * num(c.sessions), dfPct: cit ? num(cit.dfPct) : 0, buffet: false, dfFixed: 0, choice: '' }); });
+      else if (on(o.kept)) { var un = it && String(it.unit || ''); parts.push({ item: String(o.item), name: String((it && it.name) || o.name) + (un ? ' ' + fmQ(num(o.qty)) + ' ' + un : ''), qty: un ? 1 : Math.max(1, Math.round(num(o.qty))), unitQty: un ? num(o.qty) : 0, weight: 1, dfPct: num(it && it.dfPct), buffet: false, dfFixed: 0, choice: o.choice || '' }); }
       else parts.push({ item: String(o.item), name: String(o.name), qty: (num(it && it.sessions) || 1) * num(o.qty), weight: 1, dfPct: num(it && it.dfPct), buffet: typeOf(it || {}) === 'buffet', dfFixed: 0, choice: o.choice || '' });
     }
     return parts;
@@ -1932,7 +1960,7 @@ function makeCore(store) {
     parts.forEach(function (x, i) {
       var alloc = i === parts.length - 1 ? r2(net - acc) : r2(net * (x.weight || 1) / wsum); acc = r2(acc + alloc);
       var c = add('Courses', { id: nextId('CS', 'seq_CS'), hn: v.hn, name: v.name, src: o.promo || o.item, srcName: o.name, item: x.item, itemName: x.name, total: x.buffet ? 9999 : x.qty, used: 0,
-        perVal: x.buffet ? 0 : r2(alloc / Math.max(1, x.qty)), dfPct: x.dfPct, dfFixed: x.dfFixed, expire: exp, status: 'ACTIVE', receipt: rc, branch: u.branch, created: stamp(), buffet: x.buffet, choice: x.choice, legacy: false, photo: '' });
+        perVal: x.buffet ? 0 : r2(alloc / Math.max(1, x.qty)), dfPct: x.dfPct, dfFixed: x.dfFixed, expire: exp, status: 'ACTIVE', receipt: rc, branch: u.branch, created: stamp(), buffet: x.buffet, choice: x.choice, legacy: false, photo: '', unitQty: num(x.unitQty) || '' });
       var pre = preOrders(o, x.item);   // ทำไปแล้วก่อนจ่าย → ผูกเข้าคอร์สที่เพิ่งเปิด และนับเป็นครั้งที่ใช้
       if (pre.length) { pre.forEach(function (po) { upd('Orders', po, { courseRef: c.id, perVal: num(c.perVal), name: String(po.name).replace(' (ยังไม่จ่าย)', '') }); });
         var u2 = Math.min(num(c.total), pre.length); upd('Courses', c, { used: u2, status: !x.buffet && u2 >= num(c.total) ? 'USED' : 'ACTIVE' }); }
